@@ -38,42 +38,66 @@ if (process.env.NODE_ENV === 'development') {
     /(DutchExchange|DutchExchangeProxy|EtherToken|TokenFRT|TokenOWL|TokenOWLProxy)\.json$/,
   )
 } else {
+  // only diff here = TokenGNO
   req = require.context(
     '@gnosis.pm/dx-contracts/build/contracts/',
     false,
-    /(DutchExchange|DutchExchangeProxy|TokenFRT|EtherToken|TokenGNO|TokenOWL|TokenOWLProxy)\.json$/,
+    /(DutchExchange|DutchExchangeProxy|EtherToken|TokenFRT|TokenOWL|TokenOWLProxy|TokenGNO)\.json$/,
   )
 }
 
-// Wrap and deploy HumanFriendlyToken to interface with any Token contract addresses called
-export const HumanFriendlyToken = TruffleContract(require('@gnosis.pm/util-contracts/build/contracts/HumanFriendlyToken.json'))
-
-const reqKeys = req.keys()
 /**
- * contractArtifacts
- * Array of imported contract artifacts (jsons) from build/contracts
- * @type ["./OWLAirdrop.json", "./TokenGNO.json", "./TokenOWL.json", "./TokenOWLProxy.json"]
+ * reqKeys
+ * @type { string }
+ * e.g 'DutchExchange', 'MyCoolContract'
+ */
+const reqKeys = req.keys()
+
+/**
+ * contractArtifacts aka ContractJSONS
+ * Array of imported contract artifacts (JSONs) from build/contracts
+ * @type { JSON[] } - ContractJSONs
+ *
+ * e.g:
+ *
+ * [
+ *  {
+      "contractName": "CoolAppDependencies",
+      "abi": [],
+      ...
+      "networks": {},
+      "schemaVersion": "2.0.0",
+      "updatedAt": "2018-12-10T15:39:53.946Z"
+    },
+    ...
+ * ]
  */
 const contractArtifacts = contracts.map((c) => {
+  // Do we need to replace contractJSONS if we're on a different ENV?
+  // then below is done
   if (process.env.NODE_ENV === 'production') {
-    if (c === 'EtherToken') return require('@gnosis.pm/util-contracts/build/contracts/EtherToken.json')
-    if (c === 'TokenGNO') return require('@gnosis.pm/gno-token/build/contracts/TokenGNO.json')
-    if (c === 'TokenOWLProxy') return require('@gnosis.pm/owl-token/build/contracts/TokenOWLProxy.json')
-    if (c === 'TokenOWL') return require('@gnosis.pm/owl-token/build/contracts/TokenOWL.json')
+    if (c === 'EtherToken')     return require('@gnosis.pm/util-contracts/build/contracts/EtherToken.json')
+    if (c === 'TokenGNO')       return require('@gnosis.pm/gno-token/build/contracts/TokenGNO.json')
+    if (c === 'TokenOWLProxy')  return require('@gnosis.pm/owl-token/build/contracts/TokenOWLProxy.json')
+    if (c === 'TokenOWL')       return require('@gnosis.pm/owl-token/build/contracts/TokenOWL.json')
   }
   return req(reqKeys.find(key => key === `./${c}.json`))
 })
 
+// We keep a JSON file of addresses of deployed contracts for specific environments
+// e.g Development SuperCoolContract may be different from Production SuperCoolContract
 // inject network addresses
-const networksUtils = require('@gnosis.pm/util-contracts/networks.json'),
-  networksGNO = require('@gnosis.pm/gno-token/networks.json'),
-  networksOWL = require('@gnosis.pm/owl-token/networks.json'),
-  networksDX = require('@gnosis.pm/dx-contracts/networks.json')
+const
+  networksDX      = require('@gnosis.pm/dx-contracts/networks.json'),
+  networksUtils   = require('@gnosis.pm/util-contracts/networks.json'),
+  networksGNO     = require('@gnosis.pm/gno-token/networks.json'),
+  networksOWL     = require('@gnosis.pm/owl-token/networks.json')
 
+// Loop through each IDX of contractArtifacts
+// and re-assign network object (from above) to each contract JSON
 for (const contrArt of contractArtifacts) {
   const { contractName } = contrArt
-  // assign networks from the file, overriding from /build/contracts with same network id
-  // but keeping local network ids
+  // assigns networks but keeps local network ids (ganache)
   Object.assign(
     contrArt.networks,
     networksUtils[contractName],
@@ -110,22 +134,30 @@ if (process.env.NODE_ENV === 'development') {
 */
 const TruffleWrappedContractArtifacts = contractArtifacts.map(contractArtifact => TruffleContract(contractArtifact))
 
+// Wrap and deploy HumanFriendlyToken to interface with any Token contract addresses called
+export const HumanFriendlyToken = TruffleContract(require('@gnosis.pm/util-contracts/build/contracts/HumanFriendlyToken.json'))
+
 /**
  * setContractProvider
  * Sets provider for each contract - provider is created in api/ProviderWeb3
  * @param string provider
  */
-const setContractProvider = provider => TruffleWrappedContractArtifacts.concat(HumanFriendlyToken).forEach((c) => { c.setProvider(provider) })
+const setContractProvider =
+  provider =>
+    TruffleWrappedContractArtifacts
+      .concat(HumanFriendlyToken)
+      .forEach((c) => { c.setProvider(provider) })
 
 /**
  * getPromisedInstances: () => Promise<ContractCode[]>
- * Deploys each contract in TruffleWrappedContracts array
+ * STARTS deployment of each contract in TruffleWrappedContracts array
+ *
  * @returns Promise<Deployed_Contracts[]>
  */
 const getPromisedInstances = () => Promise.all(TruffleWrappedContractArtifacts.map(c => c.deployed()))
 
 /**
- * initAppContracts = async () => {
+ * getAppContracts = async () => {
  * getContracts
  * @returns
    { Object
@@ -137,8 +169,11 @@ const getPromisedInstances = () => Promise.all(TruffleWrappedContractArtifacts.m
     }
    }
  */
-export const getAppContracts = async () => {
-  if (appContracts) return appContracts
+export const getAppContracts = async (force) => {
+  // Singleton logic - if contractsAPI already initialised, don't re-init
+  // However, accepts a force param - to re-init anyways
+  // useful for walletProvider changes etc
+  if (appContracts && !force) return appContracts
 
   appContracts = await init()
   return appContracts
@@ -146,10 +181,11 @@ export const getAppContracts = async () => {
 
 /**
  * init()
- * Initiates all contracts
+ * Initiates all contracts and return API
  * @returns { Object { dx: depCon, eth: depCon, frt: depCon, hft: depCon, owl: depCon, }
  */
 async function init() {
+  // get initialised Web3API to set inside contracts
   const { currentProvider } = await getWeb3API()
 
   // set Provider for each TC wrapped ContractABI
@@ -164,6 +200,7 @@ async function init() {
    */
   let deployedContracts
   try {
+    // Resolves earlier started contracts promise
     deployedContracts = await getPromisedInstances()
   } catch (error) {
     // in browser display an error
@@ -179,12 +216,21 @@ async function init() {
     acc[shortContractNames[contracts[index]]] = contract
     return acc
   }, {})
+  console.debug('​dxContractsAPI', dxContractsAPI)
+
+  const undeployedDXContractsAPI = TruffleWrappedContractArtifacts.reduce((acc, contract, index) => {
+    acc[shortContractNames[contracts[index]]] = contract
+    return acc
+  }, {})
+  console.debug('undeployedDXContractsAPI', undeployedDXContractsAPI)
 
   const { address: proxyAddress } = dxContractsAPI.dxProxy
   const { address: owlProxyAddress } = dxContractsAPI.owlProxy
 
-  dxContractsAPI.dx = TruffleWrappedContractArtifacts[0].at(proxyAddress)
-  dxContractsAPI.owl = TruffleWrappedContractArtifacts[4].at(owlProxyAddress)
+  dxContractsAPI.dx = undeployedDXContractsAPI.dx.at(proxyAddress)
+  dxContractsAPI.owl = undeployedDXContractsAPI.owl.at(owlProxyAddress)
+  // dxContractsAPI.dx = TruffleWrappedContractArtifacts[0].at(proxyAddress)
+  // dxContractsAPI.owl = TruffleWrappedContractArtifacts[4].at(owlProxyAddress)
   dxContractsAPI.hft = HumanFriendlyToken
 
   delete dxContractsAPI.dxProxy
