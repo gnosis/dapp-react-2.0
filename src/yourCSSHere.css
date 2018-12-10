@@ -1,0 +1,44 @@
+body {
+    background: rgb(209, 209, 209);
+}
+
+form {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 20px 0;
+    max-width: 500px;
+    background: #b7b6b5;
+}
+
+input[type="text"] {
+    min-width: 250px;
+}
+
+.providerChoice {
+    display: inline-block;
+    cursor: pointer;
+    padding: 5px;
+    transition: all 0.5s ease-in-out;
+}
+
+.providerChoice:hover {
+    background: white;
+}
+
+#apiContainer {
+    display: flex;
+    flex-flow: column;
+}
+
+#apiContainer form > h4 {
+    background-color: lightblue;
+    margin-left: 10px;
+}
+
+#apiContainer button {
+    margin: 10px auto;
+    padding: 5px;
+    width: 50%;
+}

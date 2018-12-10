@@ -1,0 +1,7 @@
+build
+test
+contracts-legacy
+contracts
+.*
+node_modules
+src/vendor
