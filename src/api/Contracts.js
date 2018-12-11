@@ -157,6 +157,19 @@ const setContractProvider =
 const getPromisedInstances = () => Promise.all(TruffleWrappedContractArtifacts.map(c => c.deployed()))
 
 /**
+   * @name contractArrayToMap
+   * @param { JSON[] } contractArr - ContractJSON[] - Array of contract JSONs to reduce over
+   * @param { { [string]: string } } shortContractNamesMap - { [string]: string } - Mapping of names to assign as keys
+   *
+   * Map/reduce deployedContractsArray items to short name contract OBJECT
+   * e.g [deployedContractCodeETH, deployedContractCodeGNO, ... ] = { 'eth': deployedContractCodeETH }
+   */
+const contractArrayToMap = (contractArr, shortContractNamesMap = shortContractNames) => contractArr.reduce((acc, contract, index) => {
+  acc[shortContractNamesMap[contracts[index]]] = contract
+  return acc
+}, {})
+
+/**
  * getAppContracts = async () => {
  * getContracts
  * @returns
@@ -191,17 +204,17 @@ async function init() {
   // set Provider for each TC wrapped ContractABI
   setContractProvider(currentProvider)
 
-  /* AT THIS POINT: all contracts have their provider */
+  /* !!!AT THIS POINT: all contracts have their provider!!! */
 
-  // get back all deployed, provider ready
-  // instances of contracts
   /**
-   * @returns {Array} [ deployedContract1, deployedContract2, ... ]
+   * @name deployedContractsArray
+   * Get back all DEPLOYED, provider ready instances of CONTRACTS
+   * @type { JSON[] } [ deployedContract1, deployedContract2, ... ]
    */
-  let deployedContracts
+  let deployedContractsArray
   try {
     // Resolves earlier started contracts promise
-    deployedContracts = await getPromisedInstances()
+    deployedContractsArray = await getPromisedInstances()
   } catch (error) {
     // in browser display an error
     // in prebuild react render don't do anything
@@ -209,38 +222,24 @@ async function init() {
     return {}
   }
 
-  // Attach deployedContract instance as VALUE of
-  // short name contract
-  // e.g { 'eth': deployedContractCode }
-  const dxContractsAPI = deployedContracts.reduce((acc, contract, index) => {
-    acc[shortContractNames[contracts[index]]] = contract
-    return acc
-  }, {})
-  console.debug('​dxContractsAPI', dxContractsAPI)
+  const deployedContractsMap = contractArrayToMap(deployedContractsArray)
+  const undeployedContractsMap = contractArrayToMap(TruffleWrappedContractArtifacts)
 
-  const undeployedDXContractsAPI = TruffleWrappedContractArtifacts.reduce((acc, contract, index) => {
-    acc[shortContractNames[contracts[index]]] = contract
-    return acc
-  }, {})
-  console.debug('undeployedDXContractsAPI', undeployedDXContractsAPI)
+  const { address: proxyAddress } = deployedContractsMap.dxProxy
+  const { address: owlProxyAddress } = deployedContractsMap.owlProxy
 
-  const { address: proxyAddress } = dxContractsAPI.dxProxy
-  const { address: owlProxyAddress } = dxContractsAPI.owlProxy
+  deployedContractsMap.dx = undeployedContractsMap.dx.at(proxyAddress)
+  deployedContractsMap.owl = undeployedContractsMap.owl.at(owlProxyAddress)
+  deployedContractsMap.hft = HumanFriendlyToken
 
-  dxContractsAPI.dx = undeployedDXContractsAPI.dx.at(proxyAddress)
-  dxContractsAPI.owl = undeployedDXContractsAPI.owl.at(owlProxyAddress)
-  // dxContractsAPI.dx = TruffleWrappedContractArtifacts[0].at(proxyAddress)
-  // dxContractsAPI.owl = TruffleWrappedContractArtifacts[4].at(owlProxyAddress)
-  dxContractsAPI.hft = HumanFriendlyToken
-
-  delete dxContractsAPI.dxProxy
-  delete dxContractsAPI.owlProxy
+  delete deployedContractsMap.dxProxy
+  delete deployedContractsMap.owlProxy
 
   if (process.env.NODE_ENV === 'development') {
     // make it available globally
-    window.React_DX_DAPP_CONTRACTS = dxContractsAPI
+    window.React_DAPP_CONTRACTS = deployedContractsMap
   }
 
-  console.log('​dxContractsAPI', dxContractsAPI)
-  return dxContractsAPI
+  console.log('​deployedContractsMap', deployedContractsMap)
+  return deployedContractsMap
 }
