@@ -2,17 +2,14 @@ import React from 'react'
 import { connect } from '../StateProvider'
 
 function parseArrays(...args) {
-  console.log('TCL: parseArrays -> ...args', ...args)
   const toReturn = args.map((arg) => {
     if (/^\s*\[.+\]\s*$/.test(arg)) return JSON.parse(arg)
     return arg
   })
-  console.log('toReturn ', toReturn)
   return toReturn
 }
 
 function checkArgs(argsToCheck) {
-  // console.log('TEST', argsToCheck[0].split(','))
   if (!argsToCheck) return
 
   // check if param passed in is array
@@ -41,7 +38,7 @@ const Home = ({ account, balance: userBalance, dx, network, tokens, tokenFRT, to
 
     <h3>DutchX Token Balances:</h3>
     <ol>
-      {Object.keys(tokens).length && Object.keys(tokens).map(tokenAddr =>
+      {tokens && Object.keys(tokens).length && Object.keys(tokens).map(tokenAddr =>
         <li key={tokenAddr}>Symbol: {tokens[tokenAddr].symbol} \\ Balance: {tokens[tokenAddr].balance}</li>)}
     </ol>
     {tokenFRT && <h3>FRT Token Address: <a target="_blank" rel="noopener noreferrer" href={`https://${network === 'RINKEBY' ? 'rinkeby.' : ''}etherscan.io/token/${tokenFRT.address}`}>{tokenFRT.address}</a></h3>}

@@ -1,6 +1,3 @@
-body {
-    background: rgb(209, 209, 209);
-}
 
 form {
     display: flex;
@@ -41,4 +38,22 @@ input[type="text"] {
     margin: 10px auto;
     padding: 5px;
     width: 50%;
+}
+
+.displayBanner {
+    position: relative;
+    display: flex;
+    justify-content: center; align-items: center;
+    margin: 5px; padding: 8px;
+    top: 0; left: 0; right: 0;
+
+    background: beige;
+}
+
+.loadingHOC {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    height: 100vh; width: 100vw;
 }

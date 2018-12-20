@@ -1,7 +1,7 @@
 import React from 'react'
-import { getAccount, getNetwork, getBalance } from '../api/providers'
 import { getTokensAPI } from '../api/Tokens'
 import { getDutchXAPI } from '../api/DutchX'
+import { getWeb3API } from '../api/ProviderWeb3'
 
 const defaultState = {
   USER: {
@@ -126,12 +126,14 @@ class AppProvider extends React.Component {
       }))
 
   // USER STATE DISPATCHERS
-  grabUserState = async (provider) => {
-    const [account, network] = await Promise.all([
-      getAccount(provider),
-      getNetwork(provider),
+  grabUserState = async () => {
+    const { getCurrentAccount, getNetwork, getCurrentBalance } = await getWeb3API()
+    const [account, balance, network] = await Promise.all([
+      getCurrentAccount(),
+      getCurrentBalance(),
+      getNetwork(),
     ])
-    const balance = await getBalance(provider, account)
+
     return this.setState(prevState =>
       ({
         ...prevState,
@@ -149,14 +151,6 @@ class AppProvider extends React.Component {
   render() {
     return (
       <Provider value={memoizedContextValue(this)}>
-        {/*
-          * Printing state - runs into circular JSON stringify errors
-          process.env.NODE_ENV === 'development' && (
-            <pre style={{ position: 'fixed', bottom: 0, left: 0, zIndex: 99, backgroundColor: '#e0e0ecc9' }}>
-              {JSON.stringify(this.state, null, 2)}
-            </pre>
-          )
-         */}
         {this.props.children}
       </Provider>
     )

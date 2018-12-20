@@ -1,13 +1,13 @@
 import Web3 from 'web3'
-import { networkById, ETHEREUM_NETWORKS } from '../../globals' 
+import { networkById } from '../../globals'
 
-export const getAccount = async provider => {
+export const getAccount = async (provider) => {
   const [account] = await provider.web3.eth.getAccounts()
 
   return account
 }
 
-export const getNetwork = async provider => {
+export const getNetwork = async (provider) => {
   const networkId = await provider.web3.eth.net.getId()
 
   return networkById[networkId] || 'Unknown - Maybe localhost?'
@@ -56,8 +56,8 @@ const Providers = {
     },
 
     checkAvailability() {
-      if (this.web3) return this.walletAvailable = true
-      return this.walletAvailable = typeof window.web3 !== 'undefined' && window.web3.currentProvider.constructor
+      if (this.web3) this.walletAvailable = true
+      else this.walletAvailable = typeof window.web3 !== 'undefined' && window.web3.currentProvider.constructor
     },
 
     initialize() {

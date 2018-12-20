@@ -76,6 +76,9 @@
       "import/prefer-default-export": 0,
       "no-underscore-dangle": 0,
       "no-multi-spaces": 0,
+      "quotes": 0,
+      "indent": 0,
+      "no-tabs": 0,
       "no-mixed-operators": [
         "error",
         {

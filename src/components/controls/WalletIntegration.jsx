@@ -6,16 +6,17 @@ import { connect } from '../StateProvider'
 import { getAPI } from '../../api'
 import { getAppContracts } from '../../api/Contracts'
 
+import ConfigDisplayerHOC from '../hoc/ConfigDisplayHOC'
+
 class WalletIntegration extends React.Component {
   state = {
     activeProviderSet: undefined,
     error: undefined,
     initialising: false,
-    web3: undefined,
   }
 
   componentDidMount() {
-    const { registerProviders } = this.props
+    const { dispatchers: { registerProviders } } = this.props
     // returns [ Provider{}, ... ]
     const providersArray = Object.values(Providers)
     // register each providerObject into state
@@ -23,20 +24,21 @@ class WalletIntegration extends React.Component {
   }
 
   onChange = async (providerInfo) => {
-    const { appLoading, grabUserState, grabDXState, setActiveProvider, getDXTokenBalance } = this.props
+    const { dispatchers: { appLoading, grabUserState, grabDXState, setActiveProvider, getDXTokenBalance } } = this.props
 
     try {
+      // Set loader
       appLoading(true)
       this.setState({ initialising: true, error: undefined })
 
       const chosenProvider = Providers[providerInfo]
       // initialize providers and return specific Web3 instances
-      const web3 = await chosenProvider.initialize()
+      await chosenProvider.initialize()
 
       // Save activeProvider to State
       setActiveProvider(providerInfo)
       // Save web3 provider + notify state locally
-      this.setState({ web3, activeProviderSet: true })
+      this.setState({ activeProviderSet: true })
 
       // interface with contracts & connect entire DX API
       // grabbing eth here to show contrived example of state
@@ -50,10 +52,11 @@ class WalletIntegration extends React.Component {
 
       // contrived example below showing state grabbing
       // from DutchX contract
-      await grabUserState(chosenProvider)
+      await grabUserState()
       await Promise.all([
         grabDXState(),
-        getDXTokenBalance(contracts.eth.address, this.props.account),
+        // don't cache user account before grabbing state...
+        getDXTokenBalance(contracts.eth.address, this.props.state.account),
       ])
       appLoading(false)
       return this.setState({ initialising: false })
@@ -64,7 +67,7 @@ class WalletIntegration extends React.Component {
     }
   }
 
-  saveContractToState = contracts => Object.keys(contracts).forEach(name => this.props.saveContract({ name, contract: contracts[name] }))
+  saveContractToState = contracts => Object.keys(contracts).forEach(name => this.props.dispatchers.saveContract({ name, contract: contracts[name] }))
 
   walletSelector = () => (
     <div className="walletChooser">
@@ -89,9 +92,8 @@ class WalletIntegration extends React.Component {
 
   render() {
     const { initialising, activeProviderSet, error } = this.state,
-      { activeProvider, children } = this.props
+      { state: { activeProvider }, children } = this.props
 
-    if (this.props.loading) return <h1>Loading...</h1>
     // error occurred in async, show message
     if (error) return <h1>An error occurred: {error}</h1>
     // app state initialised, no longer loading
@@ -120,19 +122,25 @@ const mapProps = ({
   saveContract,
 }) => ({
   // state properties
-  activeProvider,
-  network,
-  account,
-  balance,
-  loading,
+  state: {
+    activeProvider,
+    network,
+    account,
+    balance,
+    loading,
+  },
   // dispatchers
-  appLoading,
-  grabUserState,
-  grabDXState,
-  registerProviders,
-  setActiveProvider,
-  getDXTokenBalance,
-  saveContract,
+  dispatchers: {
+    appLoading,
+    grabUserState,
+    grabDXState,
+    registerProviders,
+    setActiveProvider,
+    getDXTokenBalance,
+    saveContract,
+  },
 })
 
-export default connect(mapProps)(WalletIntegration)
+export default connect(mapProps)(process.env.NODE_ENV !== 'production'
+  ? ConfigDisplayerHOC(WalletIntegration)
+  : WalletIntegration)
