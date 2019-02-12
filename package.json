@@ -25,12 +25,14 @@
   "author": "W3stside <doohhello@gmail.com>(https://github.com/w3stside)",
   "license": "MIT",
   "dependencies": {
+    "@gnosis.pm/dx-mgn-pool": "0.1.0-RC1",
     "css-loader": "^0.28.11",
     "localforage": "^1.7.1",
     "react": "^16.8.1",
     "react-dom": "^16.8.1",
     "react-hot-loader": "^4.6.5",
     "style-loader": "^0.23.1",
+    "truffle": "^5.0.3",
     "truffle-contract": "4.0.4",
     "web3": "1.0.0-beta.37"
   },
