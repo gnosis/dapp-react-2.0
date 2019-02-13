@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Providers from '../../api/providers'
 
@@ -8,33 +8,44 @@ import { getAppContracts } from '../../api/Contracts'
 
 import ConfigDisplayerHOC from '../hoc/ConfigDisplayHOC'
 
-class WalletIntegration extends React.Component {
-  state = {
-    activeProviderSet: undefined,
-    error: undefined,
-    initialising: false,
-  }
+function WalletIntegration({ 
+  dispatchers: { 
+    appLoading, 
+    grabUserState, 
+    registerProviders, 
+    saveContract, 
+    setActiveProvider,
+  }, 
+  state: { activeProvider }, 
+  children,
+}) {
+  const [error, setError] = useState(undefined)
+  const [initialising, setInitialising] = useState(false)
+  const [activeProviderSet, setActiveProviderState] = useState(undefined)
 
-  componentDidMount() {
-    const { dispatchers: { registerProviders } } = this.props
+  // Fire once on load
+  useEffect(() => {
     // returns [ Provider{}, ... ]
     const providersArray = Object.values(Providers)
     // register each providerObject into state
-    return providersArray.forEach(() => { registerProviders(providersArray) })
-  }
+    providersArray.forEach(() => { registerProviders(providersArray) })
+  }, [])
+
+  const saveContractToState = contracts => Object.keys(contracts).forEach(name => saveContract({ name, contract: contracts[name] }))
 
   /**
    * onChange Event Handler
    * @param { providerInfo } @type { ProviderObject }
    * @memberof WalletIntegration
    */
-  onChange = async (providerInfo) => {
-    const { dispatchers: { appLoading, setActiveProvider, grabUserState } } = this.props
-
+  const onChange = async (providerInfo) => {
     try {
       // Set loader
       appLoading(true)
-      this.setState({ initialising: true, error: undefined })
+      
+      // State setters
+      setError(undefined)
+      setInitialising(true)
 
       const chosenProvider = Providers[providerInfo]
       // initialize providers and return specific Web3 instances
@@ -42,15 +53,16 @@ class WalletIntegration extends React.Component {
 
       // Save activeProvider to State
       setActiveProvider(providerInfo)
+      
       // Save web3 provider + notify state locally
-      this.setState({ activeProviderSet: true })
+      setActiveProviderState(true)
 
       // interface with contracts & connect entire DX API
       // grabbing eth here to show contrived example of state
       const contracts = await getAppContracts()
 
       // registers/saves contracts to StateProvider
-      this.saveContractToState(contracts)
+      saveContractToState(contracts)
 
       // INIT main API
       await getAPI()
@@ -60,50 +72,42 @@ class WalletIntegration extends React.Component {
 
       appLoading(false)
 
-      return this.setState({ initialising: false })
-    } catch (error) {
-      console.error(error)
+      return setInitialising(false)
+    } catch (err) {
+      console.error(err)
       appLoading(false)
-      return this.setState({ initialising: false, error })
+      
+      setInitialising(false)
+      return setError(error)
     }
   }
 
-  saveContractToState = contracts => Object.keys(contracts).forEach(name => this.props.dispatchers.saveContract({ name, contract: contracts[name] }))
-
-  walletSelector = () => (
+  const walletSelector = () => (
     <div className="walletChooser">
       <h1>Please select a wallet</h1>
-      <div className={!this.state.initialising ? 'lightBlue' : ''}>
+      <div className={!initialising ? 'lightBlue' : ''}>
         {Object.keys(Providers).map((provider, i) => {
           const providerInfo = Providers[provider].providerName || provider
           return (
             <div
               role="container"
               key={i}
-              onClick={() => this.onChange(provider)}
+              onClick={() => onChange(provider)}
             >
               <h4 className="providerChoice">{`${i + 1}. ${providerInfo}`}</h4>
             </div>
           )
         })}
       </div>
-      {this.state.error && <h3>{this.state.error.message}</h3>}
+      {error && <h3>{error.message}</h3>}
     </div>
   )
-
-  render() {
-    const { initialising, activeProviderSet, error } = this.state,
-      { state: { activeProvider }, children } = this.props
-
-    // error occurred in async, show message
-    if (error) return <h1>An error occurred: {error}</h1>
-    // app state initialised, no longer loading
-    // aka load app
-    if ((activeProvider && activeProviderSet) && !initialising) return children
-
-    // show user wallet selector
-    return this.walletSelector()
-  }
+  
+  if (error) return <h1>An error occurred: {error}</h1>
+  
+  if ((activeProvider && activeProviderSet) && !initialising) return children
+  
+  return walletSelector()
 }
 
 const mapProps = ({
