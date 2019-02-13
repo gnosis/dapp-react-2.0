@@ -1,5 +1,7 @@
-// eslint-disable-next-line import/prefer-default-export
-export const windowLoaded = new Promise((resolve) => {
+import { toBN, toWei, fromWei } from 'web3-utils'
+
+// eslint-disable-next-line import/prefer-default-
+const windowLoaded = new Promise((resolve) => {
   if (typeof window === 'undefined') {
     resolve()
     return
@@ -17,7 +19,7 @@ export const windowLoaded = new Promise((resolve) => {
 })
 
 const zeroDecimalsRegEx = /\.?0+$/
-export const decimalChecker = (n) => {
+const decimalChecker = (n) => {
   const indOfDecimal = n.indexOf('.')
   // no decimal point or there are fewer decimal digits than 17
   if (indOfDecimal === -1 || n.length - indOfDecimal < 17) return n
@@ -28,10 +30,10 @@ export const decimalChecker = (n) => {
   return shortened.replace(zeroDecimalsRegEx, '')
 }
 
-export const timeValidator = (t, now) => t > now
+const timeValidator = (t, now) => t > now
 
 // TODO: consider different formatting, not with .toLocaleString
-export const displayTime = (sec, locale = 'de-DE', timeZone = 'Europe/Berlin') => (sec === 0 ? null : new Date(sec * 1000).toLocaleString(locale, {
+const displayTime = (sec, locale = 'de-DE', timeZone = 'Europe/Berlin') => (sec === 0 ? null : new Date(sec * 1000).toLocaleString(locale, {
   hour: 'numeric',
   minute: 'numeric',
   year: 'numeric',
@@ -40,12 +42,25 @@ export const displayTime = (sec, locale = 'de-DE', timeZone = 'Europe/Berlin') =
   timeZone,
 }))
 
+const mapTS = arr => (Array.isArray(arr) ? arr : [arr]).map(item => item.toString())
+
+export {
+  toBN,
+  toWei,
+  fromWei,
+  mapTS,
+  displayTime,
+  timeValidator,
+  decimalChecker,
+  windowLoaded,
+}
+
 /**
    * displayTimeDiff(sec, now)
    * @param {number} endSec --> time (in seconds) when lock ENDS
    * @param {number} now    --> time NOW (in seconds)
    */
-/* export const displayTimeDiff = (endSec, now) => {
+/*  const displayTimeDiff = (endSec, now) => {
   const diff = endSec - Math.floor(now)
 
   // if lockTime has passed display nothing
