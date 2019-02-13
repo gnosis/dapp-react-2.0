@@ -62,6 +62,7 @@
         }
       ],
       "no-console": 0,
+      "no-trailing-spaces": 0,
       "class-methods-use-this": 0,
       "one-var": 0,
       "one-var-declaration-per-line": 0,
@@ -124,7 +125,7 @@
       ],
       "max-len": [
         "error",
-        150,
+        200,
         1,
         {
           "ignoreUrls": true,
