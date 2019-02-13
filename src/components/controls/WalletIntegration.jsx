@@ -23,8 +23,13 @@ class WalletIntegration extends React.Component {
     return providersArray.forEach(() => { registerProviders(providersArray) })
   }
 
+  /**
+   * onChange Event Handler
+   * @param { providerInfo } @type { ProviderObject }
+   * @memberof WalletIntegration
+   */
   onChange = async (providerInfo) => {
-    const { dispatchers: { appLoading, grabUserState, grabDXState, setActiveProvider, getDXTokenBalance } } = this.props
+    const { dispatchers: { appLoading, setActiveProvider, grabUserState } } = this.props
 
     try {
       // Set loader
@@ -50,15 +55,11 @@ class WalletIntegration extends React.Component {
       // INIT main API
       await getAPI()
 
-      // contrived example below showing state grabbing
-      // from DutchX contract
+      // First time grab userState
       await grabUserState()
-      await Promise.all([
-        grabDXState(),
-        // don't cache user account before grabbing state...
-        getDXTokenBalance(contracts.eth.address, this.props.state.account),
-      ])
+
       appLoading(false)
+
       return this.setState({ initialising: false })
     } catch (error) {
       console.error(error)
