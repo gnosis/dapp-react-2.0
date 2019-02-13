@@ -2,6 +2,9 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebPackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const pkg = require('./package.json')
+
+const version = process.env.BUILD_VERSION || pkg.version
 
 module.exports = (_, { mode }) => {
   // some code depends on it before process.env is inlined with DefinePlugin
@@ -23,6 +26,14 @@ module.exports = (_, { mode }) => {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
       ETH_NETWORK: 'local',
+    }),
+    new webpack.DefinePlugin({
+      'process.env': {
+        FE_CONDITIONAL_ENV: JSON.stringify(process.env.FE_CONDITIONAL_ENV || 'development'),
+        USE_DEV_NETWORKS: JSON.stringify(process.env.USE_DEV_NETWORKS),
+        NODE_ENV: JSON.stringify(process.env.USE_DEV_NETWORKS),
+        VERSION: JSON.stringify(`${version}`),
+      },
     }),
   ]
 
@@ -63,10 +74,10 @@ module.exports = (_, { mode }) => {
             'val-loader',
           ],
         },
-        {
-          test: /\/build\/contracts\/\w+\.json$/,
-          use: ['json-loader', 'json-x-loader?exclude=unlinked_binary+networks.*.events+networks.*.links+bytecode+deployedBytecode+sourceMap+deployedSourceMap+source+sourcePath+ast+legacyAST']
-        },
+        // {
+        //   test: /\/build\/contracts\/\w+\.json$/,
+        //   use: ['json-loader', 'json-x-loader?exclude=unlinked_binary+networks.*.events+networks.*.links+bytecode+deployedBytecode+sourceMap+deployedSourceMap+source+sourcePath+ast+legacyAST']
+        // },
       ],
     },
     resolve: {
