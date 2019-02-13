@@ -10,39 +10,39 @@ let appContracts
 // contract array, strings
 // ADD HERE contracts you want to deploy - names should be exactly as read in build/contracts (without .json)
 const contracts = [
-  'DutchExchange',
-  'DutchExchangeProxy',
+  'Coordinator',
   'EtherToken',
-  'TokenFRT',
-  'TokenOWL',
-  'TokenOWLProxy',
+  'TokenGNO',
+  // 'TokenFRT',
+  // 'TokenOWL',
+  // 'TokenOWLProxy',
 ]
 
 // to make access easier later...
 const shortContractNames = {
-  DutchExchange: 'dx',
-  DutchExchangeProxy: 'dxProxy',
+  Coordinator: 'coord',
   EtherToken: 'eth',
-  TokenFRT: 'frt',
-  TokenOWL: 'owl',
-  TokenOWLProxy: 'owlProxy',
+  TokenGNO: 'gno',
+  // TokenFRT: 'frt',
+  // TokenOWL: 'owl',
+  // TokenOWLProxy: 'owlProxy',
 }
 
 let req
 // when not on local ganache, import what is available from @gnosis.pm/owl-token
 // and later separately TokenGNO from @gnosis.pm/gno-token
-if (process.env.NODE_ENV === 'development') {
+if (process.env.FE_CONDITIONAL_ENV === 'development') {
   req = require.context(
     '../../build/contracts/',
     false,
-    /(DutchExchange|DutchExchangeProxy|EtherToken|TokenFRT|TokenOWL|TokenOWLProxy)\.json$/,
+    /(Coordinator|EtherToken|TokenGNO)\.json$/,
   )
 } else {
   // only diff here = TokenGNO
   req = require.context(
-    '@gnosis.pm/dx-contracts/build/contracts/',
+    '@gnosis.pm/dx-mgn-pool/build/contracts/',
     false,
-    /(DutchExchange|DutchExchangeProxy|EtherToken|TokenFRT|TokenOWL|TokenOWLProxy|TokenGNO)\.json$/,
+    /(Coordinator|EtherToken|TokenGNO)\.json$/,
   )
 }
 
@@ -75,11 +75,11 @@ const reqKeys = req.keys()
 const contractArtifacts = contracts.map((c) => {
   // Do we need to replace contractJSONS if we're on a different ENV?
   // then below is done
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.FE_CONDITIONAL_ENV === 'production') {
     if (c === 'EtherToken')     return require('@gnosis.pm/util-contracts/build/contracts/EtherToken.json')
     if (c === 'TokenGNO')       return require('@gnosis.pm/gno-token/build/contracts/TokenGNO.json')
-    if (c === 'TokenOWLProxy')  return require('@gnosis.pm/owl-token/build/contracts/TokenOWLProxy.json')
-    if (c === 'TokenOWL')       return require('@gnosis.pm/owl-token/build/contracts/TokenOWL.json')
+    // if (c === 'TokenOWLProxy')  return require('@gnosis.pm/owl-token/build/contracts/TokenOWLProxy.json')
+    // if (c === 'TokenOWL')       return require('@gnosis.pm/owl-token/build/contracts/TokenOWL.json')
   }
   return req(reqKeys.find(key => key === `./${c}.json`))
 })
@@ -88,10 +88,10 @@ const contractArtifacts = contracts.map((c) => {
 // e.g Development SuperCoolContract may be different from Production SuperCoolContract
 // inject network addresses
 const
-  networksDX      = require('@gnosis.pm/dx-contracts/networks.json'),
+  networksMgnPool = require('@gnosis.pm/dx-mgn-pool/networks.json'),
   networksUtils   = require('@gnosis.pm/util-contracts/networks.json'),
-  networksGNO     = require('@gnosis.pm/gno-token/networks.json'),
-  networksOWL     = require('@gnosis.pm/owl-token/networks.json')
+  networksGNO     = require('@gnosis.pm/gno-token/networks.json')
+  // networksOWL     = require('@gnosis.pm/owl-token/networks.json')
 
 // Loop through each IDX of contractArtifacts
 // and re-assign network object (from above) to each contract JSON
@@ -102,15 +102,16 @@ for (const contrArt of contractArtifacts) {
     contrArt.networks,
     networksUtils[contractName],
     networksGNO[contractName],
-    networksOWL[contractName],
-    networksDX[contractName],
+    networksMgnPool[contractName],
+    // networksOWL[contractName],
   )
 }
 
+// TODO: change - dx-mgn-pool @0.1.0 has no networks-dev
 // in development use different contract addresses
-if (process.env.NODE_ENV === 'development') {
+/* if (process.env.FE_CONDITIONAL_ENV === 'development') {
   // from networks-%ENV%.json
-  const networksDevDX = require('@gnosis.pm/dx-contracts/networks-dev.json')
+  const networksDevDX = require('@gnosis.pm/dx-mgn-pool/networks-dev.json')
 
   for (const contrArt of contractArtifacts) {
     const { contractName } = contrArt
@@ -118,19 +119,17 @@ if (process.env.NODE_ENV === 'development') {
     // but keeping local network ids
     Object.assign(contrArt.networks, networksDevDX[contractName])
   }
-}
+} */
 
 /**
  * TruffleWrappedContractArtifacts = TruffleContract(contract artifacts/json)
  * @returns {[string]} ContractsABI[] -> UNDEPLOYED
  *
  * Key
- * 0: DutchExchange
- * 1: DX-Proxy
- * 2: EtherToken
+ * 0: Coordinator
+ * 1: EtherToken
+ * 2: TokenFNO
  * 3: TokenFRT
- * 4: TokenOWL
- * 5: TokenOWLProxy
 */
 const TruffleWrappedContractArtifacts = contractArtifacts.map(contractArtifact => TruffleContract(contractArtifact))
 
@@ -223,23 +222,20 @@ async function init() {
   }
 
   const deployedContractsMap = contractArrayToMap(deployedContractsArray)
-  const undeployedContractsMap = contractArrayToMap(TruffleWrappedContractArtifacts)
+  // const undeployedContractsMap = contractArrayToMap(TruffleWrappedContractArtifacts)
 
-  const { address: proxyAddress } = deployedContractsMap.dxProxy
-  const { address: owlProxyAddress } = deployedContractsMap.owlProxy
+  // const { address: owlProxyAddress } = deployedContractsMap.owlProxy
 
-  deployedContractsMap.dx = undeployedContractsMap.dx.at(proxyAddress)
-  deployedContractsMap.owl = undeployedContractsMap.owl.at(owlProxyAddress)
+  // deployedContractsMap.owl = undeployedContractsMap.owl.at(owlProxyAddress)
   deployedContractsMap.hft = HumanFriendlyToken
 
-  delete deployedContractsMap.dxProxy
-  delete deployedContractsMap.owlProxy
+  // delete deployedContractsMap.owlProxy
 
   if (process.env.NODE_ENV === 'development') {
     // make it available globally
     window.React_DAPP_CONTRACTS = deployedContractsMap
   }
 
-  console.log('​deployedContractsMap', deployedContractsMap)
+  console.debug('​deployedContractsMap', deployedContractsMap)
   return deployedContractsMap
 }
