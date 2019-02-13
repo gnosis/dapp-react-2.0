@@ -15,6 +15,7 @@
     "migrate": "npx truffle migrate --reset",
     "start": "npm run start:local",
     "start:local": "npm run dev",
+    "start:localProd": "FE_CONDITIONAL_ENV='production' npm start",
     "start:*net": "cross-env ETH_NETWORK=*net npm run dev",
     "start:testnet": "cross-env ETH_NETWORK=testnet npm run dev",
     "rpc": "npx ganache-cli -d --mnemonic 'candy maple cake sugar pudding cream honey rich smooth crumble sweet treat' --defaultBalanceEther '5000'",
@@ -25,7 +26,7 @@
   "author": "W3stside <doohhello@gmail.com>(https://github.com/w3stside)",
   "license": "MIT",
   "dependencies": {
-    "@gnosis.pm/dx-mgn-pool": "0.1.0-RC1",
+    "@gnosis.pm/dx-mgn-pool": "^0.1.0",
     "css-loader": "^0.28.11",
     "localforage": "^1.7.1",
     "react": "^16.8.1",
