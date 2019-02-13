@@ -1,7 +1,6 @@
 // API
 import { getTokensAPI } from './Tokens'
 import { getWeb3API } from './ProviderWeb3'
-import { getDutchXAPI } from './DutchX'
 
 // API singleton
 let appAPI
@@ -128,7 +127,7 @@ export const checkIfFalseAllowance = async (amount, account, address) => {
 }
 
 // ================
-// TOKENS GNO + OWL
+// ERC20 TOKENS
 // ================
 
 export const allowance = async (tokenName, account, spender) => {
@@ -183,12 +182,11 @@ export const getState = async ({ account, timestamp: time } = {}) => {
 }
 
 async function init() {
-  const [Web3, Tokens, DutchX] = await Promise.all([
+  const [Web3, Tokens] = await Promise.all([
     getWeb3API(),
     getTokensAPI(),
-    getDutchXAPI(),
   ])
 
-  console.log('​API init -> ', { Web3, Tokens, DutchX })
-  return { Web3, Tokens, DutchX }
+  console.log('​API init -> ', { Web3, Tokens })
+  return { Web3, Tokens }
 }
