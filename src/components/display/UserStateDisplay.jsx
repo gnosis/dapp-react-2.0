@@ -10,8 +10,8 @@ const UserStateDisplay = ({
     network,
 }) =>
   <>
-    <h2>Your Data:</h2>
-    <pre className="data-pre-violet">
+    <h2>Your Data</h2>
+    <pre className="data-pre-violet word-wrap">
         <h3>Network: {network}</h3>
         <h3>Account: {account}</h3>
         <h3>Balance: {mapTS(fromWei(balance))}</h3>
