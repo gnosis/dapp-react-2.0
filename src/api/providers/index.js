@@ -1,4 +1,4 @@
-import Web3 from 'web3'
+import Web3Eth from 'web3-eth'
 import { networkById } from '../../globals'
 
 export const getAccount = async (provider) => {
@@ -57,12 +57,12 @@ const Providers = {
 
     checkAvailability() {
       if (this.web3) this.walletAvailable = true
-      else this.walletAvailable = typeof window.web3 !== 'undefined' && window.web3.currentProvider.constructor
+      else this.walletAvailable = typeof window.web3 !== 'undefined' && window.web3.constructor
     },
 
     initialize() {
       if (!this.checkAvailability()) return
-      this.web3 = new Web3(window.web3.currentProvider)
+      this.web3 = new Web3Eth(window.web3.currentProvider)
       this.state = {}
 
       return this.web3
