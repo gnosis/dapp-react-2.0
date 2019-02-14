@@ -78,8 +78,6 @@ const contractArtifacts = contracts.map((c) => {
   if (process.env.FE_CONDITIONAL_ENV === 'production') {
     if (c === 'EtherToken')     return require('@gnosis.pm/util-contracts/build/contracts/EtherToken.json')
     if (c === 'TokenGNO')       return require('@gnosis.pm/gno-token/build/contracts/TokenGNO.json')
-    // if (c === 'TokenOWLProxy')  return require('@gnosis.pm/owl-token/build/contracts/TokenOWLProxy.json')
-    // if (c === 'TokenOWL')       return require('@gnosis.pm/owl-token/build/contracts/TokenOWL.json')
   }
   return req(reqKeys.find(key => key === `./${c}.json`))
 })
@@ -91,7 +89,6 @@ const
   networksMgnPool = require('@gnosis.pm/dx-mgn-pool/networks.json'),
   networksUtils   = require('@gnosis.pm/util-contracts/networks.json'),
   networksGNO     = require('@gnosis.pm/gno-token/networks.json')
-  // networksOWL     = require('@gnosis.pm/owl-token/networks.json')
 
 // Loop through each IDX of contractArtifacts
 // and re-assign network object (from above) to each contract JSON
@@ -103,7 +100,6 @@ for (const contrArt of contractArtifacts) {
     networksUtils[contractName],
     networksGNO[contractName],
     networksMgnPool[contractName],
-    // networksOWL[contractName],
   )
 }
 
@@ -129,12 +125,12 @@ for (const contrArt of contractArtifacts) {
  * 0: Coordinator
  * 1: EtherToken
  * 2: TokenFNO
- * 3: TokenFRT
 */
 const TruffleWrappedContractArtifacts = contractArtifacts.map(contractArtifact => TruffleContract(contractArtifact))
 
 // Wrap and deploy HumanFriendlyToken to interface with any Token contract addresses called
 export const HumanFriendlyToken = TruffleContract(require('@gnosis.pm/util-contracts/build/contracts/HumanFriendlyToken.json'))
+export const DxMgnPool = TruffleContract(require('@gnosis.pm/dx-mgn-pool/build/contracts/DxMgnPool.json'))
 
 /**
  * setContractProvider
@@ -144,7 +140,7 @@ export const HumanFriendlyToken = TruffleContract(require('@gnosis.pm/util-contr
 const setContractProvider =
   provider =>
     TruffleWrappedContractArtifacts
-      .concat(HumanFriendlyToken)
+      .concat([HumanFriendlyToken, DxMgnPool])
       .forEach((c) => { c.setProvider(provider) })
 
 /**
@@ -222,14 +218,9 @@ async function init() {
   }
 
   const deployedContractsMap = contractArrayToMap(deployedContractsArray)
-  // const undeployedContractsMap = contractArrayToMap(TruffleWrappedContractArtifacts)
-
-  // const { address: owlProxyAddress } = deployedContractsMap.owlProxy
-
-  // deployedContractsMap.owl = undeployedContractsMap.owl.at(owlProxyAddress)
+  
   deployedContractsMap.hft = HumanFriendlyToken
-
-  // delete deployedContractsMap.owlProxy
+  deployedContractsMap.dxMP = DxMgnPool
 
   if (process.env.NODE_ENV === 'development') {
     // make it available globally
