@@ -4,12 +4,16 @@ import PoolData from './PoolData'
 import DataDisplay from './UserStateDisplay'
 
 const Home = () => (
-  <div>
+  <section>
     {/* DxMgnPool Data */}
     <PoolData />
     {/* Show User's State */}
-    <DataDisplay title="Your Data" colour="violet" />
-  </div>
+    <DataDisplay 
+      colour="violet" 
+      startOpen={false}
+      title="Your Data" 
+    />
+  </section>
 )
 
 export default Home

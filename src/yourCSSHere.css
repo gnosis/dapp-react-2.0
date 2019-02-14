@@ -3,6 +3,11 @@
 body {
     font-family: 'Major Mono Display', monospace;
     /* min-width: 570px; */
+    font-size: 1.4rem;
+}
+
+section {
+    margin: 0 10px;
 }
 
 li {
@@ -58,16 +63,24 @@ input[type="text"] {
     min-width: 250px;
 }
 
-.providerChoice {
-    display: inline-block;
+.providerChoiceContainer {
     cursor: pointer;
-    padding: 5px;
-    transition: all 0.5s ease-in-out;
+    background: lightsalmon;
+     
+    transition: all 0.3s ease-in-out;
 }
 
-.providerChoice:hover {
-    background: white;
+.providerChoice {
+    display: inline-block;
+    padding: 5px;
+    
+    font-family: 'Permanent Marker', cursive;
+    font-size: 28px;
 }
+
+/* .providerChoice:hover {
+    background: white;
+} */
 
 #apiContainer {
     display: flex;
@@ -100,7 +113,39 @@ input[type="text"] {
     align-items: center;
     justify-content: center;
     
-    height: 100vh; width: 100vw;
+    position: fixed;
+    background: linear-gradient(-45deg, #72bbf7, #4c68c4);
+    animation: RetroGradient 2s ease infinite;
+
+    top: 0; left: 0; right: 0; bottom: 0;
+}
+  
+@-webkit-keyframes RetroGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes RetroGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .poolContainer, .poolInnerContainer {

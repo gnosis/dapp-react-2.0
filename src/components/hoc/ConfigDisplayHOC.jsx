@@ -16,13 +16,13 @@ const ConfigDisplayerHOC = Component =>
       const { state } = this.props
       return (
         <>
-          { state.loading && <div className="loadingHOC"><h1>LOADING . . .</h1>{/* <img style={{ minWidth: '100%' }} src="" /> */}</div> }
+          { state.loading && <div className="loadingHOC"><h1>LOADING . . .</h1></div> }
           <h3>Development Context</h3>
           {Object.keys(this.state).map(stateKey => (
             <pre className="data-pre-yellow word-wrap" key={stateKey}>{`${stateKey}: ${this.state[stateKey]}`}</pre>
           ))}
-          <DataDisplay title="APP STATE" startOpen={false} colour="pink" {...this.props.state} />
           <Component {...this.props} {...this.state} />
+          <DataDisplay title="APP STATE" startOpen={false} colour="pink" {...this.props.state} />
         </>
       )
     }

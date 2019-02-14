@@ -11,7 +11,7 @@ const DataDisplay = (props) => {
     const [open, setOpen] = useState(startOpen)
     return (
       <>
-        <h2 className="clickableHeader" onClick={() => setOpen(!open)}>{title} (show/hide)</h2>
+        <h3 className="clickableHeader" onClick={() => setOpen(!open)}>{title} (show/hide)</h3>
         <pre className={`data-pre-${colour} word-wrap${!open ? ' hideContent' : ''}`}>
           
           {

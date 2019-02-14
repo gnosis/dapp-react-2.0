@@ -6,27 +6,29 @@ const PoolData = ({
 }) => {
     const { pool1, pool2 } = DX_MGN_POOL
     return (
-        <div className="poolContainer">
-            <h2>Pool Data</h2>
-            <br />
-            <div className="poolInnerContainer">
-                {/* POOL 1 */}
-                <pre className="poolDataContainer data-pre-blue">
-                    <h2>DxMGNPool #1</h2>
-                    <ul>
-                        {Object.keys(pool1).map((key, idx) => <li key={idx * Math.random()}>{`${key}: ${pool1[key]}`}</li>)}
-                    </ul>
-                </pre>
+        <>
+            <h2>Dx-Mgn-Pool Data</h2>
+            <div className="poolContainer">
+                <h3>Dx-Mgn-Pool</h3>
+                <div className="poolInnerContainer">
+                    {/* POOL 1 */}
+                    <pre className="poolDataContainer data-pre-blue">
+                        <h2>DxMGNPool #1</h2>
+                        <ul>
+                            {Object.keys(pool1).map((key, idx) => <li key={idx * Math.random()}>{`${key}: ${pool1[key]}`}</li>)}
+                        </ul>
+                    </pre>
 
-                {/* POOL 2 */}
-                <pre className="poolDataContainer data-pre-green">
-                    <h2>DxMGNPool #2</h2>
-                    <ul>
-                        {Object.keys(pool2).map((key, idx) => <li key={idx * Math.random()}>{`${key}: ${pool2[key]}`}</li>)}
-                    </ul>
-                </pre>
+                    {/* POOL 2 */}
+                    <pre className="poolDataContainer data-pre-green">
+                        <h2>DxMGNPool #2</h2>
+                        <ul>
+                            {Object.keys(pool2).map((key, idx) => <li key={idx * Math.random()}>{`${key}: ${pool2[key]}`}</li>)}
+                        </ul>
+                    </pre>
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 

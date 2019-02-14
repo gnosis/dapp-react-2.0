@@ -94,7 +94,7 @@ function WalletIntegration({
           const providerObj = Providers[provider]
           return (
             <div
-              className="poolContainer"
+              className="poolContainer providerChoiceContainer"
               role="container"
               key={i}
               onClick={() => onChange(provider)}
