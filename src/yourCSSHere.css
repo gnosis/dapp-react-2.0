@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css?family=Major+Mono+Display|Permanent+Marker');
+
+body {
+    font-family: 'Major Mono Display', monospace;
+    min-width: 570px;
+}
 
 li {
     list-style: hangul;
@@ -5,9 +11,28 @@ li {
 }
 
 pre {
-    background: lightpink;
     padding: 10px 20px;
     border-radius: 30px;
+}
+
+.data-pre-pink {
+    background-color: lightpink;
+}
+
+.data-pre-yellow {
+    background-color: lightyellow;
+}
+
+.data-pre-violet {
+    background-color: rgb(249, 224, 255);
+}
+
+.data-pre-green {
+    background-color: rgb(224, 255, 232);
+}
+
+.data-pre-blue {
+    background-color: #e0f7ff;
 }
 
 form {
@@ -77,6 +102,9 @@ input[type="text"] {
 
 .poolContainer {
     flex-flow: column nowrap;
+
+    border: dotted;
+    padding: 0 5px;
 }
 
 .poolInnerContainer {

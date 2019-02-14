@@ -9,12 +9,14 @@ const UserStateDisplay = ({
     balance,
     network,
 }) =>
-    <div>
-        <h2>Your Data:</h2>
+  <>
+    <h2>Your Data:</h2>
+    <pre className="data-pre-violet">
         <h3>Network: {network}</h3>
         <h3>Account: {account}</h3>
         <h3>Balance: {mapTS(fromWei(balance))}</h3>
-    </div>
+    </pre>
+  </>
 
 const mapProps = ({
     state: {

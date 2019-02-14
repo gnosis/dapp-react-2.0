@@ -18,10 +18,10 @@ const ConfigDisplayerHOC = Component =>
           { state.loading && <div className="loadingHOC"><h1>LOADING . . .</h1>{/* <img style={{ minWidth: '100%' }} src="" /> */}</div> }
           <h3>Development Context:</h3>
           {Object.keys(this.state).map(stateKey => (
-            <div className="displayBanner" key={stateKey}>{`${stateKey}: ${this.state[stateKey]}`}</div>
+            <pre className="data-pre-yellow" key={stateKey}>{`${stateKey}: ${this.state[stateKey]}`}</pre>
           ))}
-          <pre className="data-pre">
-            App State:
+          <h2>App State:</h2>
+          <pre className="data-pre-pink">
             <br />
             <br />
             {JSON.stringify(state, undefined, 2)}

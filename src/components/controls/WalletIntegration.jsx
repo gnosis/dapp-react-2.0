@@ -88,12 +88,13 @@ function WalletIntegration({
 
   const walletSelector = () => (
     <div className="walletChooser">
-      <h1>Please select a wallet</h1>
+      <h2>Please select a wallet</h2>
       <div className={!initialising ? 'lightBlue' : ''}>
         {Object.keys(Providers).map((provider, i) => {
           const providerObj = Providers[provider]
           return (
             <div
+              className="poolContainer"
               role="container"
               key={i}
               onClick={() => onChange(provider)}
