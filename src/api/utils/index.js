@@ -1,4 +1,5 @@
 import { toBN, toWei, fromWei } from 'web3-utils'
+import { WEBSOCKET_URLS } from '../../globals'
 
 // eslint-disable-next-line import/prefer-default-
 const windowLoaded = new Promise((resolve) => {
@@ -44,6 +45,58 @@ const displayTime = (sec, locale = 'de-DE', timeZone = 'Europe/Berlin') => (sec 
 
 const mapTS = arr => (Array.isArray(arr) ? arr : [arr]).map(item => item.toString())
 
+const netIdToName = (id) => {
+  switch (id) {
+    case 1:
+      return 'Ethereum Mainnet'
+
+    case 2:
+      return 'Morden'
+
+    case 3:
+      return 'Ropsten'
+
+    case 4:
+      return 'Rinkeby'
+
+    case 42:
+      return 'Kovan'
+
+    case null:
+    case undefined:
+      return 'No network detected'
+
+    default:
+      return 'Local Network'
+  }
+}
+
+const netIdToWebsocket = (id) => {
+  switch (id) {
+    case 1:
+      return WEBSOCKET_URLS.MAIN
+
+    case 2:
+      return WEBSOCKET_URLS.MORDEN
+
+    case 3:
+      return WEBSOCKET_URLS.ROPSTEN
+
+    case 4:
+      return WEBSOCKET_URLS.RINKEBY
+
+    case 42:
+      return WEBSOCKET_URLS.KOVAN
+
+    case null:
+    case undefined:
+      return 'No network detected'
+
+    default:
+      return WEBSOCKET_URLS.LOCAL
+  }
+}
+
 export {
   toBN,
   toWei,
@@ -52,6 +105,8 @@ export {
   displayTime,
   timeValidator,
   decimalChecker,
+  netIdToName,
+  netIdToWebsocket,
   windowLoaded,
 }
 
