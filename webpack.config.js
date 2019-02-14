@@ -67,6 +67,15 @@ module.exports = (_, { mode }) => {
           },
         },
         {
+          test: /\.(ttf|otf|eot|woff2?)(\?[a-z0-9]+)?$/,
+          use: {
+            loader: 'file-loader',
+            options: {
+              name: 'fonts/[name].[ext]',
+            },
+          },
+        },
+        {
           test: path.resolve(__dirname, './inline_render.js'),
           use: [
             'cache-loader',
