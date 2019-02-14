@@ -1,10 +1,12 @@
-import Web3 from 'web3'
-import { windowLoaded } from './utils'
+import Web3Eth from 'web3-eth'
+import Web3Utils from 'web3-utils'
+
+import { netIdToName, netIdToWebsocket, windowLoaded } from './utils'
 
 /**
- * Web3 Provider API
+ * Web3Eth Provider API
  * Version: 1.0.0beta.xx
- * Will NOT work with Web3@0.20.xx
+ * Will NOT work with Web3Eth@0.20.xx
 */
 
 let appWeb3
@@ -40,24 +42,37 @@ const getProvider = async () => {
     return window.web3.currentProvider
   }
   // window.web3 or window doesnt exist
-  return new Web3.providers.HttpProvider('http://localhost:8545')
+  return new Web3Eth('http://localhost:8545')
 }
 
 const setupWeb3 = async () => {
   await windowLoaded
 
   const provider = await getProvider()
-  return new Web3(provider)
+  return new Web3Eth(provider)
+}
+
+const setupWeb3Watchdog = async (web3) => {
+  const netId = await web3.net.getId()
+  const websocket = netIdToWebsocket(netId)
+
+  return new Web3Eth(websocket)
 }
 
 async function init() {
   const web3 = await setupWeb3()
-  const getAccounts = () => web3.eth.getAccounts()
-  const getBalance = account => web3.eth.getBalance(account)
+  const web3WS = await setupWeb3Watchdog(web3)
+
+  /* 
+   * Web3Eth API Methods
+   */
+
+  const getAccounts = () => web3.getAccounts()
+  const getBalance = account => web3.getBalance(account)
 
   /**
    * getCurrentAccount
-   * @returns {string} currentAccount in Metamask || Provider web3.eth.accounts[0]
+   * @returns {string} currentAccount in Metamask || Provider web3.accounts[0]
   */
   const getCurrentAccount = async () => {
     const [account] = await getAccounts()
@@ -76,34 +91,14 @@ async function init() {
   }
 
   const getNetwork = async () => {
-    const network = await web3.eth.net.getId()
-
-    switch (network) {
-      case 1:
-        return 'Ethereum Mainnet'
-
-      case 2:
-        return 'Morden'
-
-      case 3:
-        return 'Ropsten'
-
-      case 4:
-        return 'Rinkeby'
-
-      case 42:
-        return 'Kovan'
-
-      case null:
-      case undefined:
-        return 'No network detected'
-
-      default:
-        return 'Local Network'
-    }
+    const network = await web3.net.getId()
+    
+    return netIdToName(network)
   }
 
-  const { utils } = web3
+  const getNetworkId = async () => web3.net.getId()
+
+  const utils = Web3Utils
 
   /**
    * toWei // fromWei
@@ -116,13 +111,11 @@ async function init() {
   const fromWei = (amount, x) => utils.fromWei(amount, x)
   const toBN = amount => utils.toBN(amount)
 
-  const getBlockInfo = blockNumber => web3.eth.getBlock(blockNumber)
-
-  // set injected web3 to ours
-  if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') window.web3 = web3
+  const getBlockInfo = blockNumber => web3.getBlock(blockNumber)
 
   return {
     web3,
+    web3WS,
     get currentProvider() {
       return web3.currentProvider
     },
@@ -130,6 +123,7 @@ async function init() {
     getCurrentAccount,
     getCurrentBalance,
     getNetwork,
+    getNetworkId,
     utils,
     toBN,
     fromWei,
