@@ -26,7 +26,7 @@
   "author": "W3stside <doohhello@gmail.com>(https://github.com/w3stside)",
   "license": "MIT",
   "dependencies": {
-    "@gnosis.pm/dx-mgn-pool": "^0.1.0",
+    "@gnosis.pm/dx-mgn-pool": "^0.1.1",
     "css-loader": "^0.28.11",
     "localforage": "^1.7.1",
     "react": "^16.8.1",
