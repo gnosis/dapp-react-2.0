@@ -1,22 +1,7 @@
-import React from 'react'
-
+import DataDisplay from './DataDisplay'
 import { connect } from '../StateProvider'
 
-import { fromWei, mapTS } from '../../api/utils'
-
-const UserStateDisplay = ({
-    account,
-    balance,
-    network,
-}) =>
-  <>
-    <h2>Your Data</h2>
-    <pre className="data-pre-violet word-wrap">
-        <h3>Network: {network}</h3>
-        <h3>Account: {account}</h3>
-        <h3>Balance: {mapTS(fromWei(balance))}</h3>
-    </pre>
-  </>
+import { fromWei } from '../../api/utils'
 
 const mapProps = ({
     state: {
@@ -25,18 +10,11 @@ const mapProps = ({
         balance,
       },
       PROVIDER: { network },
-      DX_MGN_POOL: { tokens, tokenFRT, tokenOWL, priceFeed },
-      CONTRACTS: { dx },
     },
   }) => ({
     account,
-    balance,
-    dx,
+    balance: balance && fromWei(balance),
     network,
-    priceFeed,
-    tokens,
-    tokenFRT,
-    tokenOWL,
   })
   
-  export default connect(mapProps)(UserStateDisplay)
+export default connect(mapProps)(DataDisplay)

@@ -1,11 +1,13 @@
 import React from 'react'
 
 import PoolData from './PoolData'
-import UserState from './UserStateDisplay'
+import DataDisplay from './UserStateDisplay'
 
 const Home = () => (
   <div>
-    <UserState />
+    {/* Show User's State */}
+    <DataDisplay title="Your Data" colour="violet" />
+    {/* DxMgnPool Data */}
     <PoolData />
   </div>
 )
