@@ -27,7 +27,7 @@ const getProvider = async () => {
     if (window.ethereum) {
       // TODO: be careful this doesn't override window.web3 @ 0.20.x
       // with a version 1.X.xx that breaks app...
-      const providerWeb3 = window.web3 = window.ethereum
+      const providerWeb3 = window.ethereum
       try {
           // Request account access if needed
         await providerWeb3.enable()

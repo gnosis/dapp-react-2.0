@@ -15,7 +15,7 @@ const ConfigDisplayerHOC = Component =>
       const { state } = this.props
       return (
         <>
-          { state.loading && <div className="loadingHOC"><img style={{ minWidth: '100%' }} src="https://1.bp.blogspot.com/-Z4NueKmr1Bw/WMkssb-4RGI/AAAAAAAAA98/7BtKVFcqMo0PUMF81wEhsbWWkIMjJDlEQCLcB/s1600/Round%2BAnimated%2BLoading%2BGif.gif" /></div> }
+          { state.loading && <div className="loadingHOC"><h1>LOADING . . .</h1>{/* <img style={{ minWidth: '100%' }} src="" /> */}</div> }
           <h3>Development Context:</h3>
           {Object.keys(this.state).map(stateKey => (
             <div className="displayBanner" key={stateKey}>{`${stateKey}: ${this.state[stateKey]}`}</div>

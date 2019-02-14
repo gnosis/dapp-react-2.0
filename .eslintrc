@@ -62,6 +62,7 @@
         }
       ],
       "react/jsx-indent": 8,
+      "react/jsx-wrap-multilines": 0,
       "no-console": 0,
       "no-trailing-spaces": 0,
       "class-methods-use-this": 0,

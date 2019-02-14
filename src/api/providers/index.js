@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 import Web3Eth from 'web3-eth'
 import { networkById } from '../../globals'
 
@@ -46,7 +47,7 @@ const Providers = {
 
     get providerName() {
       if (!this.checkAvailability()) return null
-
+      console.debug(window.web3)
       if (window.web3.currentProvider.isSafe) return 'GNOSIS SAFE'
       if (window.web3.currentProvider.isMetaMask) return 'METAMASK'
       if (window.mist && window.web3.currentProvider.constructor.name === 'EthereumProvider') return 'MIST'
@@ -56,8 +57,8 @@ const Providers = {
     },
 
     checkAvailability() {
-      if (this.web3) this.walletAvailable = true
-      else this.walletAvailable = typeof window.web3 !== 'undefined' && window.web3.constructor
+      if (this.web3) return this.walletAvailable = true
+      return this.walletAvailable = !!(typeof window.web3 !== 'undefined' && window.web3.constructor)
     },
 
     initialize() {

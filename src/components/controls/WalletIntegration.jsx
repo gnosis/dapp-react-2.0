@@ -87,14 +87,15 @@ function WalletIntegration({
       <h1>Please select a wallet</h1>
       <div className={!initialising ? 'lightBlue' : ''}>
         {Object.keys(Providers).map((provider, i) => {
-          const providerInfo = Providers[provider].providerName || provider
+          const providerObj = Providers[provider]
+					console.debug('TCL: providerObj', providerObj)
           return (
             <div
               role="container"
               key={i}
               onClick={() => onChange(provider)}
             >
-              <h4 className="providerChoice">{`${i + 1}. ${providerInfo}`}</h4>
+              <h4 className="providerChoice">{`${providerObj.providerName}`}</h4>
             </div>
           )
         })}
