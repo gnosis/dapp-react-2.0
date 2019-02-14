@@ -1,12 +1,12 @@
-import Web3Eth from 'web3-eth'
+import Web3 from 'web3'
 import Web3Utils from 'web3-utils'
 
 import { netIdToName, netIdToWebsocket, windowLoaded } from './utils'
 
 /**
- * Web3Eth Provider API
+ * Web3 Provider API
  * Version: 1.0.0beta.xx
- * Will NOT work with Web3Eth@0.20.xx
+ * Will NOT work with Web3@0.20.xx
 */
 
 let appWeb3
@@ -42,21 +42,21 @@ const getProvider = async () => {
     return window.web3.currentProvider
   }
   // window.web3 or window doesnt exist
-  return new Web3Eth('http://localhost:8545')
+  return new Web3('http://localhost:8545')
 }
 
 const setupWeb3 = async () => {
   await windowLoaded
 
   const provider = await getProvider()
-  return new Web3Eth(provider)
+  return new Web3(provider)
 }
 
 const setupWeb3Watchdog = async (web3) => {
-  const netId = await web3.net.getId()
+  const netId = await web3.eth.net.getId()
   const websocket = netIdToWebsocket(netId)
 
-  return new Web3Eth(websocket)
+  return new Web3(websocket)
 }
 
 async function init() {
@@ -64,15 +64,15 @@ async function init() {
   const web3WS = await setupWeb3Watchdog(web3)
 
   /* 
-   * Web3Eth API Methods
+   * Web3 API Methods
    */
 
-  const getAccounts = () => web3.getAccounts()
-  const getBalance = account => web3.getBalance(account)
+  const getAccounts = () => web3.eth.getAccounts()
+  const getBalance = account => web3.eth.getBalance(account)
 
   /**
    * getCurrentAccount
-   * @returns {string} currentAccount in Metamask || Provider web3.accounts[0]
+   * @returns {string} currentAccount in Metamask || Provider web3.eth.accounts[0]
   */
   const getCurrentAccount = async () => {
     const [account] = await getAccounts()
@@ -91,12 +91,12 @@ async function init() {
   }
 
   const getNetwork = async () => {
-    const network = await web3.net.getId()
+    const network = await web3.eth.net.getId()
     
     return netIdToName(network)
   }
 
-  const getNetworkId = async () => web3.net.getId()
+  const getNetworkId = async () => web3.eth.net.getId()
 
   const utils = Web3Utils
 
@@ -111,7 +111,7 @@ async function init() {
   const fromWei = (amount, x) => utils.fromWei(amount, x)
   const toBN = amount => utils.toBN(amount)
 
-  const getBlockInfo = blockNumber => web3.getBlock(blockNumber)
+  const getBlockInfo = blockNumber => web3.eth.getBlock(blockNumber)
 
   return {
     web3,

@@ -167,15 +167,7 @@ const contractArrayToMap = (contractArr, shortContractNamesMap = shortContractNa
 /**
  * getAppContracts = async () => {
  * getContracts
- * @returns
-   { Object
-    {
-      dx: deployedDXContractCode,
-      eth: deployedContractCode,
-      gno: deployedContractCode,
-      ...
-    }
-   }
+ * @returns {{ coord: DContr, eth: DContr, gno: DContr, dxMP: TContr, hft: TContr }}
  */
 export const getAppContracts = async (force) => {
   // Singleton logic - if contractsAPI already initialised, don't re-init
@@ -217,6 +209,9 @@ async function init() {
     return {}
   }
 
+  /**
+   * @type {{ coord: Contract, eth: Contract, gno: Contract, hft: Contract, dxMP: Contract }}
+   */
   const deployedContractsMap = contractArrayToMap(deployedContractsArray)
   
   deployedContractsMap.hft = HumanFriendlyToken

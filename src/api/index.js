@@ -1,6 +1,9 @@
 // API
 import { getTokensAPI } from './Tokens'
 import { getWeb3API } from './ProviderWeb3'
+import { getDxPoolAPI } from './DxPool'
+
+import { fromWei } from '../api/utils'
 
 // API singleton
 let appAPI
@@ -14,30 +17,43 @@ export const getAPI = async () => {
 }
 
 // ============
-// WEB3
+// DX MGN POOL
 // ============
 
-export const toBN = async (amount) => {
-  const { Web3 } = await getAPI()
-
-  return Web3.toBN(amount)
+export const getPoolContracts = async () => {
+  const { getDxPool, getPoolAddresses } = await getDxPoolAPI()
+  
+  const [pool1Address, pool2Address] = await getPoolAddresses()
+  console.log('HERE', pool1Address, pool2Address)
+  
+  return Promise.all([getDxPool(pool1Address), getDxPool(pool2Address)])
 }
 
-export const toWei = async (amount, x) => {
-  const { Web3 } = await getAPI()
-  // TODO: fix this - needed as web3 1.0's toBN is different from old BigNumber
-  if (typeof amount === 'object') amount = await toBN(amount)
+/**
+ * getTotalPoolShares
+ * @returns { BN[] } - [<totalPoolShare1>, <totalPoolShare2>]
+ */
+export const getTotalPoolShares = async () => {
+  const [dxPool1, dxPool2] = await getPoolContracts()
 
-  return Web3.toWei(amount.toString(), x)
-}
-// TODO: toWei & fromWei not working
-export const fromWei = async (amount, x) => {
-  const { Web3 } = await getAPI()
-  // TODO: fix this - needed as web3 1.0's toBN is different from old BigNumber
-  if (typeof amount === 'object') amount = await toBN(amount)
+  const [totalPoolShare1, totalPoolShare2] = await Promise.all([
+    dxPool1.totalPoolShares.call(),
+    dxPool2.totalPoolShares.call(),
+  ])
 
-  return Web3.fromWei(amount.toString(), x)
+  return [totalPoolShare1, totalPoolShare2]
 }
+
+export const getMGNTokenAddress = async () => {
+  const { getMGNAddress, getPoolAddresses } = await getDxPoolAPI()
+  const [pool1Address] = await getPoolAddresses()
+
+  return getMGNAddress(pool1Address)
+}
+
+// ============
+// WEB3
+// ============
 
 export const getCurrentAccount = async () => {
   const { Web3 } = await getAPI()
@@ -182,11 +198,12 @@ export const getState = async ({ account, timestamp: time } = {}) => {
 }
 
 async function init() {
-  const [Web3, Tokens] = await Promise.all([
+  const [Web3, Tokens, DxPool] = await Promise.all([
     getWeb3API(),
     getTokensAPI(),
+    getDxPoolAPI(),
   ])
 
-  console.log('​API init -> ', { Web3, Tokens })
-  return { Web3, Tokens }
+  console.log('​API init -> ', { Web3, Tokens, DxPool })
+  return { Web3, Tokens, DxPool }
 }

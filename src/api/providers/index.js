@@ -1,5 +1,5 @@
 /* eslint-disable no-return-assign */
-import Web3Eth from 'web3-eth'
+import Web3 from 'web3'
 import { networkById } from '../../globals'
 
 export const getAccount = async (provider) => {
@@ -47,7 +47,7 @@ const Providers = {
 
     get providerName() {
       if (!this.checkAvailability()) return null
-      console.debug(window.web3)
+      
       if (window.web3.currentProvider.isSafe) return 'GNOSIS SAFE'
       if (window.web3.currentProvider.isMetaMask) return 'METAMASK'
       if (window.mist && window.web3.currentProvider.constructor.name === 'EthereumProvider') return 'MIST'
@@ -63,7 +63,7 @@ const Providers = {
 
     initialize() {
       if (!this.checkAvailability()) return
-      this.web3 = new Web3Eth(window.web3.currentProvider)
+      this.web3 = new Web3(window.web3.currentProvider)
       this.state = {}
 
       return this.web3
