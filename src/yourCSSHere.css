@@ -17,6 +17,11 @@ pre {
 
 .word-wrap {
     white-space: pre-wrap;
+    overflow: hidden;
+}
+
+.data-pre-gray {
+    background-color: lightgray;
 }
 
 .data-pre-pink {
@@ -108,7 +113,7 @@ input[type="text"] {
     flex-flow: column nowrap;
 
     border: dotted;
-    padding: 0 5px;
+    padding: 0 5px 15px;
 }
 
 .poolInnerContainer {
@@ -123,4 +128,12 @@ input[type="text"] {
     text-align: center;
 
     margin: 5px;
+}
+
+.clickableHeader {
+    cursor: pointer;
+}
+
+.hideContent {
+    height: 0;
 }
