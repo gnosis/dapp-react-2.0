@@ -1,7 +1,9 @@
 import React from 'react'
-import { getTokensAPI } from '../api/Tokens'
-import { getDutchXAPI } from '../api/DutchX'
+// import { getTokensAPI } from '../api/Tokens'
+import { getDxPoolAPI } from '../api/DxPool'
 import { getWeb3API } from '../api/ProviderWeb3'
+import { getTotalPoolShares, getMGNTokenAddress } from '../api'
+import { mapTS } from '../api/utils'
 
 const defaultState = {
   USER: {
@@ -13,8 +15,13 @@ const defaultState = {
     network: 'NETWORK NOT SUPPORTED',
     providers: [],
   },
-  DX: {
-    tokens: undefined,
+  DX_MGN_POOL: {
+    pool1: {
+      totalShare: 0,
+    },
+    pool2: {
+      totalShare: 0,
+    },
   },
   CONTRACTS: {},
   loading: false,
@@ -27,16 +34,17 @@ const memoizedContextValue = ({
   state,
   // Dispatchers
   appLoading,
-  getDXTokenBalance,
   grabDXState,
   grabUserState,
   registerProviders,
   saveContract,
   setActiveProvider,
+  saveTotalPoolShares,
+  saveMGNAddress,
 }) => {
   if (setToContext.has(state)) return setToContext.get(state)
 
-  const contextValue = { state, appLoading, grabUserState, grabDXState, registerProviders, setActiveProvider, getDXTokenBalance, saveContract }
+  const contextValue = { state, appLoading, grabUserState, grabDXState, registerProviders, setActiveProvider, saveTotalPoolShares, saveContract, saveMGNAddress }
   setToContext.set(state, contextValue)
   return contextValue
 }
@@ -60,30 +68,27 @@ class AppProvider extends React.Component {
 
 
   // DX DISPATCHERS
-  getDXTokenBalance = async (tokenAddress, userAccount) => {
-    const { getTokenSymbol } = await getTokensAPI()
-    const { getDXTokenBalance } = await getDutchXAPI()
+  saveTotalPoolShares = async () => {
+    const [totalShare1, totalShare2] = mapTS(await getTotalPoolShares())
 
-    const [symbol, balance] = await Promise.all([
-      getTokenSymbol(tokenAddress),
-      getDXTokenBalance(tokenAddress, userAccount),
-    ])
     return this.setState(prevState => ({
       ...prevState,
-      DX: {
-        ...prevState.DX,
-        tokens: {
-          [tokenAddress]: {
-            symbol,
-            balance: balance.toString(),
-          },
+      DX_MGN_POOL: {
+        ...prevState.DX_MGN_POOL,
+        pool1: {
+          totalShare: totalShare1,
+        },
+        pool2: {
+          totalShare: totalShare2,
         },
       },
     }))
   }
 
+  saveMGNAddress = async () => getMGNTokenAddress()
+
   grabDXState = async () => {
-    const { getFRTAddress, getOWLAddress, getPriceFeedAddress } = await getDutchXAPI()
+    const { getFRTAddress, getOWLAddress, getPriceFeedAddress } = await getDxPoolAPI()
     const [frtTokenAddress, owlTokenAddress, priceFeedAddress] = await Promise.all([
       getFRTAddress(),
       getOWLAddress(),
@@ -91,15 +96,15 @@ class AppProvider extends React.Component {
     ])
     return this.setState(prevState => ({
       ...prevState,
-      DX: {
-        ...prevState.DX,
+      DX_MGN_POOL: {
+        ...prevState.DX_MGN_POOL,
         tokenFRT: {
           address: frtTokenAddress,
-          ...prevState.DX.tokenFRT,
+          ...prevState.DX_MGN_POOL.tokenFRT,
         },
         tokenOWL: {
           address: owlTokenAddress,
-          ...prevState.DX.tokenOWL,
+          ...prevState.DX_MGN_POOL.tokenOWL,
         },
         priceFeed: priceFeedAddress,
       },

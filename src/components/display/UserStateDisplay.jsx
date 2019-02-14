@@ -10,8 +10,7 @@ const UserStateDisplay = ({
     network,
 }) =>
     <div>
-        <h1>Provider state:</h1>
-
+        <h2>Your Data:</h2>
         <h3>Network: {network}</h3>
         <h3>Account: {account}</h3>
         <h3>Balance: {mapTS(fromWei(balance))}</h3>
@@ -24,7 +23,7 @@ const mapProps = ({
         balance,
       },
       PROVIDER: { network },
-      DX: { tokens, tokenFRT, tokenOWL, priceFeed },
+      DX_MGN_POOL: { tokens, tokenFRT, tokenOWL, priceFeed },
       CONTRACTS: { dx },
     },
   }) => ({

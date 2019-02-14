@@ -15,6 +15,7 @@ function WalletIntegration({
     registerProviders, 
     saveContract, 
     setActiveProvider,
+    saveTotalPoolShares,
   }, 
   state: { activeProvider }, 
   children,
@@ -70,6 +71,9 @@ function WalletIntegration({
       // First time grab userState
       await grabUserState()
 
+      // Test - TODO: remove
+      await saveTotalPoolShares()
+
       appLoading(false)
 
       return setInitialising(false)
@@ -88,7 +92,6 @@ function WalletIntegration({
       <div className={!initialising ? 'lightBlue' : ''}>
         {Object.keys(Providers).map((provider, i) => {
           const providerObj = Providers[provider]
-					console.debug('TCL: providerObj', providerObj)
           return (
             <div
               role="container"
@@ -115,7 +118,8 @@ const mapProps = ({
   // state properties
   state: {
     PROVIDER: { activeProvider, network },
-    USER: { account, balance },
+    USER,
+    DX_MGN_POOL,
     loading,
   },
   // dispatchers
@@ -126,13 +130,14 @@ const mapProps = ({
   setActiveProvider,
   getDXTokenBalance,
   saveContract,
+  saveTotalPoolShares,
 }) => ({
   // state properties
   state: {
+    USER,
+    DX_MGN_POOL,
     activeProvider,
     network,
-    account,
-    balance,
     loading,
   },
   // dispatchers
@@ -144,6 +149,7 @@ const mapProps = ({
     setActiveProvider,
     getDXTokenBalance,
     saveContract,
+    saveTotalPoolShares,
   },
 })
 

@@ -20,7 +20,10 @@ const ConfigDisplayerHOC = Component =>
           {Object.keys(this.state).map(stateKey => (
             <div className="displayBanner" key={stateKey}>{`${stateKey}: ${this.state[stateKey]}`}</div>
           ))}
-          <pre>
+          <pre className="data-pre">
+            App State:
+            <br />
+            <br />
             {JSON.stringify(state, undefined, 2)}
           </pre>
           <Component {...this.props} {...this.state} />
