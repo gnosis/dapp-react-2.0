@@ -118,8 +118,7 @@ function WalletIntegration({
 const mapProps = ({
   // state properties
   state: {
-    PROVIDER: { activeProvider, network },
-    USER,
+    PROVIDER: { activeProvider },
     DX_MGN_POOL,
     loading,
   },
@@ -135,10 +134,8 @@ const mapProps = ({
 }) => ({
   // state properties
   state: {
-    USER,
     DX_MGN_POOL,
     activeProvider,
-    network,
     loading,
   },
   // dispatchers

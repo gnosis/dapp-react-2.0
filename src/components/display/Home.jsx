@@ -5,10 +5,10 @@ import DataDisplay from './UserStateDisplay'
 
 const Home = () => (
   <div>
-    {/* Show User's State */}
-    <DataDisplay title="Your Data" colour="violet" />
     {/* DxMgnPool Data */}
     <PoolData />
+    {/* Show User's State */}
+    <DataDisplay title="Your Data" colour="violet" />
   </div>
 )
 

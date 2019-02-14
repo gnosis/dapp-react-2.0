@@ -13,8 +13,9 @@ const mapProps = ({
     },
   }) => ({
     account,
-    balance: balance && fromWei(balance),
     network,
+    "balance (ETH)": balance && fromWei(balance).toString(),
+    "balance (locked MGN)": "0",
   })
   
 export default connect(mapProps)(DataDisplay)

@@ -1,9 +1,14 @@
 import React, { useState } from 'react'
 
 const DataDisplay = (props) => {
-    const { title = 'Untitled Data', colour = 'gray', ...rest } = props
+    const { 
+      title = 'Untitled Data', 
+      colour = 'gray', 
+      startOpen = true,
+      ...rest 
+    } = props
     
-    const [open, setOpen] = useState(true)
+    const [open, setOpen] = useState(startOpen)
     return (
       <>
         <h2 className="clickableHeader" onClick={() => setOpen(!open)}>{title} (show/hide)</h2>

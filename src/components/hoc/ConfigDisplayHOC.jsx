@@ -1,5 +1,5 @@
 import React from 'react'
-import DataDisplay from '../display/UserStateDisplay'
+import DataDisplay from '../display/DataDisplay'
 
 /**
  * Configuration Displayer HOC
@@ -11,8 +11,8 @@ const ConfigDisplayerHOC = Component =>
       ENV: process.env.NODE_ENV,
       TIME: (new Date()).toString(),
     }
-
     render() {
+      console.debug(this.props.state)
       const { state } = this.props
       return (
         <>
@@ -21,7 +21,7 @@ const ConfigDisplayerHOC = Component =>
           {Object.keys(this.state).map(stateKey => (
             <pre className="data-pre-yellow word-wrap" key={stateKey}>{`${stateKey}: ${this.state[stateKey]}`}</pre>
           ))}
-          <DataDisplay title="APP STATE" colour="pink" {...this.props.state} />
+          <DataDisplay title="APP STATE" startOpen={false} colour="pink" {...this.props.state} />
           <Component {...this.props} {...this.state} />
         </>
       )
