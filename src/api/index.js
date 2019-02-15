@@ -3,7 +3,7 @@ import { getTokensAPI } from './Tokens'
 import { getWeb3API } from './ProviderWeb3'
 import { getDxPoolAPI } from './DxPool'
 
-import { fromWei } from '../api/utils'
+import { fromWei, toBN } from '../api/utils'
 
 // API singleton
 let appAPI
@@ -108,8 +108,8 @@ export const calculateUserParticipation = async (address) => {
   ])
 
   // Accum all indices
-  const totalUserParticipation1 = participationsByAddress1.reduce((accum, item) => accum.add(item))
-  const totalUserParticipation2 = participationsByAddress2.reduce((accum, item) => accum.add(item))
+  const [totalUserParticipation1] = participationsByAddress1.reduce((accum, item) => accum.add(item), [toBN(0)])
+  const [totalUserParticipation2] = participationsByAddress2.reduce((accum, item) => accum.add(item), [toBN(0)])
 	console.log('TCL: calculateUsersParticipation -> totalUserParticipation1', totalUserParticipation1)
 
   return [totalUserParticipation1, totalUserParticipation2]
