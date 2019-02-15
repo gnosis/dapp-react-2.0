@@ -39,7 +39,7 @@ module.exports = (_, { mode }) => {
 
   if (prodBuild) {
     plugins.push(new MiniCssExtractPlugin({
-      filename: 'dxfrontend-[name].[hash].css',
+      filename: 'dx-mgn-pool-frontend-[name].[hash].css',
       chunkFilename: '[id].[hash].css',
     }))
   }
