@@ -8,10 +8,11 @@ import { getAppContracts } from '../../api/Contracts'
 import { fromWei } from '../../api/utils'
 
 import ConfigDisplayerHOC from '../hoc/ConfigDisplayHOC'
+import ModalHOC from '../hoc/ModalHOC'
 
 function WalletIntegration({ 
   dispatchers: { 
-    appLoading, 
+    // appLoading, 
     grabUserState, 
     registerProviders, 
     saveContract, 
@@ -19,6 +20,7 @@ function WalletIntegration({
     saveTotalPoolShares,
     saveMGNAddressAndBalance,
     setUserParticipation,
+    showModal,
   }, 
   state: { activeProvider }, 
   children,
@@ -44,9 +46,10 @@ function WalletIntegration({
    */
   const onChange = async (providerInfo) => {
     try {
-      // Set loader
-      appLoading(true)
-      
+      // Set Modal
+      showModal('LOADING USER DATA . . .')
+      // appLoading(true)
+
       // State setters
       setError(undefined)
       setInitialising(true)
@@ -82,12 +85,15 @@ function WalletIntegration({
 
       await setUserParticipation()
 
-      appLoading(false)
+      // Hide Modal, all good!
+      showModal(undefined)
+      // appLoading(false)
 
       return setInitialising(false)
     } catch (err) {
       console.error(err)
-      appLoading(false)
+      showModal(undefined)
+      // appLoading(false)
       
       setInitialising(false)
       return setError(error)
@@ -142,6 +148,7 @@ const mapProps = ({
       balance,
     },
     loading,
+    SHOW_MODAL,
   },
   // dispatchers
   appLoading,
@@ -154,6 +161,7 @@ const mapProps = ({
   saveTotalPoolShares,
   saveMGNAddressAndBalance,
   setUserParticipation,
+  showModal,
 }) => ({
   // state properties
   state: {
@@ -165,6 +173,7 @@ const mapProps = ({
     "[MGN] Balance": balance && fromWei(balance).toString(),
     activeProvider,
     loading,
+    SHOW_MODAL,
   },
   // dispatchers
   dispatchers: {
@@ -178,9 +187,10 @@ const mapProps = ({
     saveTotalPoolShares,
     saveMGNAddressAndBalance,
     setUserParticipation,
+    showModal,
   },
 })
 
-export default connect(mapProps)(process.env.NODE_ENV !== 'production'
-  ? ConfigDisplayerHOC(WalletIntegration)
-  : WalletIntegration)
+export default connect(mapProps)(process.env.SHOW_APP_DATA === 'true'
+  ? ModalHOC(ConfigDisplayerHOC(WalletIntegration))
+  : ModalHOC(WalletIntegration))
