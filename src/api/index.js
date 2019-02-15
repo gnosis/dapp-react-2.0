@@ -103,8 +103,8 @@ export const calculateUserParticipation = async (address) => {
   const [dxPool1, dxPool2] = await getPoolContracts()
 
   const [participationsByAddress1, participationsByAddress2] = await Promise.all([
-    dxPool1.participationsByAddress.call(address),
-    dxPool2.participationsByAddress.call(address),
+    dxPool1.poolSharesByAddress.call(address),
+    dxPool2.poolSharesByAddress.call(address),
   ])
 
   // Accum all indices

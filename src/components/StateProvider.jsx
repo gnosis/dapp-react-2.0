@@ -36,6 +36,7 @@ const defaultState = {
   },
   CONTRACTS: {},
   loading: false,
+  SHOW_MODAL: undefined,
 }
 
 const { Provider, Consumer } = React.createContext(defaultState)
@@ -53,6 +54,7 @@ const memoizedContextValue = ({
   saveTotalPoolShares,
   saveMGNAddressAndBalance,
   setUserParticipation,
+  showModal,
 }) => {
   if (setToContext.has(state)) return setToContext.get(state)
 
@@ -67,6 +69,7 @@ const memoizedContextValue = ({
     saveContract, 
     saveMGNAddressAndBalance, 
     setUserParticipation,
+    showModal,
   }
 
   setToContext.set(state, contextValue)
@@ -79,7 +82,7 @@ class AppProvider extends React.Component {
   }
   // GENERIC DISPATCHERS
   appLoading = loadingState => this.setState(({ loading: loadingState }))
-
+  showModal = message => this.setState(({ SHOW_MODAL: message }))
   // CONTRACT DISPATCHERS
   saveContract = ({ name, contract }) =>
     this.setState(prevState => ({
