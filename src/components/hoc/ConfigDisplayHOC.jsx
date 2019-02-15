@@ -12,7 +12,6 @@ const ConfigDisplayerHOC = Component =>
       TIME: (new Date()).toString(),
     }
     render() {
-      console.debug(this.props.state)
       const { state } = this.props
       return (
         <>

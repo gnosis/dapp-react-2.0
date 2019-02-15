@@ -2,7 +2,12 @@ import React from 'react'
 // import { getTokensAPI } from '../api/Tokens'
 import { getDxPoolAPI } from '../api/DxPool'
 import { getWeb3API } from '../api/ProviderWeb3'
-import { getTotalPoolShares, getMGNTokenAddress } from '../api'
+import { 
+  getTotalPoolShares, 
+  getMGNTokenAddress, 
+  getMGNTokenBalance,
+  calculateUserParticipation,
+} from '../api'
 import { mapTS } from '../api/utils'
 
 const defaultState = {
@@ -18,10 +23,16 @@ const defaultState = {
   DX_MGN_POOL: {
     pool1: {
       totalShare: 0,
+      totalUserParticipation: 0,
     },
     pool2: {
       totalShare: 0,
+      totalUserParticipation: 0,
     },
+  },
+  TOKEN_MGN: {
+    address: undefined,
+    balance: undefined,
   },
   CONTRACTS: {},
   loading: false,
@@ -40,11 +51,24 @@ const memoizedContextValue = ({
   saveContract,
   setActiveProvider,
   saveTotalPoolShares,
-  saveMGNAddress,
+  saveMGNAddressAndBalance,
+  setUserParticipation,
 }) => {
   if (setToContext.has(state)) return setToContext.get(state)
 
-  const contextValue = { state, appLoading, grabUserState, grabDXState, registerProviders, setActiveProvider, saveTotalPoolShares, saveContract, saveMGNAddress }
+  const contextValue = { 
+    state, 
+    appLoading, 
+    grabUserState, 
+    grabDXState, 
+    registerProviders, 
+    setActiveProvider, 
+    saveTotalPoolShares, 
+    saveContract, 
+    saveMGNAddressAndBalance, 
+    setUserParticipation,
+  }
+
   setToContext.set(state, contextValue)
   return contextValue
 }
@@ -66,7 +90,6 @@ class AppProvider extends React.Component {
       },
     }))
 
-
   // DX DISPATCHERS
   saveTotalPoolShares = async () => {
     const [totalShare1, totalShare2] = mapTS(await getTotalPoolShares())
@@ -85,7 +108,41 @@ class AppProvider extends React.Component {
     }))
   }
 
-  saveMGNAddress = async () => getMGNTokenAddress()
+  saveMGNAddressAndBalance = async () => {
+    const address = await getMGNTokenAddress()
+    const balance = await getMGNTokenBalance(this.state.USER.account)
+		console.log('TCL: AppProvider -> saveMGNAddressAndBalance -> address', address)
+		console.log('TCL: AppProvider -> saveMGNAddressAndBalance -> balance', balance)
+
+    this.setState(prevState => ({
+      ...prevState,
+      TOKEN_MGN: {
+        address,
+        balance,
+      },
+    }))
+  }
+
+  setUserParticipation = async () => {
+    const { USER: { account } } = this.state
+    const [totalContribution1, totalContribution2] = await calculateUserParticipation(account)
+    console.log('TCL: AppProvider -> setUserParticipation -> totalContribution1, totalContribution2', mapTS(totalContribution1), mapTS(totalContribution2))
+    
+    this.setState(prevState => ({
+      ...prevState,
+      DX_MGN_POOL: {
+        ...prevState.DX_MGN_POOL,
+        pool1: {
+          ...prevState.DX_MGN_POOL.pool1,
+          totalUserParticipation: totalContribution1,
+        },
+        pool2: {
+          ...prevState.DX_MGN_POOL.pool2,
+          totalUserParticipation: totalContribution2,
+        },
+      },
+    }))
+  }
 
   grabDXState = async () => {
     const { getFRTAddress, getOWLAddress, getPriceFeedAddress } = await getDxPoolAPI()

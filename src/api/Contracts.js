@@ -128,9 +128,10 @@ for (const contrArt of contractArtifacts) {
 */
 const TruffleWrappedContractArtifacts = contractArtifacts.map(contractArtifact => TruffleContract(contractArtifact))
 
-// Wrap and deploy HumanFriendlyToken to interface with any Token contract addresses called
+// Wrap and deploy HumanFriendlyToken/DxMgnPool/TokenFRT to interface with any contract addresses called
 export const HumanFriendlyToken = TruffleContract(require('@gnosis.pm/util-contracts/build/contracts/HumanFriendlyToken.json'))
 export const DxMgnPool = TruffleContract(require('@gnosis.pm/dx-mgn-pool/build/contracts/DxMgnPool.json'))
+export const TokenMGN = TruffleContract(require('@gnosis.pm/dx-contracts/build/contracts/TokenFRT.json'))
 
 /**
  * setContractProvider
@@ -140,7 +141,7 @@ export const DxMgnPool = TruffleContract(require('@gnosis.pm/dx-mgn-pool/build/c
 const setContractProvider =
   provider =>
     TruffleWrappedContractArtifacts
-      .concat([HumanFriendlyToken, DxMgnPool])
+      .concat([HumanFriendlyToken, DxMgnPool, TokenMGN])
       .forEach((c) => { c.setProvider(provider) })
 
 /**
@@ -210,12 +211,13 @@ async function init() {
   }
 
   /**
-   * @type {{ coord: Contract, eth: Contract, gno: Contract, hft: Contract, dxMP: Contract }}
+   * @type {{ coord: Contract, eth: Contract, gno: Contract, hft: Contract, dxMP: Contract, mgn: Contract }}
    */
   const deployedContractsMap = contractArrayToMap(deployedContractsArray)
   
   deployedContractsMap.hft = HumanFriendlyToken
   deployedContractsMap.dxMP = DxMgnPool
+  deployedContractsMap.mgn = TokenMGN
 
   if (process.env.NODE_ENV === 'development') {
     // make it available globally

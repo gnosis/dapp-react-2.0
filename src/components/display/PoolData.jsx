@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from '../StateProvider'
+import { fromWei } from '../../api/utils'
 
 const PoolData = ({
     DX_MGN_POOL,
@@ -13,17 +14,17 @@ const PoolData = ({
                 <div className="poolInnerContainer">
                     {/* POOL 1 */}
                     <pre className="poolDataContainer data-pre-blue">
-                        <h2>DxMGNPool #1</h2>
+                        <h2>DxMGNPool #1 {/* TOKEN SYMBOL HERE */}</h2>
                         <ul>
-                            {Object.keys(pool1).map((key, idx) => <li key={idx * Math.random()}>{`${key}: ${pool1[key]}`}</li>)}
+                            {Object.keys(pool1).map((key, idx) => <li key={idx * Math.random()}>{`${key}: ${pool1[key] && fromWei(pool1[key])}`}</li>)}
                         </ul>
                     </pre>
 
                     {/* POOL 2 */}
                     <pre className="poolDataContainer data-pre-green">
-                        <h2>DxMGNPool #2</h2>
+                        <h2>DxMGNPool #2 {/* TOKEN SYMBOL HERE */}</h2>
                         <ul>
-                            {Object.keys(pool2).map((key, idx) => <li key={idx * Math.random()}>{`${key}: ${pool2[key]}`}</li>)}
+                            {Object.keys(pool2).map((key, idx) => <li key={idx * Math.random()}>{`${key}: ${pool2[key] && fromWei(pool2[key])}`}</li>)}
                         </ul>
                     </pre>
                 </div>

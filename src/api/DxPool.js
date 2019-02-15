@@ -10,7 +10,7 @@ export const getDxPoolAPI = async () => {
 }
 
 async function init() {
-  const { coord, dxMP } = await getAppContracts()
+  const { coord, dxMP, mgn } = await getAppContracts()
 
   /**
    * getDxPool
@@ -36,8 +36,23 @@ async function init() {
    * @param { string } address
    * @returns { string } return address of MGN Token (as string)
    */
-  const getMGNAddress = async address => (await getDxPool(address)).frtToken.call()
+  const getMGNAddress = async address => (await getDxPool(address)).mgnToken.call()
 
+  const getTokenMGN = async (address) => {
+    try {
+      return mgn.at(address)
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * getMGNAddress
+   * @param { string } address
+   * @returns { string } return address of MGN Token (as string)
+   */
+  const getMGNBalance = async (address, userAddress) => (await getTokenMGN(address)).lockedTokenBalances.call(userAddress)
+  
   /* 
   const getLatestAuctionIndex = ({ sell: { address: t1 }, buy: { address: t2 } }) =>
     dx.getAuctionIndex.call(t1, t2)
@@ -64,7 +79,9 @@ async function init() {
     },
     getDxPool,
     getPoolAddresses,
+    getTokenMGN,
     getMGNAddress,
+    getMGNBalance,
     // event,
     // allEvents,
   }

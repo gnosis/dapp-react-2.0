@@ -17,41 +17,6 @@ export const getAPI = async () => {
 }
 
 // ============
-// DX MGN POOL
-// ============
-
-export const getPoolContracts = async () => {
-  const { getDxPool, getPoolAddresses } = await getDxPoolAPI()
-  
-  const [pool1Address, pool2Address] = await getPoolAddresses()
-  console.log('HERE', pool1Address, pool2Address)
-  
-  return Promise.all([getDxPool(pool1Address), getDxPool(pool2Address)])
-}
-
-/**
- * getTotalPoolShares
- * @returns { BN[] } - [<totalPoolShare1>, <totalPoolShare2>]
- */
-export const getTotalPoolShares = async () => {
-  const [dxPool1, dxPool2] = await getPoolContracts()
-
-  const [totalPoolShare1, totalPoolShare2] = await Promise.all([
-    dxPool1.totalPoolShares.call(),
-    dxPool2.totalPoolShares.call(),
-  ])
-
-  return [totalPoolShare1, totalPoolShare2]
-}
-
-export const getMGNTokenAddress = async () => {
-  const { getMGNAddress, getPoolAddresses } = await getDxPoolAPI()
-  const [pool1Address] = await getPoolAddresses()
-
-  return getMGNAddress(pool1Address)
-}
-
-// ============
 // WEB3
 // ============
 
@@ -85,6 +50,69 @@ export const getAccountAndTimestamp = async () => {
     account,
     timestamp,
   }
+}
+
+export const fillDefaultAccount = account => (!account ? getCurrentAccount() : account)
+
+// ============
+// DX MGN POOL
+// ============
+
+export const getPoolContracts = async () => {
+  const { getDxPool, getPoolAddresses } = await getDxPoolAPI()
+  
+  const [pool1Address, pool2Address] = await getPoolAddresses()
+  
+  return Promise.all([getDxPool(pool1Address), getDxPool(pool2Address)])
+}
+
+/**
+ * getTotalPoolShares
+ * @returns { BN[] } - [<totalPoolShare1>, <totalPoolShare2>]
+ */
+export const getTotalPoolShares = async () => {
+  const [dxPool1, dxPool2] = await getPoolContracts()
+
+  const [totalPoolShare1, totalPoolShare2] = await Promise.all([
+    dxPool1.totalPoolShares.call(),
+    dxPool2.totalPoolShares.call(),
+  ])
+
+  return [totalPoolShare1, totalPoolShare2]
+}
+
+export const getMGNTokenAddress = async () => {
+  const { getMGNAddress, getPoolAddresses } = await getDxPoolAPI()
+  const [pool1Address] = await getPoolAddresses()
+
+  return getMGNAddress(pool1Address)
+}
+
+export const getMGNTokenBalance = async (userAddress) => {
+  userAddress = await fillDefaultAccount(userAddress)
+  
+  const { getMGNAddress, getMGNBalance, getPoolAddresses } = await getDxPoolAPI()
+  const [pool1Address] = await getPoolAddresses()
+  const mgnAddress = await getMGNAddress(pool1Address)
+
+  return getMGNBalance(mgnAddress, userAddress)
+}
+
+export const calculateUserParticipation = async (address) => {
+  address = await fillDefaultAccount(address)
+  const [dxPool1, dxPool2] = await getPoolContracts()
+
+  const [participationsByAddress1, participationsByAddress2] = await Promise.all([
+    dxPool1.participationsByAddress.call(address),
+    dxPool2.participationsByAddress.call(address),
+  ])
+
+  // Accum all indices
+  const totalUserParticipation1 = participationsByAddress1.reduce((accum, item) => accum.add(item))
+  const totalUserParticipation2 = participationsByAddress2.reduce((accum, item) => accum.add(item))
+	console.log('TCL: calculateUsersParticipation -> totalUserParticipation1', totalUserParticipation1)
+
+  return [totalUserParticipation1, totalUserParticipation2]
 }
 
 // ============

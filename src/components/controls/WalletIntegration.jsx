@@ -5,6 +5,7 @@ import Providers from '../../api/providers'
 import { connect } from '../StateProvider'
 import { getAPI } from '../../api'
 import { getAppContracts } from '../../api/Contracts'
+import { fromWei } from '../../api/utils'
 
 import ConfigDisplayerHOC from '../hoc/ConfigDisplayHOC'
 
@@ -16,6 +17,8 @@ function WalletIntegration({
     saveContract, 
     setActiveProvider,
     saveTotalPoolShares,
+    saveMGNAddressAndBalance,
+    setUserParticipation,
   }, 
   state: { activeProvider }, 
   children,
@@ -74,6 +77,11 @@ function WalletIntegration({
       // Test - TODO: remove
       await saveTotalPoolShares()
 
+      // Test - TODO: remove
+      await saveMGNAddressAndBalance()
+
+      await setUserParticipation()
+
       appLoading(false)
 
       return setInitialising(false)
@@ -119,7 +127,20 @@ const mapProps = ({
   // state properties
   state: {
     PROVIDER: { activeProvider },
-    DX_MGN_POOL,
+    DX_MGN_POOL: {
+      pool1: {
+        totalShare,
+        totalUserParticipation: totalUserParticipation1,
+      },
+      pool2: {
+        totalShare: totalShare2,
+        totalUserParticipation: totalUserParticipation2,
+      },
+    },
+    TOKEN_MGN: {
+      address,
+      balance,
+    },
     loading,
   },
   // dispatchers
@@ -131,10 +152,17 @@ const mapProps = ({
   getDXTokenBalance,
   saveContract,
   saveTotalPoolShares,
+  saveMGNAddressAndBalance,
+  setUserParticipation,
 }) => ({
   // state properties
   state: {
-    DX_MGN_POOL,
+    "[Pool #1] Total Share": totalShare && fromWei(totalShare).toString(),
+    "[Pool #1] User's Share": totalUserParticipation1 && fromWei(totalUserParticipation1).toString(),
+    "[Pool #2] Total Share": totalShare2 && fromWei(totalShare2).toString(),
+    "[Pool #2] User's Share": totalUserParticipation2 && fromWei(totalUserParticipation2).toString(),
+    "[MGN] Address": address,
+    "[MGN] Balance": balance && fromWei(balance).toString(),
     activeProvider,
     loading,
   },
@@ -148,6 +176,8 @@ const mapProps = ({
     getDXTokenBalance,
     saveContract,
     saveTotalPoolShares,
+    saveMGNAddressAndBalance,
+    setUserParticipation,
   },
 })
 
