@@ -12,10 +12,8 @@ const ConfigDisplayerHOC = Component =>
       TIME: (new Date()).toString(),
     }
     render() {
-      const { state } = this.props
       return (
         <>
-          { state.loading && <div className="loadingHOC"><h1>LOADING . . .</h1></div> }
           <h3>Development Context</h3>
           {Object.keys(this.state).map(stateKey => (
             <pre className="data-pre-yellow word-wrap" key={stateKey}>{`${stateKey}: ${this.state[stateKey]}`}</pre>
@@ -26,5 +24,7 @@ const ConfigDisplayerHOC = Component =>
       )
     }
   }
+
+/* <div className="loadingHOC"><h1>LOADING . . .</h1></div> */
 
 export default ConfigDisplayerHOC
