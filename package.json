@@ -1,7 +1,7 @@
 {
   "name": "dx-mgn-pool-react",
   "version": "0.0.1",
-  "description": "",
+  "description": "Dx-Mgn-Pool React frontend",
   "main": "src/index.js",
   "scripts": {
     "build": "cross-env ETH_NETWORK=*net webpack --mode production",
@@ -25,6 +25,10 @@
   },
   "author": "W3stside <doohhello@gmail.com>(https://github.com/w3stside)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gnosis/dx-mgn-pool-react.git"
+  },
   "dependencies": {
     "@gnosis.pm/dx-mgn-pool": "^0.1.1",
     "css-loader": "^0.28.11",
