@@ -15,7 +15,7 @@ async function init() {
   /**
    * getDxPool
    * @param {string} address 
-   * @returns {contract} - Returns dxMgnPool contract at passed in address, if it exists
+   * @returns {contract} - dxMgnPool <Contract>
    */
   const getDxPool = async (address) => {
     try {
@@ -26,6 +26,13 @@ async function init() {
   }
 
   /**
+   * getPoolTokensAddresses
+   * @param { string } address 
+   * @returns { Promise<string[]> } - [ dtAddress, stAddress ]
+   */
+  const getPoolTokensAddresses = async address => [(await getDxPool(address)).depositToken.call(), (await getDxPool(address)).secondaryToken.call()]
+
+  /**
    * getPoolAddresses
    * @returns { string[] } - returns array of [dxMgnPool1 address, dxMgnPool2 address]
    */
@@ -34,7 +41,7 @@ async function init() {
   /**
    * getMGNAddress
    * @param { string } address
-   * @returns { string } return address of MGN Token (as string)
+   * @returns { string } mgnTokenAddress
    */
   const getMGNAddress = async address => (await getDxPool(address)).mgnToken.call()
 
@@ -49,7 +56,7 @@ async function init() {
   /**
    * getMGNAddress
    * @param { string } address
-   * @returns { string } return address of MGN Token (as string)
+   * @returns { BN } mgnTokenBalance <BN>
    */
   const getMGNBalance = async (address, userAddress) => (await getTokenMGN(address)).lockedTokenBalances.call(userAddress)
   
@@ -82,6 +89,7 @@ async function init() {
     getTokenMGN,
     getMGNAddress,
     getMGNBalance,
+    getPoolTokensAddresses,
     // event,
     // allEvents,
   }

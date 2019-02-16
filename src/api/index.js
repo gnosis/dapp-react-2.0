@@ -2,7 +2,7 @@
 import { getTokensAPI } from './Tokens'
 import { getWeb3API } from './ProviderWeb3'
 import { getDxPoolAPI } from './DxPool'
-
+import { getAppContracts } from './Contracts'
 import { fromWei, toBN } from '../api/utils'
 
 // API singleton
@@ -98,6 +98,38 @@ export const getMGNTokenBalance = async (userAddress) => {
   return getMGNBalance(mgnAddress, userAddress)
 }
 
+export const getPoolTokensInfo = async () => {
+  const [{ hft }, [dxPool1]] = await Promise.all([
+    getAppContracts(),
+    getPoolContracts(),
+  ])
+
+  const [dtAddress, stAddress] = await Promise.all([
+    dxPool1.depositToken.call(),
+    dxPool1.secondaryToken.call(),
+  ])
+
+  const [depositToken, secondaryToken] = await Promise.all([
+    hft.at(dtAddress),
+    hft.at(stAddress),
+  ])
+
+  return [
+    {
+      title: 'Deposit Token',
+      name: await depositToken.name.call() || 'Unknown token name',
+      symbol: await depositToken.symbol.call() || 'Unknown token symbol',
+      decimals: (await depositToken.decimals.call()).toNumber() || 18,
+    },
+    {
+      title: 'Secondary Token',
+      name: await secondaryToken.name.call() || 'Unknown token name',
+      symbol: await secondaryToken.symbol.call() || 'Unknown token symbol',
+      decimals: (await secondaryToken.decimals.call()).toNumber() || 18,
+    },
+  ]
+}
+
 export const calculateUserParticipation = async (address) => {
   address = await fillDefaultAccount(address)
   const [dxPool1, dxPool2] = await getPoolContracts()
@@ -114,6 +146,11 @@ export const calculateUserParticipation = async (address) => {
   return [totalUserParticipation1, totalUserParticipation2]
 }
 
+/**
+ * calculateDxMgnPoolState
+ * @description Grabs all relevant DxMgnPool state as a batch
+ * @param { string } userAccount - Address
+ */
 export const calculateDxMgnPoolState = async (userAccount) => {
   userAccount = await fillDefaultAccount(userAccount)
 
@@ -122,11 +159,13 @@ export const calculateDxMgnPoolState = async (userAccount) => {
     mgnBalance, 
     [totalShare1, totalShare2], 
     [totalContribution1, totalContribution2],
+    [depositTokenObj, secondaryTokenObj],
   ] = await Promise.all([
     getMGNTokenAddress(),
     getMGNTokenBalance(userAccount),
     getTotalPoolShares(),
     calculateUserParticipation(userAccount),
+    getPoolTokensInfo(),
   ])
 
   return [
@@ -136,6 +175,8 @@ export const calculateDxMgnPoolState = async (userAccount) => {
     totalShare2,
     totalContribution1,
     totalContribution2,
+    depositTokenObj,
+    secondaryTokenObj,
   ]
 }
 
