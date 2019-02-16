@@ -1,7 +1,7 @@
 import DataDisplay from './DataDisplay'
 import { connect } from '../StateProvider'
 
-import { fromWei } from '../../api/utils'
+import { cleanData } from '../../api/utils'
 
 const mapProps = ({
     state: {
@@ -17,8 +17,8 @@ const mapProps = ({
   }) => ({
     account,
     network,
-    "[ETH] balance": balance && fromWei(balance.toString()).toString(),
-    "[locked MGN] balance": mgnBalance && fromWei(mgnBalance.toString()).toString(),
+    "[ETH] balance": cleanData(balance),
+    "[locked MGN] balance": cleanData(mgnBalance),
   })
   
 export default connect(mapProps)(DataDisplay)

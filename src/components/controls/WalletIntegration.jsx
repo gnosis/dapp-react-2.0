@@ -5,7 +5,7 @@ import Providers from '../../api/providers'
 import { connect } from '../StateProvider'
 import { getAPI } from '../../api'
 import { getAppContracts } from '../../api/Contracts'
-import { fromWei } from '../../api/utils'
+import { cleanData } from '../../api/utils'
 
 import ConfigDisplayerHOC from '../hoc/ConfigDisplayHOC'
 import ModalHOC from '../hoc/ModalHOC'
@@ -78,14 +78,7 @@ function WalletIntegration({
       // First time grab userState
       await grabUserState()
 
-      /* // Test - TODO: remove
-      await saveTotalPoolShares()
-
-      // Test - TODO: remove
-      await saveMGNAddressAndBalance()
-
-      await setUserParticipation() */
-
+      // Sets all essential DxMgnPool State
       await setDxMgnPoolState()
 
       // Hide Modal, all good!
@@ -168,12 +161,12 @@ const mapProps = ({
 }) => ({
   // state properties
   state: {
-    "[Pool #1] Total Share": totalShare && fromWei(totalShare),
-    "[Pool #1] User's Share": totalUserParticipation1 && fromWei(totalUserParticipation1),
-    "[Pool #2] Total Share": totalShare2 && fromWei(totalShare2),
-    "[Pool #2] User's Share": totalUserParticipation2 && fromWei(totalUserParticipation2),
+    "[Pool #1] Total Share": cleanData(totalShare),
+    "[Pool #1] User's Share": cleanData(totalUserParticipation1),
+    "[Pool #2] Total Share": cleanData(totalShare2),
+    "[Pool #2] User's Share": cleanData(totalUserParticipation2),
     "[MGN] Address": address,
-    "[MGN] Balance": balance && fromWei(balance),
+    "[MGN] Balance": cleanData(balance),
     activeProvider,
     loading,
     SHOW_MODAL,

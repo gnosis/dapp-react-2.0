@@ -1,4 +1,4 @@
-import { toBN, toWei, fromWei } from 'web3-utils'
+import { isBN, toBN, toWei, fromWei } from 'web3-utils'
 import { WEBSOCKET_URLS } from '../../globals'
 
 // eslint-disable-next-line import/prefer-default-
@@ -97,10 +97,14 @@ const netIdToWebsocket = (id) => {
   }
 }
 
+const cleanData = data => (data && isBN(data) ? fromWei(data) : data)
+
 export {
   toBN,
+  isBN,
   toWei,
   fromWei,
+  cleanData,
   mapTS,
   displayTime,
   timeValidator,
