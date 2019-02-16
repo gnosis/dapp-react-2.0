@@ -1,12 +1,13 @@
 import React from 'react'
 // import { getTokensAPI } from '../api/Tokens'
-import { getDxPoolAPI } from '../api/DxPool'
+// import { getDxPoolAPI } from '../api/DxPool'
 import { getWeb3API } from '../api/ProviderWeb3'
 import { 
   getTotalPoolShares, 
   getMGNTokenAddress, 
   getMGNTokenBalance,
   calculateUserParticipation,
+  calculateDxMgnPoolState,
 } from '../api'
 import { mapTS } from '../api/utils'
 
@@ -46,7 +47,7 @@ const memoizedContextValue = ({
   state,
   // Dispatchers
   appLoading,
-  grabDXState,
+  setDxMgnPoolState,
   grabUserState,
   registerProviders,
   saveContract,
@@ -62,7 +63,7 @@ const memoizedContextValue = ({
     state, 
     appLoading, 
     grabUserState, 
-    grabDXState, 
+    setDxMgnPoolState, 
     registerProviders, 
     setActiveProvider, 
     saveTotalPoolShares, 
@@ -83,6 +84,7 @@ class AppProvider extends React.Component {
   // GENERIC DISPATCHERS
   appLoading = loadingState => this.setState(({ loading: loadingState }))
   showModal = message => this.setState(({ SHOW_MODAL: message }))
+  
   // CONTRACT DISPATCHERS
   saveContract = ({ name, contract }) =>
     this.setState(prevState => ({
@@ -93,7 +95,7 @@ class AppProvider extends React.Component {
       },
     }))
 
-  // DX DISPATCHERS
+  // DX-MGN DISPATCHERS
   saveTotalPoolShares = async () => {
     const [totalShare1, totalShare2] = mapTS(await getTotalPoolShares())
 
@@ -113,9 +115,7 @@ class AppProvider extends React.Component {
 
   saveMGNAddressAndBalance = async () => {
     const address = await getMGNTokenAddress()
-    const balance = await getMGNTokenBalance(this.state.USER.account)
-		console.log('TCL: AppProvider -> saveMGNAddressAndBalance -> address', address)
-		console.log('TCL: AppProvider -> saveMGNAddressAndBalance -> balance', balance)
+    const balance = (await getMGNTokenBalance(this.state.USER.account)).toString()
 
     this.setState(prevState => ({
       ...prevState,
@@ -128,8 +128,7 @@ class AppProvider extends React.Component {
 
   setUserParticipation = async () => {
     const { USER: { account } } = this.state
-    const [totalContribution1, totalContribution2] = await calculateUserParticipation(account)
-    console.log('TCL: AppProvider -> setUserParticipation -> totalContribution1, totalContribution2', mapTS(totalContribution1), mapTS(totalContribution2))
+    const [totalContribution1, totalContribution2] = mapTS(await calculateUserParticipation(account))
     
     this.setState(prevState => ({
       ...prevState,
@@ -147,26 +146,34 @@ class AppProvider extends React.Component {
     }))
   }
 
-  grabDXState = async () => {
-    const { getFRTAddress, getOWLAddress, getPriceFeedAddress } = await getDxPoolAPI()
-    const [frtTokenAddress, owlTokenAddress, priceFeedAddress] = await Promise.all([
-      getFRTAddress(),
-      getOWLAddress(),
-      getPriceFeedAddress(),
-    ])
+  setDxMgnPoolState = async () => {
+    const [
+      mgnAddress,
+      mgnBalance,
+      totalShare1,
+      totalShare2,
+      totalContribution1,
+      totalContribution2,
+     ] = mapTS(await calculateDxMgnPoolState(this.state.USER.account))
+    
     return this.setState(prevState => ({
       ...prevState,
       DX_MGN_POOL: {
         ...prevState.DX_MGN_POOL,
-        tokenFRT: {
-          address: frtTokenAddress,
-          ...prevState.DX_MGN_POOL.tokenFRT,
+        pool1: {
+          ...prevState.DX_MGN_POOL.pool1,
+          totalShare: totalShare1,
+          totalUserParticipation: totalContribution1,
         },
-        tokenOWL: {
-          address: owlTokenAddress,
-          ...prevState.DX_MGN_POOL.tokenOWL,
+        pool2: {
+          ...prevState.DX_MGN_POOL.pool2,
+          totalShare: totalShare2,
+          totalUserParticipation: totalContribution2,
         },
-        priceFeed: priceFeedAddress,
+      },
+      TOKEN_MGN: {
+        address: mgnAddress,
+        balance: mgnBalance,
       },
     }))
   }

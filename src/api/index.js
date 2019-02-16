@@ -110,9 +110,33 @@ export const calculateUserParticipation = async (address) => {
   // Accum all indices
   const [totalUserParticipation1] = participationsByAddress1.reduce((accum, item) => accum.add(item), [toBN(0)])
   const [totalUserParticipation2] = participationsByAddress2.reduce((accum, item) => accum.add(item), [toBN(0)])
-	console.log('TCL: calculateUsersParticipation -> totalUserParticipation1', totalUserParticipation1)
 
   return [totalUserParticipation1, totalUserParticipation2]
+}
+
+export const calculateDxMgnPoolState = async (userAccount) => {
+  userAccount = await fillDefaultAccount(userAccount)
+
+  const [
+    mgnAddress, 
+    mgnBalance, 
+    [totalShare1, totalShare2], 
+    [totalContribution1, totalContribution2],
+  ] = await Promise.all([
+    getMGNTokenAddress(),
+    getMGNTokenBalance(userAccount),
+    getTotalPoolShares(),
+    calculateUserParticipation(userAccount),
+  ])
+
+  return [
+    mgnAddress,
+    mgnBalance,
+    totalShare1,
+    totalShare2,
+    totalContribution1,
+    totalContribution2,
+  ]
 }
 
 // ============
@@ -121,14 +145,14 @@ export const calculateUserParticipation = async (address) => {
 
 /**
  * checkIfAccount
- * @param {string} account
+ * @param [string} account
  * @returns {string} accountAddress as string
  */
 export const checkIfAccount = account => account || getCurrentAccount()
 
 
 /**
- * checkIfFalseAllowance
+ * checkIf]alseAllowance
  * @param {BigNumber} amount
  * @param {*} account
  * @param {*} address

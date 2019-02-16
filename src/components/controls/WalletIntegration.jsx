@@ -12,15 +12,16 @@ import ModalHOC from '../hoc/ModalHOC'
 
 function WalletIntegration({ 
   dispatchers: { 
-    // appLoading, 
-    grabUserState, 
+    grabUserState,
+    setDxMgnPoolState,
     registerProviders, 
     saveContract, 
     setActiveProvider,
-    saveTotalPoolShares,
-    saveMGNAddressAndBalance,
-    setUserParticipation,
     showModal,
+    // appLoading, 
+    // saveTotalPoolShares,
+    // saveMGNAddressAndBalance,
+    // setUserParticipation,
   }, 
   state: { activeProvider }, 
   children,
@@ -77,13 +78,15 @@ function WalletIntegration({
       // First time grab userState
       await grabUserState()
 
-      // Test - TODO: remove
+      /* // Test - TODO: remove
       await saveTotalPoolShares()
 
       // Test - TODO: remove
       await saveMGNAddressAndBalance()
 
-      await setUserParticipation()
+      await setUserParticipation() */
+
+      await setDxMgnPoolState()
 
       // Hide Modal, all good!
       showModal(undefined)
@@ -153,24 +156,24 @@ const mapProps = ({
   // dispatchers
   appLoading,
   grabUserState,
-  grabDXState,
+  setDxMgnPoolState,
   registerProviders,
   setActiveProvider,
   getDXTokenBalance,
   saveContract,
-  saveTotalPoolShares,
-  saveMGNAddressAndBalance,
-  setUserParticipation,
   showModal,
+  // saveTotalPoolShares,
+  // saveMGNAddressAndBalance,
+  // setUserParticipation,
 }) => ({
   // state properties
   state: {
-    "[Pool #1] Total Share": totalShare && fromWei(totalShare.toString()).toString(),
-    "[Pool #1] User's Share": totalUserParticipation1 && fromWei(totalUserParticipation1.toString()).toString(),
-    "[Pool #2] Total Share": totalShare2 && fromWei(totalShare2.toString()).toString(),
-    "[Pool #2] User's Share": totalUserParticipation2 && fromWei(totalUserParticipation2.toString()).toString(),
+    "[Pool #1] Total Share": totalShare && fromWei(totalShare),
+    "[Pool #1] User's Share": totalUserParticipation1 && fromWei(totalUserParticipation1),
+    "[Pool #2] Total Share": totalShare2 && fromWei(totalShare2),
+    "[Pool #2] User's Share": totalUserParticipation2 && fromWei(totalUserParticipation2),
     "[MGN] Address": address,
-    "[MGN] Balance": balance && fromWei(balance.toString()).toString(),
+    "[MGN] Balance": balance && fromWei(balance),
     activeProvider,
     loading,
     SHOW_MODAL,
@@ -179,15 +182,15 @@ const mapProps = ({
   dispatchers: {
     appLoading,
     grabUserState,
-    grabDXState,
+    setDxMgnPoolState,
     registerProviders,
     setActiveProvider,
     getDXTokenBalance,
     saveContract,
-    saveTotalPoolShares,
-    saveMGNAddressAndBalance,
-    setUserParticipation,
     showModal,
+    // saveTotalPoolShares,
+    // saveMGNAddressAndBalance,
+    // setUserParticipation,
   },
 })
 
