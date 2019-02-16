@@ -9,6 +9,7 @@ body {
 #app {
     display: flex;
     margin: auto;
+    flex-flow: column nowrap;
     min-height: 100vh;
     max-width: 80vw;
 }
