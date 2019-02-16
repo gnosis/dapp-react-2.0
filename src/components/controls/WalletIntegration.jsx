@@ -101,7 +101,7 @@ function WalletIntegration({
   }
 
   const walletSelector = () => (
-    <div className="walletChooser">
+    <section className="walletChooser">
       <h2>Please select a wallet</h2>
       <div className={!initialising ? 'lightBlue' : ''}>
         {Object.keys(Providers).map((provider, i) => {
@@ -119,7 +119,7 @@ function WalletIntegration({
         })}
       </div>
       {error && <h3>{error.message}</h3>}
-    </div>
+    </section>
   )
   
   if (error) return <h1>An error occurred: {error}</h1>
@@ -165,12 +165,12 @@ const mapProps = ({
 }) => ({
   // state properties
   state: {
-    "[Pool #1] Total Share": totalShare && fromWei(totalShare).toString(),
-    "[Pool #1] User's Share": totalUserParticipation1 && fromWei(totalUserParticipation1).toString(),
-    "[Pool #2] Total Share": totalShare2 && fromWei(totalShare2).toString(),
-    "[Pool #2] User's Share": totalUserParticipation2 && fromWei(totalUserParticipation2).toString(),
+    "[Pool #1] Total Share": totalShare && fromWei(totalShare.toString()).toString(),
+    "[Pool #1] User's Share": totalUserParticipation1 && fromWei(totalUserParticipation1.toString()).toString(),
+    "[Pool #2] Total Share": totalShare2 && fromWei(totalShare2.toString()).toString(),
+    "[Pool #2] User's Share": totalUserParticipation2 && fromWei(totalUserParticipation2.toString()).toString(),
     "[MGN] Address": address,
-    "[MGN] Balance": balance && fromWei(balance).toString(),
+    "[MGN] Balance": balance && fromWei(balance.toString()).toString(),
     activeProvider,
     loading,
     SHOW_MODAL,

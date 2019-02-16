@@ -6,8 +6,16 @@ body {
     font-size: 1.4rem;
 }
 
+#app {
+    display: flex;
+    margin: auto;
+    min-height: 100vh;
+    max-width: 80vw;
+}
+
 section {
-    margin: 0 10px;
+    margin: auto;
+    width: 100%;
 }
 
 li {
@@ -118,34 +126,6 @@ input[type="text"] {
     animation: RetroGradient 2s ease infinite;
 
     top: 0; left: 0; right: 0; bottom: 0;
-}
-  
-@-webkit-keyframes RetroGradient {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
-@keyframes RetroGradient {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    50% {
-        background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
-    }
 }
 
 .poolContainer, .poolInnerContainer {
