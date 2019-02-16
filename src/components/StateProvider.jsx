@@ -9,7 +9,6 @@ import {
   calculateUserParticipation,
   calculateDxMgnPoolState,
 } from '../api'
-import { mapTS } from '../api/utils'
 
 const defaultState = {
   USER: {
@@ -97,7 +96,7 @@ class AppProvider extends React.Component {
 
   // DX-MGN DISPATCHERS
   saveTotalPoolShares = async () => {
-    const [totalShare1, totalShare2] = mapTS(await getTotalPoolShares())
+    const [totalShare1, totalShare2] = await getTotalPoolShares()
 
     return this.setState(prevState => ({
       ...prevState,
@@ -115,7 +114,7 @@ class AppProvider extends React.Component {
 
   saveMGNAddressAndBalance = async () => {
     const address = await getMGNTokenAddress()
-    const balance = (await getMGNTokenBalance(this.state.USER.account)).toString()
+    const balance = await getMGNTokenBalance(this.state.USER.account)
 
     this.setState(prevState => ({
       ...prevState,
@@ -128,7 +127,7 @@ class AppProvider extends React.Component {
 
   setUserParticipation = async () => {
     const { USER: { account } } = this.state
-    const [totalContribution1, totalContribution2] = mapTS(await calculateUserParticipation(account))
+    const [totalContribution1, totalContribution2] = await calculateUserParticipation(account)
     
     this.setState(prevState => ({
       ...prevState,
@@ -154,7 +153,11 @@ class AppProvider extends React.Component {
       totalShare2,
       totalContribution1,
       totalContribution2,
-     ] = mapTS(await calculateDxMgnPoolState(this.state.USER.account))
+      // Deposit Token
+      { name: name1, symbol: symbol1, decimals: decimals1 },
+      // Secondary Token
+      { name: name2, symbol: symbol2, decimals: decimals2 },
+     ] = await calculateDxMgnPoolState(this.state.USER.account)
     
     return this.setState(prevState => ({
       ...prevState,
@@ -164,11 +167,23 @@ class AppProvider extends React.Component {
           ...prevState.DX_MGN_POOL.pool1,
           totalShare: totalShare1,
           totalUserParticipation: totalContribution1,
+          dtName: name1,
+          dtSymbol: symbol1,
+          dtDecimals: decimals1,
+          stName: name2,
+          stSymbol: symbol2,
+          stDecimals: decimals2,
         },
         pool2: {
           ...prevState.DX_MGN_POOL.pool2,
           totalShare: totalShare2,
           totalUserParticipation: totalContribution2,
+          dtName: name2,
+          dtSymbol: symbol2,
+          dtDecimals: decimals2,
+          stName: name1,
+          stSymbol: symbol1,
+          stDecimals: decimals1,
         },
       },
       TOKEN_MGN: {
