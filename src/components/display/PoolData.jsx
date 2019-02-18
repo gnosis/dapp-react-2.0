@@ -1,22 +1,12 @@
 import React from 'react'
 import { connect } from '../StateProvider'
 
-import AsyncActionsHOC from '../controls/AsyncActionsHOC'
+import AsyncActionsHOC from '../hoc/AsyncActionsHOC'
+import { TextInput } from '../controls/ControlledInput'
 
 import { cleanData } from '../../api/utils'
 
-// TODO: remove
-const asyncActionMock = async (time = 2000) => new Promise(accept => setTimeout(() => accept('YAY'), time))
-
-const ButtonMocked = ({ onChange, disabled, ...rest }) => (
-        <input
-            disabled={disabled}
-            onChange={onChange}
-            type="text" 
-        />
-    )
-
-const DepositToken = AsyncActionsHOC(ButtonMocked)/* ({ asyncAction: asyncActionMock }) */
+const DepositToken = AsyncActionsHOC(TextInput)
 
 const PoolData = ({
     DX_MGN_POOL,
