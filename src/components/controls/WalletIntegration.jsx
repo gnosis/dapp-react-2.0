@@ -145,6 +145,7 @@ const mapProps = ({
     },
     loading,
     SHOW_MODAL,
+    INPUT_AMOUNT,
   },
   // dispatchers
   appLoading,
@@ -170,6 +171,7 @@ const mapProps = ({
     activeProvider,
     loading,
     SHOW_MODAL,
+    INPUT_AMOUNT,
   },
   // dispatchers
   dispatchers: {

@@ -7,3 +7,11 @@ export const TextInput = ({ onChange, disabled }) => (
         type="text" 
     />
 )
+
+export const NumberInput = ({ onChange, disabled }) => (
+    <input
+        disabled={disabled}
+        onChange={onChange}
+        type="number" 
+    />
+)

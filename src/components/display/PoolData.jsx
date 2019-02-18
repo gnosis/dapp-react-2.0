@@ -7,10 +7,13 @@ import { TextInput } from '../controls/ControlledInput'
 import { cleanData } from '../../api/utils'
 
 const DepositToken = AsyncActionsHOC(TextInput)
+const WithdrawAndClaimMGN = AsyncActionsHOC()
 
 const PoolData = ({
     DX_MGN_POOL,
     setDxMgnPoolState,
+    setDepositAmount,
+    setInputAmount,
 }) => {
     const { pool1, pool2 } = DX_MGN_POOL
     /* const props = {
@@ -30,9 +33,15 @@ const PoolData = ({
                             {Object.keys(pool1).map((key, idx) => <li key={idx * Math.random()}>{`${key}: ${cleanData(pool1[key])}`}</li>)}
                         </ul>
                         <DepositToken 
-                            asyncAction={setDxMgnPoolState} 
+                            asyncAction={() => setDepositAmount(1)} 
+                            inputChangeHandler={setInputAmount}
                             title={`Deposit [${DX_MGN_POOL.pool1.dtName}]`}
                             {...DX_MGN_POOL} 
+                        />
+                        <WithdrawAndClaimMGN 
+                            asyncAction={setDxMgnPoolState}
+                            buttonText="Claim + Withdraw"
+                            title="Claim + Withdraw MGN Tokens"
                         />
                     </pre>
                     {/* POOL 2 */}
@@ -42,7 +51,8 @@ const PoolData = ({
                             {Object.keys(pool2).map((key, idx) => <li key={idx * Math.random()}>{`${key}: ${cleanData(pool2[key])}`}</li>)}
                         </ul>
                         <DepositToken 
-                            asyncAction={setDxMgnPoolState} 
+                            asyncAction={() => setDepositAmount(2)} 
+                            inputChangeHandler={setInputAmount}
                             title={`Deposit [${DX_MGN_POOL.pool1.stName}]`}
                             {...DX_MGN_POOL} 
                         />
@@ -58,9 +68,13 @@ const mapProps = ({
       DX_MGN_POOL,
     },
     setDxMgnPoolState,
+    setDepositAmount,
+    setInputAmount,
   }) => ({
     DX_MGN_POOL,
     setDxMgnPoolState,
+    setDepositAmount,
+    setInputAmount,
   })
   
   export default connect(mapProps)(PoolData)

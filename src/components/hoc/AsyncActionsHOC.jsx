@@ -3,13 +3,14 @@ import React, { /* useEffect, */ useState } from 'react'
 const AsyncActionsHOC = Component => ({
     asyncAction,
     buttonText = 'Submit',
+    inputChangeHandler,
     title,
     ...rest
 }) => {
     // State - button blocked disables use of butotn
     // e.g on blockchain action - released on receipt
     const [buttonBlocked, setButtonBlocked] = useState(false)
-    const [inputAmount, setInputAmount] = useState(null)
+    const [inputAmount, setInputAmount] = useState(1)
     const [error, setError] = useState(null)
 
     // useEffect()
@@ -20,14 +21,13 @@ const AsyncActionsHOC = Component => ({
         
         // replace commas w/periods
         value = value.replace(/[,]/g, '.')
-        console.debug(value)
         
         const validValue = !!(+value)
         if (!validValue || !value) {
             return setError('Please enter a valid amount')
         }
         
-        setInputAmount(value)
+        return inputChangeHandler ? inputChangeHandler(value) : setInputAmount(value)
     }
     
     const handleClick = async () => {
@@ -36,13 +36,13 @@ const AsyncActionsHOC = Component => ({
             setButtonBlocked(true)
 
             // fire action
-            const res = await asyncAction(inputAmount)
-            console.debug('ASYNC RES = ', res)
+            await asyncAction()
 
             // re-enable button
             setButtonBlocked(false)   
         } catch (err) {
-            setError(err)
+			console.error('AsyncActionsHOC ERROR: ', err)
+            setError(err.message || err)
             setButtonBlocked(false)
         }
     }
@@ -50,12 +50,13 @@ const AsyncActionsHOC = Component => ({
     return (
         <div className="asyncActionContainer">  
             <h5>{title}</h5>
-            <Component
-                disabled={buttonBlocked}
-                onChange={handleChange}
-                value={inputAmount}
-                {...rest} 
-            />
+            {Component && 
+                <Component
+                    disabled={buttonBlocked}
+                    onChange={handleChange}
+                    value={inputAmount}
+                    {...rest} 
+                />}
             <button
                 className="ctaButton"
                 disabled={error || buttonBlocked || !inputAmount}
