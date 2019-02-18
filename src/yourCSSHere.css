@@ -73,6 +73,9 @@ hr {
     background-color: lightpink;
     font-size: 12px;
     font-style: italic;
+
+    white-space: pre-wrap;
+    max-width: 70%;
 }
 
 form {
@@ -206,8 +209,9 @@ button {
     color: #000;
     
     display: inline-block;
-    font-size: 14px;
     font-family: inherit;
+    font-size: 14px;
+    font-weight: 900;
 
     margin: 4px 2px;
     padding: 6px 22px;
