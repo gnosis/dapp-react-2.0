@@ -6,7 +6,10 @@ import {
   getMGNTokenBalance,
   calculateUserParticipation,
   calculateDxMgnPoolState,
+  approveAndDepositIntoDxMgnPool,
 } from '../api'
+
+import { toBN, toWei } from '../api/utils'
 
 const defaultState = {
   USER: {
@@ -22,10 +25,12 @@ const defaultState = {
     pool1: {
       totalShare: 0,
       totalUserParticipation: 0,
+      depositAmount: 0,
     },
     pool2: {
       totalShare: 0,
       totalUserParticipation: 0,
+      depositAmount: 0,
     },
   },
   TOKEN_MGN: {
@@ -33,8 +38,9 @@ const defaultState = {
     balance: undefined,
   },
   CONTRACTS: {},
-  loading: false,
   SHOW_MODAL: undefined,
+  loading: false,
+  INPUT_AMOUNT: 0,
 }
 
 const { Provider, Consumer } = React.createContext(defaultState)
@@ -53,6 +59,8 @@ const memoizedContextValue = ({
   saveMGNAddressAndBalance,
   setUserParticipation,
   showModal,
+  setDepositAmount,
+  setInputAmount,
 }) => {
   if (setToContext.has(state)) return setToContext.get(state)
 
@@ -68,6 +76,8 @@ const memoizedContextValue = ({
     saveMGNAddressAndBalance, 
     setUserParticipation,
     showModal,
+    setDepositAmount,
+    setInputAmount,
   }
 
   setToContext.set(state, contextValue)
@@ -93,6 +103,13 @@ class AppProvider extends React.Component {
     }))
 
   // DX-MGN DISPATCHERS
+  setInputAmount = (INPUT_AMOUNT) => {
+    this.setState(prevState => ({
+      ...prevState,
+      INPUT_AMOUNT,
+    }))
+  }
+
   saveTotalPoolShares = async () => {
     const [totalShare1, totalShare2] = await getTotalPoolShares()
 
@@ -141,6 +158,16 @@ class AppProvider extends React.Component {
         },
       },
     }))
+  }
+
+  setDepositAmount = async (poolNumber) => {
+    const { 
+      USER: { account },
+      INPUT_AMOUNT,
+    } = this.state
+
+    const receipt = await approveAndDepositIntoDxMgnPool(poolNumber, toBN(toWei(INPUT_AMOUNT)), account)
+		console.debug('TCL: AppProvider -> setDepositAmount -> RECEIPT= ', receipt)
   }
 
   setDxMgnPoolState = async () => {
