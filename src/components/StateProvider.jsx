@@ -1,6 +1,4 @@
 import React from 'react'
-// import { getTokensAPI } from '../api/Tokens'
-// import { getDxPoolAPI } from '../api/DxPool'
 import { getWeb3API } from '../api/ProviderWeb3'
 import { 
   getTotalPoolShares, 
@@ -159,7 +157,7 @@ class AppProvider extends React.Component {
       { name: name2, symbol: symbol2, decimals: decimals2 },
      ] = await calculateDxMgnPoolState(this.state.USER.account)
     
-    return this.setState(prevState => ({
+     return this.setState(prevState => ({
       ...prevState,
       DX_MGN_POOL: {
         ...prevState.DX_MGN_POOL,

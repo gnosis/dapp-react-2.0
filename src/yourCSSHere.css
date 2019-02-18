@@ -29,6 +29,14 @@ pre {
     border-radius: 30px;
 }
 
+hr {
+    height: 1px;
+    border-width: 0;
+    border-bottom: 1px dashed lightgray;
+    flex: 1;
+    margin: 12px 12px 0;
+}
+
 .word-wrap {
     white-space: pre-wrap;
     overflow: hidden;
@@ -56,6 +64,12 @@ pre {
 
 .data-pre-blue {
     background-color: #e0f7ff;
+}
+
+.data-pre-error {
+    background-color: lightpink;
+    font-size: 12px;
+    font-style: italic;
 }
 
 form {
@@ -153,7 +167,16 @@ input[type="text"] {
     align-items: center;
     text-align: center;
 
-    margin: 5px;
+    margin: 5px 15px;
+}
+
+.asyncActionContainer {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    
+    padding: 0 5px 15px;
+    font-family: 'Major Mono Display', monospace
 }
 
 .clickableHeader {
@@ -162,4 +185,58 @@ input[type="text"] {
 
 .hideContent {
     height: 0;
+}
+
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+
+  cursor: not-allowed;
+}
+
+button {
+    background-color: #fff; /* Green */
+    border: 1px solid #4CAF50;
+    border-radius: 10px;
+    color: #000;
+    
+    display: inline-block;
+    font-size: 14px;
+    font-family: inherit;
+
+    margin: 4px 2px;
+    padding: 6px 22px;
+    text-align: center;
+    text-decoration: none;
+
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+
+}
+
+button[disabled]:hover {
+  background-color: #cccccc;
+  color: #666666;
+}
+
+button:hover {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+input {
+    padding: 10px;
+    margin-bottom: 10px;
+    font-family: monospace;
+    font-size: 16px;
+    box-shadow: 0px 4px 11px 0px #0000004d;
+    outline: none;
+    border: none;
+}
+
+input[disabled], input:disabled {
+    box-shadow: none;
 }
