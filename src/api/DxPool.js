@@ -1,4 +1,5 @@
 import { getAppContracts } from './Contracts'
+import { GAS_LIMIT, GAS_PRICE } from '../globals'
 
 let dxPoolAPI
 
@@ -11,6 +12,21 @@ export const getDxPoolAPI = async () => {
 
 async function init() {
   const { coord, dxMP, mgn } = await getAppContracts()
+
+  const [dxMP1Address, dxMP2Address] = await Promise.all([
+    coord.dxMgnPool1.call(),
+    coord.dxMgnPool2.call(),
+  ])
+  
+  const [dxMP1, dxMP2] = await Promise.all([
+    dxMP.at(dxMP1Address),
+    dxMP.at(dxMP2Address),
+  ])
+
+  const [dxMP1DepositTokenAddress, dxMP1SecondaryTokenAddress] = await Promise.all([
+    dxMP1.depositToken.call(),
+    dxMP1.secondaryToken.call(),
+  ])
 
   /**
    * getDxPool
@@ -60,6 +76,26 @@ async function init() {
    */
   const getMGNBalance = async (address, userAddress) => (await getTokenMGN(address)).lockedTokenBalances.call(userAddress)
   
+
+  /**
+   * depositIntoPool1
+   * @param { string || BN } amount - string value or BN instance
+   * @param { string } userAccount
+   */
+  const depositIntoPool1 = async (
+    amount,
+    userAccount,
+  ) => dxMP1.deposit(amount, { from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+  /**
+   * depositIntoPool2
+   * @param { string || BN } amount - string value or BN instance
+   * @param { string } userAccount
+   */
+  const depositIntoPool2 = async (
+    amount,
+    userAccount,
+  ) => dxMP2.deposit(amount, { from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+
   /* 
   const getLatestAuctionIndex = ({ sell: { address: t1 }, buy: { address: t2 } }) =>
     dx.getAuctionIndex.call(t1, t2)
@@ -80,16 +116,25 @@ async function init() {
 
   const allEvents = coord.allEvents.bind(coord)
  */
+
   return {
     get coordAddress() {
       return coord.address
     },
+    dxMP1Address,
+    dxMP2Address,
+    dxMP1,
+    dxMP2,
+    dxMP1DepositTokenAddress,
+    dxMP1SecondaryTokenAddress,
     getDxPool,
     getPoolAddresses,
     getTokenMGN,
     getMGNAddress,
     getMGNBalance,
     getPoolTokensAddresses,
+    depositIntoPool1,
+    depositIntoPool2,
     // event,
     // allEvents,
   }

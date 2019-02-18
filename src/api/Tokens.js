@@ -1,4 +1,4 @@
-import { getAppContracts, HumanFriendlyToken as hft } from './Contracts'
+import { getAppContracts } from './Contracts'
 
 /**
  * Tokens OWL and Tokens GNO API
@@ -17,18 +17,28 @@ export const getTokensAPI = async () => {
 
 async function init() {
   const contractMap = await getAppContracts()
+  const { hft, weth } = contractMap
   /**
    * getToken
    * @param {string} tokenAddress '0xc89asd ... '
    * @returns {contract} TokenContract interfaced via HFT - if it exists
    */
-  const getToken = (tokenAddress) => {
+  const getToken = async (tokenAddress) => {
     try {
       return hft.at(tokenAddress)
     } catch (error) {
       throw new Error(error)
     }
   }
+
+  const getWETHToken = async (wethAddress) => {
+    try {
+      return weth.at(wethAddress)
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
   // return tokenAPI methods here...
   /**
    * allowance
@@ -37,7 +47,7 @@ async function init() {
    * @param {string} spender SPENDER address
    * @returns {Promise<BigNumber>} allowance
    */
-  const allowance = (tokenAddress, owner, spender) => getToken(tokenAddress).allowance.call(owner, spender)
+  const allowance = async (tokenAddress, owner, spender) => (await getToken(tokenAddress)).allowance.call(owner, spender)
 
   /**
    * approve
@@ -47,21 +57,21 @@ async function init() {
    * @param {{ from: string }} tx
    * @returns {object} txReceipt
    */
-  const approve = (tokenAddress, spender, value, tx) => getToken(tokenAddress).approve(spender, value, tx)
+  const approve = async (tokenAddress, spender, value, tx) => (await getToken(tokenAddress)).approve(spender, value, tx)
 
   /**
    * getTokenSymbol
    * @param {string} tokenAddress
    * @returns {Promise<BigNumber>} symbol
    */
-  const getTokenSymbol = tokenAddress => getToken(tokenAddress).symbol.call()
+  const getTokenSymbol = async tokenAddress => (await getToken(tokenAddress)).symbol.call()
 
   /**
    * getTokenName
    * @param {string} tokenAddress
    * @returns {Promise<BigNumber>} name
    */
-  const getTokenName = tokenAddress => getToken(tokenAddress).name.call()
+  const getTokenName = async tokenAddress => (await getToken(tokenAddress)).name.call()
 
   /**
    * getTokenBalance
@@ -69,14 +79,14 @@ async function init() {
    * @param {string} account
    * @returns {Promise<BigNumber>} balance
    */
-  const getTokenBalance = (tokenAddress, account) => getToken(tokenAddress).balanceOf.call(account)
+  const getTokenBalance = async (tokenAddress, account) => (await getToken(tokenAddress)).balanceOf.call(account)
 
   /**
    * getTotalSupply
    * @param {string} tokenAddress TOKEN tokenAddress as string
    * @returns {Promise<BigNumber>} total supply
    */
-  const getTotalSupply = tokenAddress => getToken(tokenAddress).totalSupply.call()
+  const getTotalSupply = async tokenAddress => (await getToken(tokenAddress)).totalSupply.call()
 
   /**
    * transfer
@@ -86,7 +96,7 @@ async function init() {
    * @param {{ from: string }} tx transaction object
    * @returns {object} txReceipt
    */
-  const transfer = (tokenAddress, to, value, tx) => getToken(tokenAddress).transfer(to, value, tx)
+  const transfer = async (tokenAddress, to, value, tx) => (await getToken(tokenAddress)).transfer(to, value, tx)
 
   /**
    * transferFrom
@@ -97,7 +107,17 @@ async function init() {
    * @param {{ from: string }} tx transaction object
    * @returns {object} txReceipt
    */
-  const transferFrom = (tokenAddress, from, to, value, tx) => getToken(tokenAddress).transferFrom(from, to, value, tx)
+  const transferFrom = async (tokenAddress, from, to, value, tx) => (await getToken(tokenAddress)).transferFrom(from, to, value, tx)
+
+  /**
+   * depositEth
+   * @param {string} tokenAddress tokenAddress of token as string
+   * @param {string} from address to send FROM as string
+   * @param {number} value value to send as number
+   * @param {{ from: string }} tx transaction object
+   * @returns {object} txReceipt
+   */
+  const depositETH = async (tokenAddress, tx) => (await getWETHToken(tokenAddress)).deposit(tx)
 
   return {
     allowance,
@@ -110,5 +130,6 @@ async function init() {
     tokens: contractMap,
     transfer,
     transferFrom,
+    depositETH,
   }
 }

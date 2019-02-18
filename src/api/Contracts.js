@@ -132,6 +132,7 @@ const TruffleWrappedContractArtifacts = contractArtifacts.map(contractArtifact =
 export const HumanFriendlyToken = TruffleContract(require('@gnosis.pm/util-contracts/build/contracts/HumanFriendlyToken.json'))
 export const DxMgnPool = TruffleContract(require('@gnosis.pm/dx-mgn-pool/build/contracts/DxMgnPool.json'))
 export const TokenMGN = TruffleContract(require('@gnosis.pm/dx-contracts/build/contracts/TokenFRT.json'))
+export const EtherToken = TruffleContract(require('@gnosis.pm/util-contracts/build/contracts/EtherToken.json'))
 
 /**
  * setContractProvider
@@ -141,7 +142,7 @@ export const TokenMGN = TruffleContract(require('@gnosis.pm/dx-contracts/build/c
 const setContractProvider =
   provider =>
     TruffleWrappedContractArtifacts
-      .concat([HumanFriendlyToken, DxMgnPool, TokenMGN])
+      .concat([HumanFriendlyToken, DxMgnPool, TokenMGN, EtherToken])
       .forEach((c) => { c.setProvider(provider) })
 
 /**
@@ -218,6 +219,7 @@ async function init() {
   deployedContractsMap.hft = HumanFriendlyToken
   deployedContractsMap.dxMP = DxMgnPool
   deployedContractsMap.mgn = TokenMGN
+  deployedContractsMap.weth = EtherToken
 
   if (process.env.NODE_ENV === 'development') {
     // make it available globally

@@ -5,6 +5,8 @@ import { getDxPoolAPI } from './DxPool'
 import { getAppContracts } from './Contracts'
 import { fromWei, toBN } from '../api/utils'
 
+import { BN_10_PERCENT } from '../globals'
+
 // API singleton
 let appAPI
 
@@ -27,9 +29,15 @@ export const getCurrentAccount = async () => {
 }
 
 export const getCurrentNetwork = async () => {
-  const { Web3 } = await getAPI()
+  const { getNetwork } = await getWeb3API()
 
-  return Web3.getNetwork()
+  return getNetwork()
+}
+
+export const getCurrentNetworkId = async () => {
+  const { getNetworkId } = await getWeb3API()
+
+  return getNetworkId()
 }
 
 // TODO: possibly remove - testing only
@@ -53,6 +61,8 @@ export const getAccountAndTimestamp = async () => {
 }
 
 export const fillDefaultAccount = account => (!account ? getCurrentAccount() : account)
+
+export const fillNetworkId = netId => (!netId ? getCurrentNetworkId() : netId)
 
 // ============
 // DX MGN POOL
@@ -138,12 +148,106 @@ export const calculateUserParticipation = async (address) => {
     dxPool1.poolSharesByAddress.call(address),
     dxPool2.poolSharesByAddress.call(address),
   ])
-
+  
   // Accum all indices
-  const [totalUserParticipation1] = participationsByAddress1.reduce((accum, item) => accum.add(item), [toBN(0)])
-  const [totalUserParticipation2] = participationsByAddress2.reduce((accum, item) => accum.add(item), [toBN(0)])
-
+  const totalUserParticipation1 = participationsByAddress1.reduce((accum, item) => accum.add(item), toBN(0))
+  const totalUserParticipation2 = participationsByAddress2.reduce((accum, item) => accum.add(item), toBN(0))
+  
   return [totalUserParticipation1, totalUserParticipation2]
+}
+
+export const approveAndDepositIntoDxMgnPool = async (pool, depositAmount, userAccount) => {
+  userAccount = await fillDefaultAccount(userAccount)
+  const {
+    dxMP1Address,
+    dxMP2Address,
+    dxMP1DepositTokenAddress, 
+    dxMP1SecondaryTokenAddress, 
+    depositIntoPool1, 
+    depositIntoPool2, 
+  } = await getDxPoolAPI()
+  const tokenAddress = (pool === 1 ? dxMP1DepositTokenAddress : dxMP1SecondaryTokenAddress)
+  const poolAddress = (pool === 1 ? dxMP1Address : dxMP2Address)
+  
+  // Check token allowance - do we need to approve?
+  const tokenAllowance = await allowance(tokenAddress, userAccount, poolAddress)
+	console.log('TCL: approveAndDepositIntoDxMgnPool -> tokenAllowance', tokenAllowance)
+  console.log('TCL: approveAndDepositIntoDxMgnPool -> depositAmount', toBN(depositAmount))
+
+  // Approve deposit amount if necessary
+  if (tokenAllowance.lt(toBN(depositAmount))) await approve(tokenAddress, poolAddress, depositAmount, userAccount)
+
+  // Check if token = WETH and make deposits if necessary
+  await depositIfETH(tokenAddress, depositAmount, userAccount)
+
+  return pool === 1 ? depositIntoPool1(depositAmount, userAccount) : depositIntoPool2(depositAmount, userAccount)
+}
+
+/**
+ * isEth
+ * @param {string} tokenAddress 
+ * @param {string} netId 
+ * @returns {boolean} - is token passed in WETH?
+ */
+async function isETH(tokenAddress, netId) {
+  netId = await fillNetworkId(netId)
+
+  let ETH_ADDRESS
+  
+  if (netId === '1') {
+    // Mainnet
+    const { MAINNET_WETH } = require('../globals')
+    ETH_ADDRESS = MAINNET_WETH
+  } else {
+    // Rinkeby
+    const { RINKEBY_WETH } = require('../globals')
+    ETH_ADDRESS = RINKEBY_WETH
+  }
+  
+  return tokenAddress.toUpperCase() === ETH_ADDRESS.toUpperCase() ? ETH_ADDRESS : false
+}
+
+
+/**
+ * checkEthTokenBalance > returns false or EtherToken Balance
+ * @param token
+ * @param weiAmount
+ * @param account
+ * @returns boolean | BigNumber <false, amt>
+ */
+async function checkEthTokenBalance(
+  tokenAddress,
+  weiAmount,
+  account,
+) {
+  // BYPASS[return false] => if token is not ETHER
+  const ethAddress = await isETH(tokenAddress)
+  if (!ethAddress) return false
+  
+  const wrappedETH = await getTokenBalance(ethAddress, false, account)
+	console.log('TCL: wrappedETH', wrappedETH, 'weiAmount= ', weiAmount)
+  
+  // BYPASS[return false] => if wrapped Eth is enough
+  // wrappedETH must be GREATER THAN OR EQUAL to WEI_AMOUNT * 1.1 (10% added for gas costs)
+  if (wrappedETH.gte(weiAmount.mul(BN_10_PERCENT))) return (console.debug('Enough WETH balance, skipping deposit.'), false)
+
+  // Else return amount needed to wrap to make tx happen
+  console.debug('Not enough WETH balance, needed: ', 'weiAmount= ', weiAmount, 'wrappedETH = ', wrappedETH, weiAmount.sub(wrappedETH))
+  return weiAmount.sub(wrappedETH)
+}
+
+async function depositIfETH(tokenAddress, weiAmount, userAccount) {
+  const wethBalance = await checkEthTokenBalance(tokenAddress, weiAmount, userAccount)
+	console.debug('TCL: depositIfETH -> wethBalance', wethBalance)
+
+  // WETH
+  if (wethBalance) {
+    const depositReceipt = await depositETH(tokenAddress, wethBalance, userAccount)
+		return console.debug('TCL: depositIfETH -> depositReceipt', depositReceipt)
+  }
+
+  console.debug('NOT WETH or not necessary to deposit.')
+  return false
 }
 
 /**
@@ -193,7 +297,8 @@ export const checkIfAccount = account => account || getCurrentAccount()
 
 
 /**
- * checkIf]alseAllowance
+ * checkIfFalseAllowance
+ * WARNING - APPROVES MAX AMOUNT
  * @param {BigNumber} amount
  * @param {*} account
  * @param {*} address
@@ -202,7 +307,7 @@ export const checkIfAccount = account => account || getCurrentAccount()
  */
 // eslint-disable-next-line
 export const checkIfFalseAllowance = async (amount, account, address) => {
-  const { Tokens, Web3: { toBN: BN } } = await getAPI()
+  const { Tokens } = await getAPI()
   try {
     /**
      * Checklist
@@ -223,7 +328,7 @@ export const checkIfFalseAllowance = async (amount, account, address) => {
     if (amountApprovedRemaining.lt(amount)) {
       // BigNumber convert here
       // toApprove = (2^255) - amountAlreadyAllowed
-      const toApprove = (BN(2).pow(BN(255))).sub(BN(amountApprovedRemaining))
+      const toApprove = (toBN(2).pow(toBN(255))).sub(toBN(amountApprovedRemaining))
 
       console.info('Approved amount = ', toApprove)
 
@@ -239,21 +344,21 @@ export const checkIfFalseAllowance = async (amount, account, address) => {
 // ERC20 TOKENS
 // ================
 
-export const allowance = async (tokenName, account, spender) => {
+export async function allowance(tokenName, account, spender) {
   const { Tokens } = await getAPI()
   account = await checkIfAccount(account)
 
   return Tokens.allowance(tokenName, account, spender)
 }
 
-export const approve = async (tokenName, spender, amount, account) => {
+export async function approve(tokenAddress, spender, amount, account) {
   const { Tokens } = await getAPI()
   account = await checkIfAccount(account)
 
-  return Tokens.approve(tokenName, spender, amount, { from: account })
+  return Tokens.approve(tokenAddress, spender, amount, { from: account })
 }
 
-export const getTokenBalance = async (tokenName, formatFromWei, account) => {
+export async function getTokenBalance(tokenName, formatFromWei, account) {
   const { Tokens } = await getAPI()
   account = await checkIfAccount(account)
 
@@ -267,6 +372,13 @@ export const transfer = async (tokenName, amount, to, account) => {
   account = await checkIfAccount(account)
 
   return Tokens.transfer(tokenName, to, amount, { from: account })
+}
+
+export async function depositETH(tokenAddress, depositAmount, userAccount) {
+  const { Tokens } = await getAPI()
+  userAccount = await checkIfAccount(userAccount)
+
+  return Tokens.depositETH(tokenAddress, { from: userAccount, value: depositAmount })
 }
 
 export const getState = async ({ account, timestamp: time } = {}) => {
@@ -297,6 +409,6 @@ async function init() {
     getDxPoolAPI(),
   ])
 
-  console.log('​API init -> ', { Web3, Tokens, DxPool })
+  console.debug('​API init -> ', { Web3, Tokens, DxPool })
   return { Web3, Tokens, DxPool }
 }
