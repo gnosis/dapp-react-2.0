@@ -4,13 +4,16 @@ body {
     font-family: 'Major Mono Display', monospace;
     /* min-width: 570px; */
     font-size: 1.4rem;
+
+    display: flex;
+    min-height: 100vh;
 }
 
 #app {
     display: flex;
     margin: auto;
     flex-flow: column nowrap;
-    min-height: 100vh;
+    /* min-height: 100vh; */
     max-width: 80vw;
 }
 
