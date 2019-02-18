@@ -1,3 +1,5 @@
+import { toBN, toWei } from './api/utils'
+
 export const ETHEREUM_NETWORKS = {
   MAIN: 'MAIN',
   MORDEN: 'MORDEN',
@@ -15,7 +17,7 @@ export const networkById = {
   42: ETHEREUM_NETWORKS.KOVAN,
 }
 
-export const GAS_LIMIT = 4000000
+export const GAS_LIMIT = 400000
 export const GAS_PRICE = 5e9
 
 export const WEBSOCKET_URLS = {
@@ -31,3 +33,8 @@ export const INFURA_URLS = {
   MAIN: 'https://mainnet.infura.io/v3/fb2b930672ff4872bfcad69671f2dfd4',
   RINKEBY: 'https://rinkeby.infura.io/v3/fb2b930672ff4872bfcad69671f2dfd4',
 }
+
+export const MAINNET_WETH = require('@gnosis.pm/util-contracts/networks.json').EtherToken['1'].address
+export const RINKEBY_WETH = require('@gnosis.pm/util-contracts/networks.json').EtherToken['4'].address
+
+export const BN_10_PERCENT = toBN(toWei("1.1"))
