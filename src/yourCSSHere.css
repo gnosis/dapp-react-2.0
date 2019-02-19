@@ -2,7 +2,7 @@
 
 body {
     font-family: 'Major Mono Display', monospace;
-    /* min-width: 570px; */
+    min-width: 630px;
     font-size: 1.4rem;
 
     display: flex;
@@ -14,7 +14,7 @@ body {
     margin: auto;
     flex-flow: column nowrap;
     /* min-height: 100vh; */
-    max-width: 80vw;
+    min-width: 80vw;
 }
 
 section {
@@ -143,8 +143,14 @@ input[type="text"] {
     justify-content: center;
     
     position: fixed;
-    background: linear-gradient(-45deg, #72bbf7, #4c68c4);
-    animation: RetroGradient 2s ease infinite;
+    background: linear-gradient(-45deg, #4c68c4, #72bbf7/* #e5a1fc */, #a2b2fe, #eec6fc);
+    background-size: 600% 600%;
+
+    -webkit-animation: GradientAnimation 9s ease infinite;
+    -moz-animation: GradientAnimation 9s ease infinite;
+    animation: GradientAnimation 9s ease infinite;
+    /* background: linear-gradient(-45deg, #72bbf7, #4c68c4);
+    animation: RetroGradient 2s ease infinite; */
 
     top: 0; left: 0; right: 0; bottom: 0;
 }
@@ -164,7 +170,7 @@ input[type="text"] {
 
 .poolInnerContainer {
     flex-flow: row wrap;
-    width: 75%;
+    /* width: 75%; */
 }
 
 .poolDataContainer {
@@ -173,7 +179,7 @@ input[type="text"] {
     align-items: center;
     text-align: center;
 
-    margin: 5px 15px;
+    margin: 5px 15px auto;
 }
 
 .asyncActionContainer {
@@ -246,4 +252,29 @@ input {
 
 input[disabled], input:disabled {
     box-shadow: none;
+}
+
+.loadGradient {
+    background: linear-gradient(270deg, #a1e1fc, #e5a1fc, #a2b2fe);
+    background-size: 600% 600%;
+
+    -webkit-animation: GradientAnimation 30s ease infinite;
+    -moz-animation: GradientAnimation 30s ease infinite;
+    animation: GradientAnimation 30s ease infinite;
+}
+
+@-webkit-keyframes GradientAnimation {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@-moz-keyframes GradientAnimation {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@keyframes GradientAnimation { 
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
 }

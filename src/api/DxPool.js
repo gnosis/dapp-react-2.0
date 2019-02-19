@@ -46,7 +46,10 @@ async function init() {
    * @param { string } address 
    * @returns { Promise<string[]> } - [ dtAddress, stAddress ]
    */
-  const getPoolTokensAddresses = async address => [(await getDxPool(address)).depositToken.call(), (await getDxPool(address)).secondaryToken.call()]
+  const getPoolTokensAddresses = async () => Promise.all([
+    dxMP1.depositToken.call(), 
+    dxMP1.secondaryToken.call(),
+  ])
 
   /**
    * getPoolAddresses

@@ -130,13 +130,13 @@ const mapProps = ({
   state: {
     PROVIDER: { activeProvider },
     DX_MGN_POOL: {
-      pool1: {
-        totalShare,
-        totalUserParticipation: totalUserParticipation1,
+      POOL1: {
+        TOTAL_SHARE: TOTAL_SHARE1,
+        YOUR_SHARE: YOUR_SHARE1,
       },
-      pool2: {
-        totalShare: totalShare2,
-        totalUserParticipation: totalUserParticipation2,
+      POOL2: {
+        TOTAL_SHARE: TOTAL_SHARE2,
+        YOUR_SHARE: YOUR_SHARE2,
       },
     },
     TOKEN_MGN: {
@@ -162,10 +162,10 @@ const mapProps = ({
 }) => ({
   // state properties
   state: {
-    "[Pool #1] Total Share": cleanData(totalShare),
-    "[Pool #1] User's Share": cleanData(totalUserParticipation1),
-    "[Pool #2] Total Share": cleanData(totalShare2),
-    "[Pool #2] User's Share": cleanData(totalUserParticipation2),
+    "[Pool #1] Total Share": cleanData(TOTAL_SHARE1),
+    "[Pool #1] User's Share": cleanData(YOUR_SHARE1),
+    "[Pool #2] Total Share": cleanData(TOTAL_SHARE2),
+    "[Pool #2] User's Share": cleanData(YOUR_SHARE2),
     "[MGN] Address": address,
     "[MGN] Balance": cleanData(balance),
     activeProvider,

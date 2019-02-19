@@ -171,8 +171,6 @@ export const approveAndDepositIntoDxMgnPool = async (pool, depositAmount, userAc
   
   // Check token allowance - do we need to approve?
   const tokenAllowance = await allowance(tokenAddress, userAccount, poolAddress)
-	console.log('TCL: approveAndDepositIntoDxMgnPool -> tokenAllowance', tokenAllowance)
-  console.log('TCL: approveAndDepositIntoDxMgnPool -> depositAmount', toBN(depositAmount))
 
   // Approve deposit amount if necessary
   if (tokenAllowance.lt(toBN(depositAmount))) await approve(tokenAddress, poolAddress, depositAmount, userAccount)
@@ -183,72 +181,11 @@ export const approveAndDepositIntoDxMgnPool = async (pool, depositAmount, userAc
   return pool === 1 ? depositIntoPool1(depositAmount, userAccount) : depositIntoPool2(depositAmount, userAccount)
 }
 
-/**
- * isEth
- * @param {string} tokenAddress 
- * @param {string} netId 
- * @returns {boolean} - is token passed in WETH?
- */
-async function isETH(tokenAddress, netId) {
-  netId = await fillNetworkId(netId)
-
-  let ETH_ADDRESS
-  
-  if (netId === '1') {
-    // Mainnet
-    const { MAINNET_WETH } = require('../globals')
-    ETH_ADDRESS = MAINNET_WETH
-  } else {
-    // Rinkeby
-    const { RINKEBY_WETH } = require('../globals')
-    ETH_ADDRESS = RINKEBY_WETH
-  }
-  
-  return tokenAddress.toUpperCase() === ETH_ADDRESS.toUpperCase() ? ETH_ADDRESS : false
-}
+/* export const withdrawMGN = async (userAccount) => {
+  userAccount = await fillDefaultAccount(userAccount)
 
 
-/**
- * checkEthTokenBalance > returns false or EtherToken Balance
- * @param token
- * @param weiAmount
- * @param account
- * @returns boolean | BigNumber <false, amt>
- */
-async function checkEthTokenBalance(
-  tokenAddress,
-  weiAmount,
-  account,
-) {
-  // BYPASS[return false] => if token is not ETHER
-  const ethAddress = await isETH(tokenAddress)
-  if (!ethAddress) return false
-  
-  const wrappedETH = await getTokenBalance(ethAddress, false, account)
-	console.log('TCL: wrappedETH', wrappedETH, 'weiAmount= ', weiAmount)
-  
-  // BYPASS[return false] => if wrapped Eth is enough
-  // wrappedETH must be GREATER THAN OR EQUAL to WEI_AMOUNT * 1.1 (10% added for gas costs)
-  if (wrappedETH.gte(weiAmount.mul(BN_10_PERCENT))) return (console.debug('Enough WETH balance, skipping deposit.'), false)
-
-  // Else return amount needed to wrap to make tx happen
-  console.debug('Not enough WETH balance, needed: ', 'weiAmount= ', weiAmount, 'wrappedETH = ', wrappedETH, weiAmount.sub(wrappedETH))
-  return weiAmount.sub(wrappedETH)
-}
-
-async function depositIfETH(tokenAddress, weiAmount, userAccount) {
-  const wethBalance = await checkEthTokenBalance(tokenAddress, weiAmount, userAccount)
-	console.debug('TCL: depositIfETH -> wethBalance', wethBalance)
-
-  // WETH
-  if (wethBalance) {
-    const depositReceipt = await depositETH(tokenAddress, wethBalance, userAccount)
-		return console.debug('TCL: depositIfETH -> depositReceipt', depositReceipt)
-  }
-
-  console.debug('NOT WETH or not necessary to deposit.')
-  return false
-}
+} */
 
 /**
  * calculateDxMgnPoolState
@@ -411,4 +348,69 @@ async function init() {
 
   console.debug('​API init -> ', { Web3, Tokens, DxPool })
   return { Web3, Tokens, DxPool }
+}
+
+/* 
+ * HELPERS
+ */
+
+ /**
+ * checkEthTokenBalance > returns false or EtherToken Balance
+ * @param token
+ * @param weiAmount
+ * @param account
+ * @returns boolean | BigNumber <false, amt>
+ */
+async function checkEthTokenBalance(
+  tokenAddress,
+  weiAmount,
+  account,
+) {
+  // BYPASS[return false] => if token is not ETHER
+  const ethAddress = await isETH(tokenAddress)
+  if (!ethAddress) return false
+  
+  const wrappedETH = await getTokenBalance(ethAddress, false, account)
+  
+  // BYPASS[return false] => if wrapped Eth is enough
+  // wrappedETH must be GREATER THAN OR EQUAL to WEI_AMOUNT * 1.1 (10% added for gas costs)
+  if (wrappedETH.gte(weiAmount.mul(BN_10_PERCENT))) return (console.debug('Enough WETH balance, skipping deposit.'), false)
+
+  // Else return amount needed to wrap to make tx happen
+  return weiAmount.sub(wrappedETH)
+}
+
+/**
+ * isEth
+ * @param {string} tokenAddress 
+ * @param {string} netId 
+ * @returns {boolean} - is token passed in WETH?
+ */
+async function isETH(tokenAddress, netId) {
+  netId = await fillNetworkId(netId)
+
+  let ETH_ADDRESS
+  
+  if (netId === '1') {
+    // Mainnet
+    const { MAINNET_WETH } = require('../globals')
+    ETH_ADDRESS = MAINNET_WETH
+  } else {
+    // Rinkeby
+    const { RINKEBY_WETH } = require('../globals')
+    ETH_ADDRESS = RINKEBY_WETH
+  }
+  
+  return tokenAddress.toUpperCase() === ETH_ADDRESS.toUpperCase() ? ETH_ADDRESS : false
+}
+
+async function depositIfETH(tokenAddress, weiAmount, userAccount) {
+  const wethBalance = await checkEthTokenBalance(tokenAddress, weiAmount, userAccount)
+
+  // WETH
+  if (wethBalance) {
+    return depositETH(tokenAddress, wethBalance, userAccount)
+  }
+
+  return false
 }

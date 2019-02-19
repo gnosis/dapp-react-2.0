@@ -22,15 +22,15 @@ const defaultState = {
     providers: [],
   },
   DX_MGN_POOL: {
-    pool1: {
-      totalShare: 0,
-      totalUserParticipation: 0,
-      depositAmount: 0,
+    POOL1: {
+      YOUR_SHARE: 0,
+      TOTAL_SHARE: 0,
+      DEPOSIT_AMOUNT: 0,
     },
-    pool2: {
-      totalShare: 0,
-      totalUserParticipation: 0,
-      depositAmount: 0,
+    POOL2: {
+      YOUR_SHARE: 0,
+      TOTAL_SHARE: 0,
+      DEPOSIT_AMOUNT: 0,
     },
   },
   TOKEN_MGN: {
@@ -110,23 +110,6 @@ class AppProvider extends React.Component {
     }))
   }
 
-  saveTotalPoolShares = async () => {
-    const [totalShare1, totalShare2] = await getTotalPoolShares()
-
-    return this.setState(prevState => ({
-      ...prevState,
-      DX_MGN_POOL: {
-        ...prevState.DX_MGN_POOL,
-        pool1: {
-          totalShare: totalShare1,
-        },
-        pool2: {
-          totalShare: totalShare2,
-        },
-      },
-    }))
-  }
-
   saveMGNAddressAndBalance = async () => {
     const address = await getMGNTokenAddress()
     const balance = await getMGNTokenBalance(this.state.USER.account)
@@ -140,6 +123,23 @@ class AppProvider extends React.Component {
     }))
   }
 
+  saveTotalPoolShares = async () => {
+    const [totalShare1, totalShare2] = await getTotalPoolShares()
+
+    return this.setState(prevState => ({
+      ...prevState,
+      DX_MGN_POOL: {
+        ...prevState.DX_MGN_POOL,
+        POOL1: {
+          TOTAL_SHARE: totalShare1,
+        },
+        POOL2: {
+          TOTAL_SHARE: totalShare2,
+        },
+      },
+    }))
+  }
+
   setUserParticipation = async () => {
     const { USER: { account } } = this.state
     const [totalContribution1, totalContribution2] = await calculateUserParticipation(account)
@@ -148,13 +148,13 @@ class AppProvider extends React.Component {
       ...prevState,
       DX_MGN_POOL: {
         ...prevState.DX_MGN_POOL,
-        pool1: {
-          ...prevState.DX_MGN_POOL.pool1,
-          totalUserParticipation: totalContribution1,
+        POOL1: {
+          ...prevState.DX_MGN_POOL.POOL1,
+          YOUR_SHARE: totalContribution1,
         },
-        pool2: {
-          ...prevState.DX_MGN_POOL.pool2,
-          totalUserParticipation: totalContribution2,
+        POOL2: {
+          ...prevState.DX_MGN_POOL.POOL2,
+          YOUR_SHARE: totalContribution2,
         },
       },
     }))
@@ -188,27 +188,27 @@ class AppProvider extends React.Component {
       ...prevState,
       DX_MGN_POOL: {
         ...prevState.DX_MGN_POOL,
-        pool1: {
-          ...prevState.DX_MGN_POOL.pool1,
-          totalShare: totalShare1,
-          totalUserParticipation: totalContribution1,
-          dtName: name1,
-          dtSymbol: symbol1,
-          dtDecimals: decimals1,
-          stName: name2,
-          stSymbol: symbol2,
-          stDecimals: decimals2,
+        POOL1: {
+          ...prevState.DX_MGN_POOL.POOL1,
+          YOUR_SHARE: totalContribution1,
+          TOTAL_SHARE: totalShare1,
+          DEPOSIT_TOKEN: name1,
+          DEPOSIT_SYMBOL: symbol1,
+          DEPOSIT_DECIMALS: decimals1,
+          SECONDARY_TOKEN: name2,
+          SECONDARY_SYMBOL: symbol2,
+          SECONDARY_DECIMALS: decimals2,
         },
-        pool2: {
-          ...prevState.DX_MGN_POOL.pool2,
-          totalShare: totalShare2,
-          totalUserParticipation: totalContribution2,
-          dtName: name2,
-          dtSymbol: symbol2,
-          dtDecimals: decimals2,
-          stName: name1,
-          stSymbol: symbol1,
-          stDecimals: decimals1,
+        POOL2: {
+          ...prevState.DX_MGN_POOL.POOL2,
+          YOUR_SHARE: totalContribution2,
+          TOTAL_SHARE: totalShare2,
+          DEPOSIT_TOKEN: name2,
+          DEPOSIT_SYMBOL: symbol2,
+          // dtDecimals: decimals2,
+          SECONDARY_TOKEN: name1,
+          // stSymbol: symbol1,
+          // stDecimals: decimals1,
         },
       },
       TOKEN_MGN: {
