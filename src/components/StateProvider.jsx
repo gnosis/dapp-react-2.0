@@ -166,6 +166,8 @@ class AppProvider extends React.Component {
       INPUT_AMOUNT,
     } = this.state
 
+    console.debug('toBN(toWei(INPUT_AMOUNT)) ', toBN(toWei(INPUT_AMOUNT)))
+
     const receipt = await approveAndDepositIntoDxMgnPool(poolNumber, toBN(toWei(INPUT_AMOUNT)), account)
 		console.debug('TCL: AppProvider -> setDepositAmount -> RECEIPT= ', receipt)
   }

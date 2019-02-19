@@ -1,4 +1,4 @@
-import { toBN, toWei } from './api/utils'
+import { toBN } from './api/utils'
 
 export const ETHEREUM_NETWORKS = {
   MAIN: 'MAIN',
@@ -37,4 +37,4 @@ export const INFURA_URLS = {
 export const MAINNET_WETH = require('@gnosis.pm/util-contracts/networks.json').EtherToken['1'].address
 export const RINKEBY_WETH = require('@gnosis.pm/util-contracts/networks.json').EtherToken['4'].address
 
-export const BN_10_PERCENT = toBN(toWei("1.1"))
+export const BN_4_PERCENT = toBN(104)

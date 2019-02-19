@@ -5,7 +5,7 @@ import { getDxPoolAPI } from './DxPool'
 import { getAppContracts } from './Contracts'
 import { fromWei, toBN } from '../api/utils'
 
-import { BN_10_PERCENT } from '../globals'
+import { BN_4_PERCENT } from '../globals'
 
 // API singleton
 let appAPI
@@ -166,12 +166,21 @@ export const approveAndDepositIntoDxMgnPool = async (pool, depositAmount, userAc
     depositIntoPool1, 
     depositIntoPool2, 
   } = await getDxPoolAPI()
+
+  console.debug('approveAndDeposit = ', {
+    dxMP1Address,
+    dxMP2Address,
+    dxMP1DepositTokenAddress, 
+    dxMP1SecondaryTokenAddress, 
+    depositIntoPool1, 
+    depositIntoPool2, 
+  })
+
   const tokenAddress = (pool === 1 ? dxMP1DepositTokenAddress : dxMP1SecondaryTokenAddress)
   const poolAddress = (pool === 1 ? dxMP1Address : dxMP2Address)
   
   // Check token allowance - do we need to approve?
   const tokenAllowance = await allowance(tokenAddress, userAccount, poolAddress)
-
   // Approve deposit amount if necessary
   if (tokenAllowance.lt(toBN(depositAmount))) await approve(tokenAddress, poolAddress, depositAmount, userAccount)
 
@@ -368,13 +377,14 @@ async function checkEthTokenBalance(
 ) {
   // BYPASS[return false] => if token is not ETHER
   const ethAddress = await isETH(tokenAddress)
+
   if (!ethAddress) return false
-  
+
   const wrappedETH = await getTokenBalance(ethAddress, false, account)
   
   // BYPASS[return false] => if wrapped Eth is enough
   // wrappedETH must be GREATER THAN OR EQUAL to WEI_AMOUNT * 1.1 (10% added for gas costs)
-  if (wrappedETH.gte(weiAmount.mul(BN_10_PERCENT))) return (console.debug('Enough WETH balance, skipping deposit.'), false)
+  if (wrappedETH.gte((weiAmount.mul(BN_4_PERCENT).div(toBN(100))))) return (console.debug('Enough WETH balance, skipping deposit.'), false)
 
   // Else return amount needed to wrap to make tx happen
   return weiAmount.sub(wrappedETH)
@@ -406,11 +416,10 @@ async function isETH(tokenAddress, netId) {
 
 async function depositIfETH(tokenAddress, weiAmount, userAccount) {
   const wethBalance = await checkEthTokenBalance(tokenAddress, weiAmount, userAccount)
+	console.debug('TCL: depositIfETH -> wethBalance', wethBalance)
 
   // WETH
-  if (wethBalance) {
-    return depositETH(tokenAddress, wethBalance, userAccount)
-  }
+  if (wethBalance) return depositETH(tokenAddress, wethBalance, userAccount)
 
   return false
 }
