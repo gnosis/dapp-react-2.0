@@ -2,14 +2,13 @@ import React from 'react'
 import { getWeb3API } from '../api/ProviderWeb3'
 import { 
   getTotalPoolShares, 
-  getMGNTokenAddress, 
-  getMGNTokenBalance,
   calculateUserParticipation,
   calculateDxMgnPoolState,
   approveAndDepositIntoDxMgnPool,
 } from '../api'
 
 import { toBN, toWei } from '../api/utils'
+import { getDxPoolAPI } from '../api/DxPool';
 
 const defaultState = {
   USER: {
@@ -25,17 +24,17 @@ const defaultState = {
     POOL1: {
       YOUR_SHARE: 0,
       TOTAL_SHARE: 0,
-      DEPOSIT_AMOUNT: 0,
     },
     POOL2: {
       YOUR_SHARE: 0,
       TOTAL_SHARE: 0,
-      DEPOSIT_AMOUNT: 0,
     },
   },
   TOKEN_MGN: {
-    address: undefined,
-    balance: undefined,
+    ADDRESS: undefined,
+    BALANCE: undefined,
+    LOCKED_BALANCE: undefined,
+    UNLOCKED_BALANCE: undefined,
   },
   CONTRACTS: {},
   SHOW_MODAL: undefined,
@@ -111,14 +110,27 @@ class AppProvider extends React.Component {
   }
 
   saveMGNAddressAndBalance = async () => {
-    const address = await getMGNTokenAddress()
-    const balance = await getMGNTokenBalance(this.state.USER.account)
+    const { 
+      getMGNTokenAddress, 
+      getMGNTokenLockedBalance, 
+      getMGNTokenUnlockedBalance, 
+      getMGNTokenBalance, 
+    } = await getDxPoolAPI()
+
+    const [ADDRESS, LOCKED_BALANCE, UNLOCKED_BALANCE, BALANCE] = await Promise.all([
+      getMGNTokenAddress(),
+      getMGNTokenLockedBalance(this.state.USER.account),
+      getMGNTokenUnlockedBalance(this.state.USER.account),
+      getMGNTokenBalance(this.state.USER.account),
+    ])
 
     this.setState(prevState => ({
       ...prevState,
       TOKEN_MGN: {
-        address,
-        balance,
+        ADDRESS,
+        LOCKED_BALANCE,
+        UNLOCKED_BALANCE,
+        BALANCE,
       },
     }))
   }
@@ -175,15 +187,18 @@ class AppProvider extends React.Component {
   setDxMgnPoolState = async () => {
     const [
       mgnAddress,
+      mgnLockedBalance,
+      mgnUnlockedBalance,
       mgnBalance,
       totalShare1,
       totalShare2,
       totalContribution1,
       totalContribution2,
+      // TODO: can be cleaned up to used derived object names instead of duping logic
       // Deposit Token
-      { name: name1, symbol: symbol1, decimals: decimals1 },
+      { name: name1, symbol: symbol1, decimals: decimals1, balance: balance1 },
       // Secondary Token
-      { name: name2, symbol: symbol2, decimals: decimals2 },
+      { name: name2, symbol: symbol2, decimals: decimals2, balance: balance2 },
      ] = await calculateDxMgnPoolState(this.state.USER.account)
     
      return this.setState(prevState => ({
@@ -200,6 +215,7 @@ class AppProvider extends React.Component {
           SECONDARY_TOKEN: name2,
           SECONDARY_SYMBOL: symbol2,
           SECONDARY_DECIMALS: decimals2,
+          TOKEN_BALANCE: balance1,
         },
         POOL2: {
           ...prevState.DX_MGN_POOL.POOL2,
@@ -211,11 +227,14 @@ class AppProvider extends React.Component {
           SECONDARY_TOKEN: name1,
           // stSymbol: symbol1,
           // stDecimals: decimals1,
+          TOKEN_BALANCE: balance2,
         },
       },
       TOKEN_MGN: {
-        address: mgnAddress,
-        balance: mgnBalance,
+        ADDRESS: mgnAddress,
+        LOCKED_BALANCE: mgnLockedBalance,
+        UNLOCKED_BALANCE: mgnUnlockedBalance,
+        BALANCE: mgnBalance,
       },
     }))
   }

@@ -98,17 +98,37 @@ export const getMGNTokenAddress = async () => {
   return getMGNAddress(pool1Address)
 }
 
-export const getMGNTokenBalance = async (userAddress) => {
+export const getMGNTokenLockedBalance = async (userAddress) => {
   userAddress = await fillDefaultAccount(userAddress)
   
-  const { getMGNAddress, getMGNBalance, getPoolAddresses } = await getDxPoolAPI()
+  const { getMGNAddress, getMGNLockedBalance, getPoolAddresses } = await getDxPoolAPI()
   const [pool1Address] = await getPoolAddresses()
   const mgnAddress = await getMGNAddress(pool1Address)
 
-  return getMGNBalance(mgnAddress, userAddress)
+  return getMGNLockedBalance(mgnAddress, userAddress)
 }
 
-export const getPoolTokensInfo = async () => {
+/**
+ * getAllMGNTokenBalances
+ * @param { string } userAddress 
+ * @returns { BN[] } - Array of BN values
+ */
+export const getAllMGNTokenBalances = async (userAddress) => {
+  userAddress = await fillDefaultAccount(userAddress)
+  
+  const { getMGNAddress, getMGNLockedBalance, getMGNUnlockedBalance, getMGNBalance, getPoolAddresses } = await getDxPoolAPI()
+  const [pool1Address] = await getPoolAddresses()
+  const mgnAddress = await getMGNAddress(pool1Address)
+
+  return Promise.all([
+    getMGNLockedBalance(mgnAddress, userAddress),
+    getMGNUnlockedBalance(mgnAddress, userAddress),
+    getMGNBalance(mgnAddress, userAddress),
+  ])
+}
+
+export const getPoolTokensInfo = async (userAccount) => {
+  userAccount = await fillDefaultAccount(userAccount)
   const [{ hft }, [dxPool1]] = await Promise.all([
     getAppContracts(),
     getPoolContracts(),
@@ -130,12 +150,14 @@ export const getPoolTokensInfo = async () => {
       name: await depositToken.name.call() || 'Unknown token name',
       symbol: await depositToken.symbol.call() || 'Unknown token symbol',
       decimals: (await depositToken.decimals.call()).toNumber() || 18,
+      balance: await depositToken.balanceOf.call(userAccount),
     },
     {
       title: 'Secondary Token',
       name: await secondaryToken.name.call() || 'Unknown token name',
       symbol: await secondaryToken.symbol.call() || 'Unknown token symbol',
       decimals: (await secondaryToken.decimals.call()).toNumber() || 18,
+      balance: await secondaryToken.balanceOf.call(userAccount),
     },
   ]
 }
@@ -206,13 +228,13 @@ export const calculateDxMgnPoolState = async (userAccount) => {
 
   const [
     mgnAddress, 
-    mgnBalance, 
+    [mgnLockedBalance, mgnUnlockedBalance, mgnBalance], 
     [totalShare1, totalShare2], 
     [totalContribution1, totalContribution2],
     [depositTokenObj, secondaryTokenObj],
   ] = await Promise.all([
     getMGNTokenAddress(),
-    getMGNTokenBalance(userAccount),
+    getAllMGNTokenBalances(userAccount),
     getTotalPoolShares(),
     calculateUserParticipation(userAccount),
     getPoolTokensInfo(),
@@ -220,6 +242,8 @@ export const calculateDxMgnPoolState = async (userAccount) => {
 
   return [
     mgnAddress,
+    mgnLockedBalance,
+    mgnUnlockedBalance, 
     mgnBalance,
     totalShare1,
     totalShare2,

@@ -11,14 +11,18 @@ const mapProps = ({
       },
       PROVIDER: { network },
       TOKEN_MGN: {
-        balance: mgnBalance,
+        LOCKED_BALANCE,
+        UNLOCKED_BALANCE,
+        BALANCE: MGN_BALANCE,
       },
     },
   }) => ({
     account,
     network,
     "[ETH] balance": cleanData(balance),
-    "[locked MGN] balance": cleanData(mgnBalance),
+    "[MGN] balance": cleanData(MGN_BALANCE),    
+    "[locked MGN] balance": cleanData(LOCKED_BALANCE),
+    "[unlocked MGN] balance": cleanData(UNLOCKED_BALANCE),
   })
   
 export default connect(mapProps)(DataDisplay)

@@ -73,12 +73,28 @@ async function init() {
   }
 
   /**
-   * getMGNAddress
+   * getMGNLockedBalance
    * @param { string } address
-   * @returns { BN } mgnTokenBalance <BN>
+   * @param { string } userAddress
+   * @returns { BN } mgnLockedTokenBalance as <BN>
    */
-  const getMGNBalance = async (address, userAddress) => (await getTokenMGN(address)).lockedTokenBalances.call(userAddress)
-  
+  const getMGNLockedBalance = async (address, userAddress) => (await getTokenMGN(address)).lockedTokenBalances.call(userAddress)
+
+  /**
+   * getMGNUnlockedBalance
+   * @param { string } address
+   * @param { string } userAddress
+   * @returns { BN } getMGNUnlockedBalance as <BN>
+   */
+  const getMGNUnlockedBalance = async (address, userAddress) => (await (await getTokenMGN(address)).unlockedTokens.call(userAddress)).amountUnlocked
+
+  /**
+   * getMGNBalance
+   * @param { string } address
+   * @param { string } userAddress
+   * @returns { BN } getMGNBalance as <BN>
+   */
+  const getMGNBalance = async (address, userAddress) => (await getTokenMGN(address)).balanceOf.call(userAddress)  
 
   /**
    * depositIntoPool1
@@ -134,6 +150,8 @@ async function init() {
     getPoolAddresses,
     getTokenMGN,
     getMGNAddress,
+    getMGNLockedBalance,
+    getMGNUnlockedBalance,
     getMGNBalance,
     getPoolTokensAddresses,
     depositIntoPool1,

@@ -20,7 +20,7 @@ const PoolData = ({
     const makePoolObject = keyName => ({
         TOTAL_SHARE: keyName.TOTAL_SHARE,
         YOUR_SHARE: keyName.YOUR_SHARE,
-        DEPOSIT_AMOUNT: keyName.DEPOSIT_AMOUNT,
+        TOKEN_BALANCE: keyName.TOKEN_BALANCE,
     })
     return (
         <>  
@@ -44,8 +44,8 @@ const PoolData = ({
                         />
                         <WithdrawAndClaimMGN 
                             asyncAction={setDxMgnPoolState}
-                            buttonText="Claim + Withdraw"
-                            title="Claim + Withdraw MGN Tokens"
+                            buttonText="Withdraw"
+                            title="Withdraw MGN Tokens"
                         />
                     </pre>
                     {/* POOL 2 */}
@@ -62,8 +62,8 @@ const PoolData = ({
                         />
                         <WithdrawAndClaimMGN 
                             asyncAction={setDxMgnPoolState}
-                            buttonText="Claim + Withdraw"
-                            title="Claim + Withdraw MGN Tokens"
+                            buttonText="Withdraw"
+                            title="Withdraw MGN Tokens"
                         />
                     </pre>
                 </div>

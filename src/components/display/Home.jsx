@@ -5,14 +5,14 @@ import DataDisplay from './UserStateDisplay'
 
 const Home = () => (
   <section>
-    {/* DxMgnPool Data */}
-    <PoolData />
     {/* Show User's State */}
     <DataDisplay 
       colour="violet" 
-      startOpen={false}
+      // startOpen={true}
       title="Your Data" 
     />
+    {/* DxMgnPool Data */}
+    <PoolData />
   </section>
 )
 
