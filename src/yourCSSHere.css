@@ -32,12 +32,18 @@ pre {
     border-radius: 30px;
 }
 
+pre > h1, pre > h2, pre > h3, pre > h4, pre > h5 {
+    font-family: 'Major Mono Display';
+    font-weight: 100;
+    font-style: italic;
+}
+
 hr {
     height: 1px;
     border-width: 0;
-    border-bottom: 1px dashed lightgray;
+    border-bottom: 1px dashed black;
     flex: 1;
-    margin: 12px 12px 0;
+    margin: 12px 2px -4px;
 }
 
 .word-wrap {
@@ -165,12 +171,12 @@ input[type="text"] {
     flex-flow: column nowrap;
 
     border: dotted;
-    padding: 0 5px 15px;
+    /* padding: 0 5px 15px; */
 }
 
 .poolInnerContainer {
     flex-flow: row wrap;
-    /* width: 75%; */
+    width: 96%;
 }
 
 .poolDataContainer {
@@ -179,7 +185,7 @@ input[type="text"] {
     align-items: center;
     text-align: center;
 
-    margin: 5px 15px auto;
+    margin: 15px;
 }
 
 .asyncActionContainer {

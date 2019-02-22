@@ -14,23 +14,18 @@ import startSubscriptions from '../../subscriptions'
 
 function WalletIntegration({ 
   dispatchers: { 
-    grabUserState,
-    setDxMgnPoolState,
+    setUserState,
     registerProviders, 
-    saveContract, 
     setActiveProvider,
     showModal,
-    // appLoading, 
-    // saveTotalPoolShares,
-    // saveMGNAddressAndBalance,
-    // setUserParticipation,
+    setPoolTokenInfo,
   }, 
-  state: { activeProvider }, 
+  state: { ACTIVE_PROVIDER }, 
   children,
 }) {
-  const [error, setError] = useState(undefined)
-  const [initialising, setInitialising] = useState(false)
-  const [activeProviderSet, setActiveProviderState] = useState(undefined)
+  const [error, _setError] = useState(undefined)
+  const [initialising, _setInitialising] = useState(false)
+  const [activeProviderSet, _setActiveProviderState] = useState(undefined)
 
   // Fire once on load
   useEffect(() => {
@@ -40,7 +35,7 @@ function WalletIntegration({
     providersArray.forEach(() => { registerProviders(providersArray) })
   }, [])
 
-  const saveContractToState = contracts => Object.keys(contracts).forEach(name => saveContract({ name, contract: contracts[name] }))
+  // const saveContractToState = contracts => Object.keys(contracts).forEach(name => saveContract({ name, contract: contracts[name] }))
 
   /**
    * onChange Event Handler
@@ -54,49 +49,51 @@ function WalletIntegration({
       // appLoading(true)
 
       // State setters
-      setError(undefined)
-      setInitialising(true)
+      _setError(undefined)
+      _setInitialising(true)
 
       const chosenProvider = Providers[providerInfo]
       // initialize providers and return specific Web3 instances
       await chosenProvider.initialize()
 
-      // Save activeProvider to State
+      // Save ACTIVE_PROVIDER to State
       setActiveProvider(providerInfo)
       
       // Save web3 provider + notify state locally
-      setActiveProviderState(true)
+      _setActiveProviderState(true)
 
       // interface with contracts & connect entire DX API
       // grabbing eth here to show contrived example of state
-      const contracts = await getAppContracts()
+      await getAppContracts()
 
       // registers/saves contracts to StateProvider
-      saveContractToState(contracts)
+      // saveContractToState(contracts)
 
       // INIT main API
       await getAPI()
 
       // First time grab userState
-      await grabUserState()
+      setUserState()
 
       // Sets all essential DxMgnPool State
-      await setDxMgnPoolState()
-
+      // await setDxMgnPoolState()
       startSubscriptions()
+
+      // Set pool token info
+      setPoolTokenInfo()
 
       // Hide Modal, all good!
       showModal(undefined)
       // appLoading(false)
 
-      return setInitialising(false)
+      return _setInitialising(false)
     } catch (err) {
       console.error(err)
       showModal(undefined)
       // appLoading(false)
       
-      setInitialising(false)
-      return setError(error)
+      _setInitialising(false)
+      return _setError(error)
     }
   }
 
@@ -124,7 +121,7 @@ function WalletIntegration({
   
   if (error) return <h1>An error occurred: {error}</h1>
   
-  if ((activeProvider && activeProviderSet) && !initialising) return children
+  if ((ACTIVE_PROVIDER && activeProviderSet) && !initialising) return children
   
   return walletSelector()
 }
@@ -132,7 +129,7 @@ function WalletIntegration({
 const mapProps = ({
   // state properties
   state: {
-    PROVIDER: { activeProvider },
+    PROVIDER: { ACTIVE_PROVIDER },
     DX_MGN_POOL: {
       POOL1: {
         TOTAL_SHARE: TOTAL_SHARE1,
@@ -144,25 +141,23 @@ const mapProps = ({
       },
     },
     TOKEN_MGN: {
-      address,
-      balance,
+      ADDRESS,
+      BALANCE,
     },
-    loading,
+    LOADING,
     SHOW_MODAL,
     INPUT_AMOUNT,
   },
   // dispatchers
   appLoading,
-  grabUserState,
+  setUserState,
   setDxMgnPoolState,
   registerProviders,
   setActiveProvider,
   getDXTokenBalance,
   saveContract,
   showModal,
-  // saveTotalPoolShares,
-  // saveMGNAddressAndBalance,
-  // setUserParticipation,
+  setPoolTokenInfo,
 }) => ({
   // state properties
   state: {
@@ -170,26 +165,24 @@ const mapProps = ({
     "[Pool #1] User's Share": cleanData(YOUR_SHARE1),
     "[Pool #2] Total Share": cleanData(TOTAL_SHARE2),
     "[Pool #2] User's Share": cleanData(YOUR_SHARE2),
-    "[MGN] Address": address,
-    "[MGN] Balance": cleanData(balance),
-    activeProvider,
-    loading,
+    "[MGN] Address": ADDRESS,
+    "[MGN] Balance": cleanData(BALANCE),
+    ACTIVE_PROVIDER,
+    LOADING,
     SHOW_MODAL,
     INPUT_AMOUNT,
   },
   // dispatchers
   dispatchers: {
     appLoading,
-    grabUserState,
+    setUserState,
     setDxMgnPoolState,
     registerProviders,
     setActiveProvider,
     getDXTokenBalance,
     saveContract,
     showModal,
-    // saveTotalPoolShares,
-    // saveMGNAddressAndBalance,
-    // setUserParticipation,
+    setPoolTokenInfo,
   },
 })
 

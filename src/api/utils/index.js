@@ -117,9 +117,7 @@ const shallowDifferent = (obj1, obj2) => {
   if (!obj1 || !obj2) return true
   
   const flatObj1 = flattener(obj1)
-	console.warn('TCL: shallowDifferent -> flatObj1', flatObj1)
   const flatObj2 = flattener(obj2)
-	console.warn('TCL: shallowDifferent -> flatObj2', flatObj2)
 
   const keys1 = Object.keys(flatObj1)
   const keys2 = Object.keys(flatObj2)
@@ -127,6 +125,22 @@ const shallowDifferent = (obj1, obj2) => {
   if (keys1.length !== keys2.length) return true
   
   return keys1.some(key => !Object.is(flatObj1[key], flatObj2[key]))
+}
+
+const poolStateIdToName = (id) => {
+  switch (id) {
+    case '1':
+    case 1:
+      return 'PoolingEnded'
+    case '2':
+    case 2:
+      return 'DepositWithdrawnFromDx'
+    case '3':
+    case 3:
+      return 'MgnUnlocked'
+    default: 
+      return 'Pooling' 
+  }
 }
 
 export {
@@ -144,6 +158,7 @@ export {
   windowLoaded,
   flattener,
   shallowDifferent,
+  poolStateIdToName,
 }
 
 /**

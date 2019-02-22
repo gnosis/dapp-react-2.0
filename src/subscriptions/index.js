@@ -3,10 +3,9 @@ import { createSubscription } from 'create-subscription'
 
 import { calculateDxMgnPoolState, fillDefaultAccount } from '../api'
 import { getWeb3API } from '../api/ProviderWeb3'
-import { fromWei, mapTS } from '../api/utils'
+import { fromWei, mapTS, poolStateIdToName } from '../api/utils'
 
-import createStatefulSub from './genericSub'
-
+import createStatefulSub/* , { createMultiSub } */ from './genericSub'
 
 const fetchAccountData = async () => {
     const { getCurrentAccount } = await getWeb3API()
@@ -50,15 +49,20 @@ const fetchMgnPoolData = async () => {
         totalShare1,
         totalShare2,
         totalContribution1,
-        totalContribution2,        
+        totalContribution2,
+        ,,
+        pool1State,
+        pool2State,       
       ] = mapTS(await calculateDxMgnPoolState(), 'fromWei')
 
     return {
         POOL1: {
+            'CURRENT STATE': poolStateIdToName(pool1State),
             'TOTAL SHARE': totalShare1,
             'YOUR SHARE': totalContribution1,
         },
         POOL2: {
+            'CURRENT STATE': poolStateIdToName(pool2State),
             'TOTAL SHARE': totalShare2,
             'YOUR SHARE': totalContribution2,
         },
@@ -85,10 +89,12 @@ export const MGNBalancesSub = createStatefulSub(fetchMGNBalances, {
 
 export const MGNPoolDataSub = createStatefulSub(fetchMgnPoolData, {
     POOL1: {
+        'Current State': 'loading...',
         'Total Share': 'loading...',
         'Your Contribution': 'loading...',
     },
     POOL2: {
+        'Current State': 'loading...',
         'Total Share': 'loading...',
         'Your Contribution': 'loading...',
     },
@@ -97,9 +103,19 @@ export const MGNPoolDataSub = createStatefulSub(fetchMgnPoolData, {
         if (!prevState) return true
 
         return prevState.POOL1['TOTAL SHARE'] !== (nextState.POOL1['TOTAL SHARE'])
-            || prevState.POOL2['TOTAL SHARE'] !== (nextState.POOL2['TOTAL SHARE']) 
+            || prevState.POOL2['TOTAL SHARE'] !== (nextState.POOL2['TOTAL SHARE'])
+            || prevState.POOL1['CURRENT STATE'] !== (nextState.POOL1['CURRENT STATE'])
+            || prevState.POOL2['CURRENT STATE'] !== (nextState.POOL2['CURRENT STATE'])
     },
 })
+
+/* const AccountAndBlockSub = createMultiSub(AccountSub, BlockSub)
+
+AccountAndBlockSub.subscribe(([accountState, blockTimestamp]) => {
+    ETHbalanceSub.update(accountState.account, blockTimestamp)
+    MGNPoolDataSub.update(accountState.account, blockTimestamp)
+    return MGNBalancesSub.update(accountState.account, blockTimestamp)
+}) */
 
 // Subsribe Balances to changes in Accounts.
 // Any change in account will fire an update in ETH balance

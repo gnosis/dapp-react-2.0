@@ -77,6 +77,19 @@ export const getPoolContracts = async () => {
 }
 
 /**
+ * getPoolInternalState
+ * @returns { BN[] } - BN value of current state: [0 == Pooling // 1 == PoolingEnded // 2 == DepositWithdrawnFromDx // 3 == MgnUnlocked]
+ */
+export const getPoolInternalState = async () => {
+  const [dxMP1, dxMP2] = await getPoolContracts()
+
+  return Promise.all([
+    dxMP1.currentState.call(),
+    dxMP2.currentState.call(),
+  ])
+}
+
+/**
  * getTotalPoolShares
  * @returns { BN[] } - [<totalPoolShare1>, <totalPoolShare2>]
  */
@@ -179,6 +192,7 @@ export const calculateUserParticipation = async (address) => {
 }
 
 export const approveAndDepositIntoDxMgnPool = async (pool, depositAmount, userAccount) => {
+	console.error('TCL: approveAndDepositIntoDxMgnPool -> userAccount', userAccount)
   userAccount = await fillDefaultAccount(userAccount)
   const {
     dxMP1Address,
@@ -238,12 +252,14 @@ export const calculateDxMgnPoolState = async (userAccount) => {
     [totalShare1, totalShare2], 
     [totalContribution1, totalContribution2],
     [depositTokenObj, secondaryTokenObj],
+    [pool1State, pool2State],
   ] = await Promise.all([
     getMGNTokenAddress(),
     getAllMGNTokenBalances(userAccount),
     getTotalPoolShares(),
     calculateUserParticipation(userAccount),
     getPoolTokensInfo(),
+    getPoolInternalState(),
   ])
 
   return [
@@ -257,6 +273,8 @@ export const calculateDxMgnPoolState = async (userAccount) => {
     totalContribution2,
     depositTokenObj,
     secondaryTokenObj,
+    pool1State, 
+    pool2State,
   ]
 }
 
@@ -446,7 +464,6 @@ async function isETH(tokenAddress, netId) {
 
 async function depositIfETH(tokenAddress, weiAmount, userAccount) {
   const wethBalance = await checkEthTokenBalance(tokenAddress, weiAmount, userAccount)
-	console.debug('TCL: depositIfETH -> wethBalance', wethBalance)
 
   // WETH
   if (wethBalance) return depositETH(tokenAddress, wethBalance, userAccount)

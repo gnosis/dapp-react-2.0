@@ -38,7 +38,7 @@ const AsyncActionsHOC = Component => ({
             // fire action
             await asyncAction()
 
-            return inputChangeHandler ? inputChangeHandler(0) : setInputAmount(0)   
+            return inputChangeHandler ? inputChangeHandler(null) : setInputAmount(null)   
         } catch (err) {
 			console.error('AsyncActionsHOC ERROR: ', err)
             setError(err.message || err)

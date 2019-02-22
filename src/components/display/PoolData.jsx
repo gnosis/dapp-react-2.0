@@ -23,33 +23,35 @@ const PoolData = ({
             <div className="poolInnerContainer">
                 {/* POOL 1 */}
                 <pre className="poolDataContainer data-pre-blue">
-                    <h2>{DX_MGN_POOL.POOL1.DEPOSIT_TOKEN} [{DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL}]</h2>
+                    <h4>{DX_MGN_POOL.POOL1.DEPOSIT_TOKEN} [{DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL.toLowerCase()}]</h4>
                     {/* <ul>
                         {Object.keys(makePoolObject(POOL1)).map((key, idx) => <li key={idx * Math.random()}>{`${key.split('_').join(' ')}: ${cleanData(POOL1[key])}`}</li>)}
                     </ul> */}
                     <MGNPoolDataSubscription source={MGNPoolDataSub}>
                         {({ POOL1: p1 }) => <DataDisplay {...p1} />}
                     </MGNPoolDataSubscription>
+                    <hr />
                     <DepositToken 
                         asyncAction={() => setDepositAmount(1)} 
                         inputChangeHandler={setInputAmount}
-                        title={`Deposit [${DX_MGN_POOL.POOL1.DEPOSIT_TOKEN}]`}
+                        title={`deposit [${DX_MGN_POOL.POOL1.DEPOSIT_TOKEN}]`}
                         {...DX_MGN_POOL} 
                     />
                 </pre>
                 {/* POOL 2 */}
                 <pre className="poolDataContainer data-pre-green">
-                    <h2>{DX_MGN_POOL.POOL1.SECONDARY_TOKEN} [{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL}]</h2>
+                    <h4>{DX_MGN_POOL.POOL1.SECONDARY_TOKEN} [{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL.toLowerCase()}]</h4>
                     {/* <ul>
                         {Object.keys(makePoolObject(POOL2)).map((key, idx) => <li key={idx * Math.random()}>{`${key.split('_').join(' ')}: ${cleanData(POOL2[key])}`}</li>)}
                     </ul> */}
                     <MGNPoolDataSubscription source={MGNPoolDataSub}>
                         {({ POOL2: p2 }) => <DataDisplay {...p2} />}
                     </MGNPoolDataSubscription>
+                    <hr />
                     <DepositToken 
                         asyncAction={() => setDepositAmount(2)} 
                         inputChangeHandler={setInputAmount}
-                        title={`Deposit [${DX_MGN_POOL.POOL1.SECONDARY_TOKEN}]`}
+                        title={`deposit [${DX_MGN_POOL.POOL1.SECONDARY_TOKEN.toLowerCase()}]`}
                         {...DX_MGN_POOL} 
                     />
                 </pre>
