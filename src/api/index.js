@@ -212,11 +212,17 @@ export const approveAndDepositIntoDxMgnPool = async (pool, depositAmount, userAc
   return pool === 1 ? depositIntoPool1(depositAmount, userAccount) : depositIntoPool2(depositAmount, userAccount)
 }
 
-/* export const withdrawMGN = async (userAccount) => {
+export const lockAllMgn = async (userAccount) => {
+  const { dxMP1Address, lockMGN, getMGNAddress } = await getDxPoolAPI()
   userAccount = await fillDefaultAccount(userAccount)
+  
+  const mgnAddress = await getMGNAddress(dxMP1Address)
+  const mgnBalance = await getTokenBalance(mgnAddress, undefined, userAccount)
+  
+  if (mgnBalance.lte(toBN(0))) throw new Error('You have zero lockable MGN Balance')
 
-
-} */
+  return lockMGN(mgnBalance.add(toBN(1)), mgnAddress, userAccount)
+}
 
 /**
  * calculateDxMgnPoolState
@@ -314,11 +320,11 @@ export const checkIfFalseAllowance = async (amount, account, address) => {
 // ERC20 TOKENS
 // ================
 
-export async function allowance(tokenName, account, spender) {
+export async function allowance(tokenAddress, account, spender) {
   const { Tokens } = await getAPI()
   account = await checkIfAccount(account)
 
-  return Tokens.allowance(tokenName, account, spender)
+  return Tokens.allowance(tokenAddress, account, spender)
 }
 
 export async function approve(tokenAddress, spender, amount, account) {
@@ -328,20 +334,20 @@ export async function approve(tokenAddress, spender, amount, account) {
   return Tokens.approve(tokenAddress, spender, amount, { from: account })
 }
 
-export async function getTokenBalance(tokenName, formatFromWei, account) {
+export async function getTokenBalance(tokenAddress, formatFromWei, account) {
   const { Tokens } = await getAPI()
   account = await checkIfAccount(account)
 
-  const bal = await Tokens.getTokenBalance(tokenName, account)
+  const bal = await Tokens.getTokenBalance(tokenAddress, account)
 
   return formatFromWei ? fromWei(bal) : bal
 }
 
-export const transfer = async (tokenName, amount, to, account) => {
+export const transfer = async (tokenAddress, amount, to, account) => {
   const { Tokens } = await getAPI()
   account = await checkIfAccount(account)
 
-  return Tokens.transfer(tokenName, to, amount, { from: account })
+  return Tokens.transfer(tokenAddress, to, amount, { from: account })
 }
 
 export async function depositETH(tokenAddress, depositAmount, userAccount) {

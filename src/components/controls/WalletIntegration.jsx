@@ -10,6 +10,8 @@ import { cleanData } from '../../api/utils'
 import ConfigDisplayerHOC from '../hoc/ConfigDisplayHOC'
 import ModalHOC from '../hoc/ModalHOC'
 
+import startSubscriptions from '../../subscriptions'
+
 function WalletIntegration({ 
   dispatchers: { 
     grabUserState,
@@ -48,7 +50,7 @@ function WalletIntegration({
   const onChange = async (providerInfo) => {
     try {
       // Set Modal
-      showModal('LOADING USER DATA . . .')
+      showModal('Loading user data . . .')
       // appLoading(true)
 
       // State setters
@@ -80,6 +82,8 @@ function WalletIntegration({
 
       // Sets all essential DxMgnPool State
       await setDxMgnPoolState()
+
+      startSubscriptions()
 
       // Hide Modal, all good!
       showModal(undefined)

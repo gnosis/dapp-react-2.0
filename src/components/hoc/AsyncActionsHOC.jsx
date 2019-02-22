@@ -38,12 +38,12 @@ const AsyncActionsHOC = Component => ({
             // fire action
             await asyncAction()
 
-            // re-enable button
-            setButtonBlocked(false)
             return inputChangeHandler ? inputChangeHandler(0) : setInputAmount(0)   
         } catch (err) {
 			console.error('AsyncActionsHOC ERROR: ', err)
             setError(err.message || err)
+        } finally {
+            // reEnable button
             setButtonBlocked(false)
         }
     }

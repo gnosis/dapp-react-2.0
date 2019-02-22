@@ -1,28 +1,45 @@
-import DataDisplay from './DataDisplay'
-import { connect } from '../StateProvider'
+import React from 'react'
+import DataDisplayVisualContainer, { DataDisplay } from './DataDisplay'
+import AsyncActionsHOC from '../hoc/AsyncActionsHOC'
 
-import { cleanData } from '../../api/utils'
+import {
+  lockAllMgn,
+} from '../../api'
 
-const mapProps = ({
-    state: {
-      USER: {
-        account,
-        balance,
-      },
-      PROVIDER: { network },
-      TOKEN_MGN: {
-        LOCKED_BALANCE,
-        UNLOCKED_BALANCE,
-        BALANCE: MGN_BALANCE,
-      },
-    },
-  }) => ({
-    account,
-    network,
-    "[ETH] balance": cleanData(balance),
-    "[MGN] balance": cleanData(MGN_BALANCE),    
-    "[locked MGN] balance": cleanData(LOCKED_BALANCE),
-    "[unlocked MGN] balance": cleanData(UNLOCKED_BALANCE),
-  })
-  
-export default connect(mapProps)(DataDisplay)
+import { 
+  AccountSubscription, 
+  AccountSub, 
+  ETHbalanceSubscription, 
+  ETHbalanceSub, 
+  MGNBalancesSubscription, 
+  MGNBalancesSub,
+} from '../../subscriptions'
+
+const LockMGN = AsyncActionsHOC()
+
+const UserStateDisplay = () =>
+  <DataDisplayVisualContainer
+    title="Connected Wallet"
+    colour="violet"
+  >
+    {props =>
+    <>
+      <AccountSubscription source={AccountSub}>
+        {subInfo => <DataDisplay {...subInfo} {...props} />}
+      </AccountSubscription>
+      <ETHbalanceSubscription source={ETHbalanceSub}>
+        {subInfo => <DataDisplay {...subInfo} {...props} />}
+      </ETHbalanceSubscription>
+      <MGNBalancesSubscription source={MGNBalancesSub}>
+        {subInfo => <DataDisplay {...subInfo} {...props} />}
+      </MGNBalancesSubscription>
+      <LockMGN 
+        asyncAction={lockAllMgn}
+        buttonText="Lock"
+        title="Lock Mgn Tokens"
+      />
+    </>
+    }
+  </DataDisplayVisualContainer>
+
+export default UserStateDisplay

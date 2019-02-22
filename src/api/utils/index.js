@@ -43,7 +43,7 @@ const displayTime = (sec, locale = 'de-DE', timeZone = 'Europe/Berlin') => (sec 
   timeZone,
 }))
 
-const mapTS = arr => (Array.isArray(arr) ? arr : [arr]).map(item => item.toString())
+const mapTS = (arr, type) => (Array.isArray(arr) ? arr : [arr]).map(item => (type === 'fromWei' && isBN(item) ? fromWei(item) : item).toString())
 
 const netIdToName = (id) => {
   switch (id) {
@@ -97,7 +97,37 @@ const netIdToWebsocket = (id) => {
   }
 }
 
-const cleanData = data => (data && isBN(data) ? fromWei(data) : data)
+// const cleanData = data => (data && isBN(data) ? fromWei(data) : data)
+const cleanData = data => data && fromWei(toBN(data))
+
+const flattener = obj => Object.assign(
+  {},
+  ...(function _flatten(o) {
+      return [].concat(...Object.keys(o)
+          .map(k =>
+              (typeof o[k] === 'object' ?
+                  _flatten(o[k]) :
+                  ({ [k]: o[k] }))))
+  }(obj)),
+)
+
+const shallowDifferent = (obj1, obj2) => {
+  if (Object.is(obj1, obj2)) return false
+
+  if (!obj1 || !obj2) return true
+  
+  const flatObj1 = flattener(obj1)
+	console.warn('TCL: shallowDifferent -> flatObj1', flatObj1)
+  const flatObj2 = flattener(obj2)
+	console.warn('TCL: shallowDifferent -> flatObj2', flatObj2)
+
+  const keys1 = Object.keys(flatObj1)
+  const keys2 = Object.keys(flatObj2)
+
+  if (keys1.length !== keys2.length) return true
+  
+  return keys1.some(key => !Object.is(flatObj1[key], flatObj2[key]))
+}
 
 export {
   toBN,
@@ -112,6 +142,8 @@ export {
   netIdToName,
   netIdToWebsocket,
   windowLoaded,
+  flattener,
+  shallowDifferent,
 }
 
 /**

@@ -1,5 +1,5 @@
 import React from 'react'
-import DataDisplay from '../display/DataDisplay'
+import DataDisplayContainer from '../display/DataDisplay'
 
 /**
  * Configuration Displayer HOC
@@ -19,7 +19,7 @@ const ConfigDisplayerHOC = Component =>
             <pre className="data-pre-yellow word-wrap" key={stateKey}>{`${stateKey}: ${this.state[stateKey]}`}</pre>
           ))}
           <Component {...this.props} {...this.state} />
-          <DataDisplay title="APP STATE" startOpen={false} colour="pink" {...this.props.state} />
+          <DataDisplayContainer title="App state" startOpen={false} colour="pink" {...this.props.state} />
         </>
       )
     }

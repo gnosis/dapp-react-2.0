@@ -1,16 +1,13 @@
 import React from 'react'
 
 import PoolData from './PoolData'
-import DataDisplay from './UserStateDisplay'
+import UserStateDisplay from './UserStateDisplay'
 
 const Home = () => (
   <section>
     {/* Show User's State */}
-    <DataDisplay 
-      colour="violet" 
-      // startOpen={true}
-      title="Your Data" 
-    />
+    <UserStateDisplay />
+    
     {/* DxMgnPool Data */}
     <PoolData />
   </section>

@@ -97,6 +97,14 @@ async function init() {
   const getMGNBalance = async (address, userAddress) => (await getTokenMGN(address)).balanceOf.call(userAddress)  
 
   /**
+   * lockMGN
+   * @param { string | BN } amount - BN or string
+   * @param { string } address - Address
+   * @param { string } userAddress - Address 
+   */
+  const lockMGN = async (amount, address, userAddress) => (await getTokenMGN(address)).lockTokens(amount, { from: userAddress })  
+
+  /**
    * depositIntoPool1
    * @param { string || BN } amount - string value or BN instance
    * @param { string } userAccount
@@ -154,6 +162,7 @@ async function init() {
     getMGNUnlockedBalance,
     getMGNBalance,
     getPoolTokensAddresses,
+    lockMGN,
     depositIntoPool1,
     depositIntoPool2,
     // event,
