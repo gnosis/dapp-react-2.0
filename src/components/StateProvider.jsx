@@ -1,8 +1,9 @@
 import React, { useReducer, useEffect } from 'react'
-import { getWeb3API } from '../api/ProviderWeb3'
 import { 
+  getAPI,
   getPoolTokensInfo, 
   approveAndDepositIntoDxMgnPool,
+  calculateDxMgnPoolState,
 } from '../api'
 
 import { toBN, toWei } from '../api/utils'
@@ -97,212 +98,6 @@ const memoizedContextValue = ({
   return contextValue
 }
 
-/* class AppProvider extends React.Component {
-  state = {
-    ...defaultState,
-  }
-
-  // GENERIC DISPATCHERS
-  appLoading = loadingState => this.setState(({ loading: loadingState }))
-  showModal = message => this.setState(({ SHOW_MODAL: message }))
-  
-  // CONTRACT DISPATCHERS
-  saveContract = ({ name, contract }) =>
-    this.setState(prevState => ({
-      ...prevState,
-      CONTRACTS: {
-        ...prevState.CONTRACTS,
-        [name]: contract,
-      },
-    }))
-
-  // DX-MGN DISPATCHERS
-  setInputAmount = (INPUT_AMOUNT) => {
-    this.setState(prevState => ({
-      ...prevState,
-      INPUT_AMOUNT,
-    }))
-  }
-
-  saveMGNAddressAndBalance = async () => {
-    const { 
-      getMGNTokenAddress, 
-      getMGNTokenLockedBalance, 
-      getMGNTokenUnlockedBalance, 
-      getMGNTokenBalance, 
-    } = await getDxPoolAPI()
-
-    const [ADDRESS, LOCKED_BALANCE, UNLOCKED_BALANCE, BALANCE] = await Promise.all([
-      getMGNTokenAddress(),
-      getMGNTokenLockedBalance(this.state.USER.account),
-      getMGNTokenUnlockedBalance(this.state.USER.account),
-      getMGNTokenBalance(this.state.USER.account),
-    ])
-
-    this.setState(prevState => ({
-      ...prevState,
-      TOKEN_MGN: {
-        ADDRESS,
-        LOCKED_BALANCE,
-        UNLOCKED_BALANCE,
-        BALANCE,
-      },
-    }))
-  }
-
-  saveTotalPoolShares = async () => {
-    const [totalShare1, totalShare2] = await getTotalPoolShares()
-
-    return this.setState(prevState => ({
-      ...prevState,
-      DX_MGN_POOL: {
-        ...prevState.DX_MGN_POOL,
-        POOL1: {
-          TOTAL_SHARE: totalShare1,
-        },
-        POOL2: {
-          TOTAL_SHARE: totalShare2,
-        },
-      },
-    }))
-  }
-
-  setUserParticipation = async () => {
-    const { USER: { account } } = this.state
-    const [totalContribution1, totalContribution2] = await calculateUserParticipation(account)
-    
-    this.setState(prevState => ({
-      ...prevState,
-      DX_MGN_POOL: {
-        ...prevState.DX_MGN_POOL,
-        POOL1: {
-          ...prevState.DX_MGN_POOL.POOL1,
-          YOUR_SHARE: totalContribution1,
-        },
-        POOL2: {
-          ...prevState.DX_MGN_POOL.POOL2,
-          YOUR_SHARE: totalContribution2,
-        },
-      },
-    }))
-  }
-
-  setDepositAmount = async (poolNumber) => {
-    const { 
-      INPUT_AMOUNT,
-    } = this.state
-
-    console.debug('toBN(toWei(INPUT_AMOUNT)) ', toBN(toWei(INPUT_AMOUNT)))
-
-    const receipt = await approveAndDepositIntoDxMgnPool(poolNumber, toBN(toWei(INPUT_AMOUNT)), this.state.USER.account)
-		console.debug('TCL: AppProvider -> setDepositAmount -> RECEIPT= ', receipt)
-  }
-
-  setDxMgnPoolState = async () => {
-    const [
-      mgnAddress,
-      mgnLockedBalance,
-      mgnUnlockedBalance,
-      mgnBalance,
-      totalShare1,
-      totalShare2,
-      totalContribution1,
-      totalContribution2,
-      // TODO: can be cleaned up to used derived object names instead of duping logic
-      // Deposit Token
-      { name: name1, symbol: symbol1, decimals: decimals1, balance: balance1 },
-      // Secondary Token
-      { name: name2, symbol: symbol2, decimals: decimals2, balance: balance2 },
-     ] = await calculateDxMgnPoolState(this.state.USER.account)
-    
-     return this.setState(prevState => ({
-      ...prevState,
-      DX_MGN_POOL: {
-        ...prevState.DX_MGN_POOL,
-        POOL1: {
-          ...prevState.DX_MGN_POOL.POOL1,
-          YOUR_SHARE: totalContribution1,
-          TOTAL_SHARE: totalShare1,
-          DEPOSIT_TOKEN: name1,
-          DEPOSIT_SYMBOL: symbol1,
-          DEPOSIT_DECIMALS: decimals1,
-          SECONDARY_TOKEN: name2,
-          SECONDARY_SYMBOL: symbol2,
-          SECONDARY_DECIMALS: decimals2,
-          TOKEN_BALANCE: balance1,
-        },
-        POOL2: {
-          ...prevState.DX_MGN_POOL.POOL2,
-          YOUR_SHARE: totalContribution2,
-          TOTAL_SHARE: totalShare2,
-          DEPOSIT_TOKEN: name2,
-          DEPOSIT_SYMBOL: symbol2,
-          // dtDecimals: decimals2,
-          SECONDARY_TOKEN: name1,
-          // stSymbol: symbol1,
-          // stDecimals: decimals1,
-          TOKEN_BALANCE: balance2,
-        },
-      },
-      TOKEN_MGN: {
-        ADDRESS: mgnAddress,
-        LOCKED_BALANCE: mgnLockedBalance,
-        UNLOCKED_BALANCE: mgnUnlockedBalance,
-        BALANCE: mgnBalance,
-      },
-    }))
-  }
-
-  // PROVIDER DISPATCHERS
-  setActiveProvider = providerName =>
-    this.setState(prevState =>
-      ({
-        ...prevState,
-        PROVIDER: {
-          ...prevState.PROVIDER,
-          activeProvider: providerName,
-        },
-      }))
-  registerProviders = provider =>
-    this.setState(prevState =>
-      ({
-        ...prevState,
-        PROVIDER: {
-          providers: [...provider, ...prevState.PROVIDER.providers],
-        },
-      }))
-
-  // USER STATE DISPATCHERS
-  setUserState = async () => {
-    const { getCurrentAccount, getNetwork, getCurrentBalance } = await getWeb3API()
-    const [account, balance, network] = await Promise.all([
-      getCurrentAccount(),
-      getCurrentBalance(),
-      getNetwork(),
-    ])
-    return this.setState(prevState =>
-      ({
-        ...prevState,
-        USER: {
-          account,
-          balance,
-        },
-        PROVIDER: {
-          ...prevState.PROVIDER,
-          network,
-        },
-      }))
-  }
-
-  render() {
-    return (
-      <Provider value={memoizedContextValue(this)}>
-        {this.props.children}
-      </Provider>
-    )
-  }
-} */
-
 // CONSTANTS
 const SET_ACTIVE_PROVIDER = 'SET_ACTIVE_PROVIDER'
 const REGISTER_PROVIDERS = 'REGISTER_PROVIDERS'
@@ -311,6 +106,10 @@ const SHOW_MODAL = 'SHOW_MODAL'
 const SET_INPUT_AMOUNT = 'SET_INPUT_AMOUNT'
 const SET_USER_STATE = 'SET_USER_STATE'
 const SET_POOL_TOKEN_INFO = 'SET_POOL_TOKEN_INFO'
+const SET_USER_ACCOUNT = 'SET_USER_ACCOUNT'
+const SET_USER_BALANCE = 'SET_USER_BALANCE'
+const SET_MGN_BALANCES = 'SET_MGN_BALANCES'
+const SET_DX_MGN_POOL_STATE = 'SET_DX_MGN_POOL_STATE'
 
 function reducer(state, action) {
   switch (action.type) {
@@ -324,10 +123,21 @@ function reducer(state, action) {
         INPUT_AMOUNT: action.payload,
       }
 
+    case SET_MGN_BALANCES:
+      console.error(action)
+      return {
+        ...state,
+        TOKEN_MGN: {
+          ...state.TOKEN_MGN,
+          ...action.payload,
+        },
+      }
+
     case SET_POOL_TOKEN_INFO:
       return {
         ...state,
         DX_MGN_POOL: {
+          ...state.DX_MGN_POOL,
           POOL1: {
             ...state.DX_MGN_POOL.POOL1,
             DEPOSIT_TOKEN: action.payload.name,
@@ -347,20 +157,54 @@ function reducer(state, action) {
         },
       }
 
+    case SET_DX_MGN_POOL_STATE:
+      return {
+        ...state,
+        DX_MGN_POOL: {
+          ...state.DX_MGN_POOL,
+          POOL1: {
+            ...state.DX_MGN_POOL.POOL1,
+            ...action.payload.POOL1,
+          },
+          POOL2: {
+            ...state.DX_MGN_POOL.POOL2,
+            ...action.payload.POOL2,
+          },
+        },
+      }
+
     /*
      * USER STATE SPECIFIC REDUCERS 
      */
+
+    case SET_USER_ACCOUNT:
+      return {
+        ...state,
+        USER: {
+          ...state.USER,
+          ACCOUNT: action.payload,
+        },
+      }
+
+    case SET_USER_BALANCE:
+      return {
+        ...state,
+        USER: {
+          ...state.USER,
+          BALANCE: action.payload,
+        },
+      }
 
     case SET_USER_STATE:
       return {
         ...state,
         USER: {
-          ACCOUNT: action.payload.ACCOUNT,
-          BALANCE: action.payload.BALANCE,
+          ...state.USER,
+          ...action.payload.USER,
         },
         PROVIDER: {
           ...state.PROVIDER,
-          NETWORK: action.payload.NETWORK,
+          ...action.payload.PROVIDER,
         },
       }
 
@@ -410,20 +254,38 @@ function reducer(state, action) {
 function AppProvider(props) {
   const {
     children,
+    subState: [{ account }, { timestamp }, { balance: ETHBalance }, { MGN_BALANCE, LOCKED_MGN_BALANCE, UNLOCKED_MGN_BALANCE }, poolState, { network }],
   } = props
-
+  // console.warn([{ account }, { timestamp }, { balance: ETHBalance }, MGN_BALANCE, LOCKED_MGN_BALANCE, UNLOCKED_MGN_BALANCE, poolState])
   const [state, dispatch] = useReducer(reducer, defaultState)
   
   // useEffect - only update State when subscriber user Account changes
   useEffect(() => {
-    console.debug('USE EFFECT IN ACTION', props.account)
     dispatch({ 
       type: SET_USER_STATE,
       payload: {
-        ACCOUNT: props.account,
+        USER: {
+          ACCOUNT: account,
+          BALANCE: ETHBalance,
+        },
+        PROVIDER: {
+          NETWORK: network,
+        },
       },
     }) 
-  }, [props.account])
+  }, [account, ETHBalance, network])
+
+  // useEffect - only update State when subscriber user Account changes
+  useEffect(() => {
+    dispatch({ 
+      type: SET_MGN_BALANCES,
+      payload: {
+        MGN_BALANCE,
+        LOCKED_MGN_BALANCE,
+        UNLOCKED_MGN_BALANCE,
+      },
+    }) 
+  }, [MGN_BALANCE, LOCKED_MGN_BALANCE, UNLOCKED_MGN_BALANCE])
 
   const dispatchers = {
     // DX-MGN DISPATCHERS
@@ -441,6 +303,49 @@ function AppProvider(props) {
 
       const receipt = await approveAndDepositIntoDxMgnPool(poolNumber, toBN(toWei(INPUT_AMOUNT)), ACCOUNT)
       console.debug('TCL: AppProvider -> setDepositAmount -> RECEIPT= ', receipt)
+    },
+
+    setDxMgnPoolState: async () => {
+      const [
+        ,,,,
+        totalShare1,
+        totalShare2,
+        totalContribution1,
+        totalContribution2,
+        // TODO: can be cleaned up to used derived object names instead of duping logic
+        // Deposit Token
+        { name: name1, symbol: symbol1, decimals: decimals1, balance: balance1 },
+        // Secondary Token
+        { name: name2, symbol: symbol2, decimals: decimals2, balance: balance2 },
+       ] = await calculateDxMgnPoolState(state.USER.account)
+      
+       return dispatch({
+        type: SET_DX_MGN_POOL_STATE,
+        payload: {
+          POOL1: {
+            YOUR_SHARE: totalContribution1,
+            TOTAL_SHARE: totalShare1,
+            DEPOSIT_TOKEN: name1,
+            DEPOSIT_SYMBOL: symbol1,
+            DEPOSIT_DECIMALS: decimals1,
+            SECONDARY_TOKEN: name2,
+            SECONDARY_SYMBOL: symbol2,
+            SECONDARY_DECIMALS: decimals2,
+            TOKEN_BALANCE: balance1,
+          },
+          POOL2: {
+            YOUR_SHARE: totalContribution2,
+            TOTAL_SHARE: totalShare2,
+            DEPOSIT_TOKEN: name2,
+            DEPOSIT_SYMBOL: symbol2,
+            // dtDecimals: decimals2,
+            SECONDARY_TOKEN: name1,
+            // stSymbol: symbol1,
+            // stDecimals: decimals1,
+            TOKEN_BALANCE: balance2,
+          },
+        },
+      })
     },
 
     setPoolTokenInfo: async () => {
@@ -472,7 +377,7 @@ function AppProvider(props) {
 
     // USER STATE SPECIFIC DISPATCHERS
     setUserState: async () => {
-      const { getCurrentAccount, getNetwork, getCurrentBalance } = await getWeb3API()
+      const { Web3: { getCurrentAccount, getNetwork, getCurrentBalance } } = await getAPI()
       const [ACCOUNT, BALANCE, NETWORK] = await Promise.all([
         getCurrentAccount(),
         getCurrentBalance(),
