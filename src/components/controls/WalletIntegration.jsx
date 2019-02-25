@@ -14,11 +14,11 @@ import startSubscriptions from '../../subscriptions'
 
 function WalletIntegration({ 
   dispatchers: { 
-    setUserState,
     registerProviders, 
     setActiveProvider,
     showModal,
     setPoolTokenInfo,
+    setDxMgnPoolState,
   }, 
   state: { ACTIVE_PROVIDER }, 
   children,
@@ -33,6 +33,16 @@ function WalletIntegration({
     const providersArray = Object.values(Providers)
     // register each providerObject into state
     providersArray.forEach(() => { registerProviders(providersArray) })
+  }, [])
+
+  useEffect(() => {
+    let sub
+
+    startSubscriptions().then((i) => {
+      sub = i
+    }).catch(console.error)
+
+    return () => sub()
   }, [])
 
   // const saveContractToState = contracts => Object.keys(contracts).forEach(name => saveContract({ name, contract: contracts[name] }))
@@ -73,11 +83,10 @@ function WalletIntegration({
       await getAPI()
 
       // First time grab userState
-      setUserState()
+      // setUserState()
 
       // Sets all essential DxMgnPool State
-      // await setDxMgnPoolState()
-      startSubscriptions()
+      setDxMgnPoolState()
 
       // Set pool token info
       setPoolTokenInfo()
