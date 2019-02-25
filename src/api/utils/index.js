@@ -97,8 +97,8 @@ const netIdToWebsocket = (id) => {
   }
 }
 
-// const cleanData = data => (data && isBN(data) ? fromWei(data) : data)
-const cleanData = data => data && fromWei(toBN(data))
+const cleanData = data => (data && isBN(data) ? fromWei(data) : data)
+// const cleanData = data => data && fromWei(toBN(data))
 
 const flattener = obj => Object.assign(
   {},

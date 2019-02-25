@@ -5,12 +5,21 @@ import StateProvider from './components/StateProvider'
 import WalletIntegration from './components/controls/WalletIntegration'
 import Home from './components/display/Home'
 
+import { 
+  GlobalSubscription,
+  GlobalSub,
+} from './subscriptions'
+
 const App = () => (
-  <StateProvider>
-    <WalletIntegration>
-      <Home />
-    </WalletIntegration>
-  </StateProvider>
+  <GlobalSubscription source={GlobalSub}>
+    {subState =>
+      <StateProvider subState={subState}>
+        <WalletIntegration>
+          <Home />
+        </WalletIntegration>
+      </StateProvider>
+    }
+  </GlobalSubscription>
 )
 
 export default hot(module)(App)
