@@ -35,41 +35,47 @@ const fetchBlockTimestamp = async (hashOrNumber = 'latest') => {
 }
 
 const fetchMGNBalances = async () => {
-    const [
-        ,
+    const {
         mgnLockedBalance,
         mgnUnlockedBalance,
         mgnBalance,
-    ] = mapTS(await calculateDxMgnPoolState(), 'fromWei')
+     } = await calculateDxMgnPoolState()
+
+    const [mgnLockedBalanceWEI, mgnUnlockedBalanceWEI, mgnBalanceWEI] = mapTS([mgnLockedBalance, mgnUnlockedBalance, mgnBalance], 'fromWei')
 
     return {
-        MGN_BALANCE: mgnBalance,
-        LOCKED_MGN_BALANCE: mgnLockedBalance,
-        UNLOCKED_MGN_BALANCE: mgnUnlockedBalance,
+        MGN_BALANCE: mgnBalanceWEI,
+        LOCKED_MGN_BALANCE: mgnLockedBalanceWEI,
+        UNLOCKED_MGN_BALANCE: mgnUnlockedBalanceWEI,
     }
 }
 
 const fetchMgnPoolData = async () => {
-    const [,,,,
+    const {
         totalShare1,
         totalShare2,
         totalContribution1,
         totalContribution2,
-        ,,
         pool1State,
-        pool2State,       
-      ] = mapTS(await calculateDxMgnPoolState(), 'fromWei')
+        pool2State,
+        depositTokenObj: { balance },
+        secondaryTokenObj: { balance: balance2 },       
+     } = await calculateDxMgnPoolState()
+
+    const [ts1, ts2, tc1, tc2] = mapTS([totalShare1, totalShare2, totalContribution1, totalContribution2, pool1State, pool2State], 'fromWei')
 
     return {
         POOL1: {
-            'CURRENT STATE': poolStateIdToName(pool1State),
-            'TOTAL SHARE': totalShare1,
-            'YOUR SHARE': totalContribution1,
+            CURRENT_STATE: poolStateIdToName(pool1State.toString()),
+            TOTAL_SHARE: ts1,
+            YOUR_SHARE: tc1,
+            TOKEN_BALANCE: balance,
         },
         POOL2: {
-            'CURRENT STATE': poolStateIdToName(pool2State),
-            'TOTAL SHARE': totalShare2,
-            'YOUR SHARE': totalContribution2,
+            CURRENT_STATE: poolStateIdToName(pool2State.toString()),
+            TOTAL_SHARE: ts2,
+            YOUR_SHARE: tc2,
+            TOKEN_BALANCE: balance2,
         },
     }
 }
@@ -79,7 +85,6 @@ export const AccountSub = createStatefulSub(fetchAccountData, { account: 'loadin
 export const NetworkSub = createStatefulSub(fetchNetwork, { network: 'loading...' })
 
 export const ETHbalanceSub = createStatefulSub(fetchETHBalance, { balance: '0' })
-window.ETHbalanceSub = ETHbalanceSub
 export const BlockSub = createStatefulSub(fetchBlockTimestamp, { blockInfo: 'loading...' })
 
 export const MGNBalancesSub = createStatefulSub(fetchMGNBalances, {
@@ -90,28 +95,32 @@ export const MGNBalancesSub = createStatefulSub(fetchMGNBalances, {
 
 export const MGNPoolDataSub = createStatefulSub(fetchMgnPoolData, {
     POOL1: {
-        'Current State': 'loading...',
-        'Total Share': 'loading...',
-        'Your Contribution': 'loading...',
+        CURRENT_STATE: 'loading...',
+        TOTAL_SHARE: 'loading...',
+        YOUR_SHARE: 'loading...',
+        TOKEN_BALANCE: 'loading...',
     },
     POOL2: {
-        'Current State': 'loading...',
-        'Total Share': 'loading...',
-        'Your Contribution': 'loading...',
+        CURRENT_STATE: 'loading...',
+        TOTAL_SHARE: 'loading...',
+        YOUR_SHARE: 'loading...',
+        TOKEN_BALANCE: 'loading...',
     },
 }, {
     _shouldUpdate(prevState, nextState) {
         if (!prevState) return true
-
-        return prevState.POOL1['TOTAL SHARE'] !== (nextState.POOL1['TOTAL SHARE'])
-            || prevState.POOL2['TOTAL SHARE'] !== (nextState.POOL2['TOTAL SHARE'])
-            || prevState.POOL1['CURRENT STATE'] !== (nextState.POOL1['CURRENT STATE'])
-            || prevState.POOL2['CURRENT STATE'] !== (nextState.POOL2['CURRENT STATE'])
+        
+        return prevState.POOL1.YOUR_SHARE !== (nextState.POOL1.YOUR_SHARE)
+            || prevState.POOL2.YOUR_SHARE !== (nextState.POOL2.YOUR_SHARE)
+            || prevState.POOL1.TOTAL_SHARE !== (nextState.POOL1.TOTAL_SHARE)
+            || prevState.POOL2.TOTAL_SHARE !== (nextState.POOL2.TOTAL_SHARE)
+            || prevState.POOL1.CURRENT_STATE !== (nextState.POOL1.CURRENT_STATE)
+            || prevState.POOL2.CURRENT_STATE !== (nextState.POOL2.CURRENT_STATE)
     },
 })
 
 export const GlobalSub = createMultiSub(AccountSub, BlockSub, ETHbalanceSub, MGNBalancesSub, MGNPoolDataSub, NetworkSub)
-// AccountSub.subscribe((accountState) => { console.error('ACCOUNT SUB LOG', accountState) })
+
 GlobalSub.subscribe(() => {
     ETHbalanceSub.update()
     MGNPoolDataSub.update()

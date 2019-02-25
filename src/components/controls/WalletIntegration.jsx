@@ -18,7 +18,6 @@ function WalletIntegration({
     setActiveProvider,
     showModal,
     setPoolTokenInfo,
-    setDxMgnPoolState,
   }, 
   state: { ACTIVE_PROVIDER }, 
   children,
@@ -81,12 +80,6 @@ function WalletIntegration({
 
       // INIT main API
       await getAPI()
-
-      // First time grab userState
-      // setUserState()
-
-      // Sets all essential DxMgnPool State
-      setDxMgnPoolState()
 
       // Set pool token info
       setPoolTokenInfo()
@@ -159,8 +152,6 @@ const mapProps = ({
   },
   // dispatchers
   appLoading,
-  setUserState,
-  setDxMgnPoolState,
   registerProviders,
   setActiveProvider,
   getDXTokenBalance,
@@ -184,8 +175,6 @@ const mapProps = ({
   // dispatchers
   dispatchers: {
     appLoading,
-    setUserState,
-    setDxMgnPoolState,
     registerProviders,
     setActiveProvider,
     getDXTokenBalance,

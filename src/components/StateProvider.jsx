@@ -33,7 +33,7 @@ const defaultState = {
     POOL2: {
       YOUR_SHARE: 0,
       TOTAL_SHARE: 0,
-      POSIT_TOKEN: '...',
+      DEPOSIT_TOKEN: '...',
       DEPOSIT_SYMBOL: '...',
       DEPOSIT_DECIMALS: '...',
       SECONDARY_TOKEN: '...',
@@ -74,7 +74,6 @@ const memoizedContextValue = ({
   setInputAmount,
   setPoolTokenInfo,
 }) => {
-  // console.error(state)
   if (setToContext.has(state)) return setToContext.get(state)
 
   const contextValue = { 
@@ -109,7 +108,8 @@ const SET_POOL_TOKEN_INFO = 'SET_POOL_TOKEN_INFO'
 const SET_USER_ACCOUNT = 'SET_USER_ACCOUNT'
 const SET_USER_BALANCE = 'SET_USER_BALANCE'
 const SET_MGN_BALANCES = 'SET_MGN_BALANCES'
-const SET_DX_MGN_POOL_STATE = 'SET_DX_MGN_POOL_STATE'
+const SET_ALL_DX_POOL_STATES = 'SET_ALL_DX_POOL_STATES'
+const SET_DX_POOL_STATE = 'SET_DX_POOL_STATE'
 
 function reducer(state, action) {
   switch (action.type) {
@@ -124,7 +124,6 @@ function reducer(state, action) {
       }
 
     case SET_MGN_BALANCES:
-      console.error(action)
       return {
         ...state,
         TOKEN_MGN: {
@@ -157,9 +156,29 @@ function reducer(state, action) {
         },
       }
 
-    case SET_DX_MGN_POOL_STATE:
+    case SET_DX_POOL_STATE:
       return {
         ...state,
+        DX_MGN_POOL: {
+          ...state.DX_MGN_POOL,
+          [action.pool]: {
+            ...state.DX_MGN_POOL[action.pool],
+            ...action.payload,
+          },
+        },
+      }
+
+    case SET_ALL_DX_POOL_STATES:
+      return {
+        ...state,
+        USER: {
+          ...state.USER,
+          ...action.payload.USER,
+        },
+        PROVIDER: {
+          ...state.PROVIDER,
+          ...action.payload.PROVIDER,
+        },
         DX_MGN_POOL: {
           ...state.DX_MGN_POOL,
           POOL1: {
@@ -170,6 +189,10 @@ function reducer(state, action) {
             ...state.DX_MGN_POOL.POOL2,
             ...action.payload.POOL2,
           },
+        },
+        TOKEN_MGN: {
+          ...state.TOKEN_MGN,
+          ...action.payload.TOKEN_MGN,
         },
       }
 
@@ -254,9 +277,16 @@ function reducer(state, action) {
 function AppProvider(props) {
   const {
     children,
-    subState: [{ account }, { timestamp }, { balance: ETHBalance }, { MGN_BALANCE, LOCKED_MGN_BALANCE, UNLOCKED_MGN_BALANCE }, poolState, { network }],
+    subState: [
+      { account }, 
+      { timestamp }, 
+      { balance: ETHBalance }, 
+      { MGN_BALANCE, LOCKED_MGN_BALANCE, UNLOCKED_MGN_BALANCE }, 
+      { POOL1: { CURRENT_STATE, TOTAL_SHARE, YOUR_SHARE, TOKEN_BALANCE }, POOL2: { CURRENT_STATE: CURRENT_STATE2, TOTAL_SHARE: TOTAL_SHARE2, YOUR_SHARE: YOUR_SHARE2, TOKEN_BALANCE: TOKEN_BALANCE2 } }, 
+      { network },
+    ],
   } = props
-  // console.warn([{ account }, { timestamp }, { balance: ETHBalance }, MGN_BALANCE, LOCKED_MGN_BALANCE, UNLOCKED_MGN_BALANCE, poolState])
+
   const [state, dispatch] = useReducer(reducer, defaultState)
   
   // useEffect - only update State when subscriber user Account changes
@@ -287,6 +317,34 @@ function AppProvider(props) {
     }) 
   }, [MGN_BALANCE, LOCKED_MGN_BALANCE, UNLOCKED_MGN_BALANCE])
 
+  // useEffect - only update State when subscriber user Account changes
+  useEffect(() => {
+    dispatch({ 
+      type: SET_DX_POOL_STATE,
+      pool: 'POOL1',
+      payload: {
+        CURRENT_STATE,
+        TOTAL_SHARE,
+        YOUR_SHARE,
+        TOKEN_BALANCE,
+      },
+    }) 
+  }, [CURRENT_STATE, TOTAL_SHARE, YOUR_SHARE, TOKEN_BALANCE])
+
+  // useEffect - only update State when subscriber user Account changes
+  useEffect(() => {
+    dispatch({ 
+      type: SET_DX_POOL_STATE,
+      pool: 'POOL2',
+      payload: {
+        CURRENT_STATE: CURRENT_STATE2,
+        TOTAL_SHARE: TOTAL_SHARE2,
+        YOUR_SHARE: YOUR_SHARE2,
+        TOKEN_BALANCE: TOKEN_BALANCE2,
+      },
+    }) 
+  }, [CURRENT_STATE2, TOTAL_SHARE2, YOUR_SHARE2, TOKEN_BALANCE2])
+
   const dispatchers = {
     // DX-MGN DISPATCHERS
     setInputAmount: INPUT_AMOUNT =>
@@ -302,27 +360,34 @@ function AppProvider(props) {
       } = state
 
       const receipt = await approveAndDepositIntoDxMgnPool(poolNumber, toBN(toWei(INPUT_AMOUNT)), ACCOUNT)
-      console.debug('TCL: AppProvider -> setDepositAmount -> RECEIPT= ', receipt)
+			console.debug('APPROVE and DEPOSIT into DX-MGN-POOL TX RECEIPT: ', receipt)
     },
 
     setDxMgnPoolState: async () => {
-      const [
-        ,,,,
+      const {
+        mgnLockedBalance,
+        mgnUnlockedBalance, 
+        mgnBalance,
         totalShare1,
         totalShare2,
         totalContribution1,
         totalContribution2,
-        // TODO: can be cleaned up to used derived object names instead of duping logic
-        // Deposit Token
-        { name: name1, symbol: symbol1, decimals: decimals1, balance: balance1 },
-        // Secondary Token
-        { name: name2, symbol: symbol2, decimals: decimals2, balance: balance2 },
-       ] = await calculateDxMgnPoolState(state.USER.account)
+        depositTokenObj: { name: name1, symbol: symbol1, decimals: decimals1, balance: balance1 },
+        secondaryTokenObj: { name: name2, symbol: symbol2, decimals: decimals2, balance: balance2 },
+        pool1State, 
+        pool2State,
+       } = await calculateDxMgnPoolState(state.USER.account)
       
        return dispatch({
-        type: SET_DX_MGN_POOL_STATE,
+        type: SET_ALL_DX_POOL_STATES,
         payload: {
+          TOKEN_MGN: {
+            BALANCE: mgnBalance,
+            LOCKED_BALANCE: mgnLockedBalance,
+            UNLOCKED_BALANCE: mgnUnlockedBalance,
+          },
           POOL1: {
+            CURRENT_STATE: pool1State,
             YOUR_SHARE: totalContribution1,
             TOTAL_SHARE: totalShare1,
             DEPOSIT_TOKEN: name1,
@@ -334,14 +399,9 @@ function AppProvider(props) {
             TOKEN_BALANCE: balance1,
           },
           POOL2: {
+            CURRENT_STATE: pool2State,
             YOUR_SHARE: totalContribution2,
             TOTAL_SHARE: totalShare2,
-            DEPOSIT_TOKEN: name2,
-            DEPOSIT_SYMBOL: symbol2,
-            // dtDecimals: decimals2,
-            SECONDARY_TOKEN: name1,
-            // stSymbol: symbol1,
-            // stDecimals: decimals1,
             TOKEN_BALANCE: balance2,
           },
         },
@@ -417,7 +477,6 @@ function AppProvider(props) {
       }),
   }
   
-  console.debug({ ...state, ...dispatchers })
   return (
     <Provider value={memoizedContextValue({ state, ...dispatchers })}>
         {children}

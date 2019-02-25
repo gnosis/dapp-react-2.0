@@ -129,6 +129,9 @@ const shallowDifferent = (obj1, obj2) => {
 
 const poolStateIdToName = (id) => {
   switch (id) {
+    case '0':
+    case 0:
+      return 'Pooling'
     case '1':
     case 1:
       return 'PoolingEnded'
@@ -139,7 +142,7 @@ const poolStateIdToName = (id) => {
     case 3:
       return 'MgnUnlocked'
     default: 
-      return 'Pooling' 
+      return 'Unknown Contract State' 
   }
 }
 

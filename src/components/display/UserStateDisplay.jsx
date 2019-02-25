@@ -11,7 +11,7 @@ import { connect } from '../StateProvider'
 
 const LockMGN = AsyncActionsHOC()
 
-const UserStateDisplay = ({ state, NETWORK, USER, MGN_BALANCES }) =>
+const UserStateDisplay = ({ NETWORK, USER, MGN_BALANCES }) =>
   <DataDisplayVisualContainer
     title="Connected Wallet"
     colour="violet"
@@ -33,7 +33,6 @@ const UserStateDisplay = ({ state, NETWORK, USER, MGN_BALANCES }) =>
         buttonText="Lock"
         title="Lock Mgn Tokens"
       />
-      {JSON.stringify({ ...state.USER, ...state.DX_MGN_POOL, ...{ PROVIDER: { ACTIVE_PROVIDER: state.PROVIDER.ACTIVE_PROVIDER, NETWORK: state.PROVIDER.NETWORK } } }, undefined, 2)}
     </>
     }
   </DataDisplayVisualContainer>

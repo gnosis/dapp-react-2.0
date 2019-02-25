@@ -192,7 +192,6 @@ export const calculateUserParticipation = async (address) => {
 }
 
 export const approveAndDepositIntoDxMgnPool = async (pool, depositAmount, userAccount) => {
-	console.error('TCL: approveAndDepositIntoDxMgnPool -> userAccount', userAccount)
   userAccount = await fillDefaultAccount(userAccount)
   const {
     DxPool: {
@@ -264,7 +263,7 @@ export const calculateDxMgnPoolState = async (userAccount) => {
     getPoolInternalState(),
   ])
 
-  return [
+  return {
     mgnAddress,
     mgnLockedBalance,
     mgnUnlockedBalance, 
@@ -277,7 +276,7 @@ export const calculateDxMgnPoolState = async (userAccount) => {
     secondaryTokenObj,
     pool1State, 
     pool2State,
-  ]
+  }
 }
 
 // ============
