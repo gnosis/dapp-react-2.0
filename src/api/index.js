@@ -29,15 +29,15 @@ export const getCurrentAccount = async () => {
 }
 
 export const getCurrentNetwork = async () => {
-  const { getNetwork } = await getWeb3API()
+  const { Web3 } = await getAPI()
 
-  return getNetwork()
+  return Web3.getNetwork()
 }
 
 export const getCurrentNetworkId = async () => {
-  const { getNetworkId } = await getWeb3API()
+  const { Web3 } = await getAPI()
 
-  return getNetworkId()
+  return Web3.getNetworkId()
 }
 
 // TODO: possibly remove - testing only
@@ -69,7 +69,7 @@ export const fillNetworkId = netId => (!netId ? getCurrentNetworkId() : netId)
 // ============
 
 export const getPoolContracts = async () => {
-  const { getDxPool, getPoolAddresses } = await getDxPoolAPI()
+  const { DxPool: { getDxPool, getPoolAddresses } } = await getAPI()
   
   const [pool1Address, pool2Address] = await getPoolAddresses()
   
@@ -105,7 +105,7 @@ export const getTotalPoolShares = async () => {
 }
 
 export const getMGNTokenAddress = async () => {
-  const { getMGNAddress, getPoolAddresses } = await getDxPoolAPI()
+  const { DxPool: { getMGNAddress, getPoolAddresses } } = await getAPI()
   const [pool1Address] = await getPoolAddresses()
 
   return getMGNAddress(pool1Address)
@@ -114,7 +114,7 @@ export const getMGNTokenAddress = async () => {
 export const getMGNTokenLockedBalance = async (userAddress) => {
   userAddress = await fillDefaultAccount(userAddress)
   
-  const { getMGNAddress, getMGNLockedBalance, getPoolAddresses } = await getDxPoolAPI()
+  const { DxPool: { getMGNAddress, getMGNLockedBalance, getPoolAddresses } } = await getAPI()
   const [pool1Address] = await getPoolAddresses()
   const mgnAddress = await getMGNAddress(pool1Address)
 
@@ -129,7 +129,7 @@ export const getMGNTokenLockedBalance = async (userAddress) => {
 export const getAllMGNTokenBalances = async (userAddress) => {
   userAddress = await fillDefaultAccount(userAddress)
   
-  const { getMGNAddress, getMGNLockedBalance, getMGNUnlockedBalance, getMGNBalance, getPoolAddresses } = await getDxPoolAPI()
+  const { DxPool: { getMGNAddress, getMGNLockedBalance, getMGNUnlockedBalance, getMGNBalance, getPoolAddresses } } = await getAPI()
   const [pool1Address] = await getPoolAddresses()
   const mgnAddress = await getMGNAddress(pool1Address)
 
@@ -142,8 +142,8 @@ export const getAllMGNTokenBalances = async (userAddress) => {
 
 export const getPoolTokensInfo = async (userAccount) => {
   userAccount = await fillDefaultAccount(userAccount)
-  const [{ hft }, [dxPool1]] = await Promise.all([
-    getAppContracts(),
+  const [{ Contracts: { hft } }, [dxPool1]] = await Promise.all([
+    getAPI(),
     getPoolContracts(),
   ])
 
@@ -195,13 +195,15 @@ export const approveAndDepositIntoDxMgnPool = async (pool, depositAmount, userAc
 	console.error('TCL: approveAndDepositIntoDxMgnPool -> userAccount', userAccount)
   userAccount = await fillDefaultAccount(userAccount)
   const {
-    dxMP1Address,
-    dxMP2Address,
-    dxMP1DepositTokenAddress, 
-    dxMP1SecondaryTokenAddress, 
-    depositIntoPool1, 
-    depositIntoPool2, 
-  } = await getDxPoolAPI()
+    DxPool: {
+      dxMP1Address,
+      dxMP2Address,
+      dxMP1DepositTokenAddress, 
+      dxMP1SecondaryTokenAddress, 
+      depositIntoPool1, 
+      depositIntoPool2, 
+    },
+  } = await getAPI()
 
   console.debug('approveAndDeposit = ', {
     dxMP1Address,
@@ -227,7 +229,7 @@ export const approveAndDepositIntoDxMgnPool = async (pool, depositAmount, userAc
 }
 
 export const lockAllMgn = async (userAccount) => {
-  const { dxMP1Address, lockMGN, getMGNAddress } = await getDxPoolAPI()
+  const { DxPool: { dxMP1Address, lockMGN, getMGNAddress } } = await getAPI()
   userAccount = await fillDefaultAccount(userAccount)
   
   const mgnAddress = await getMGNAddress(dxMP1Address)
@@ -403,8 +405,10 @@ async function init() {
     getDxPoolAPI(),
   ])
 
-  console.debug('​API init -> ', { Web3, Tokens, DxPool })
-  return { Web3, Tokens, DxPool }
+  const Contracts = await getAppContracts()
+
+  console.debug('​API init -> ', { Web3, Tokens, DxPool, Contracts })
+  return { Web3, Tokens, DxPool, Contracts }
 }
 
 /* 
