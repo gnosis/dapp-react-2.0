@@ -1,30 +1,35 @@
-import React from 'react'
 import { createSubscription } from 'create-subscription'
 
-import { calculateDxMgnPoolState, fillDefaultAccount } from '../api'
-import { getWeb3API } from '../api/ProviderWeb3'
+import { getAPI, calculateDxMgnPoolState, fillDefaultAccount } from '../api'
 import { fromWei, mapTS, poolStateIdToName } from '../api/utils'
 
-import createStatefulSub/* , { createMultiSub } */ from './genericSub'
+import createStatefulSub, { createMultiSub } from './genericSub'
 
 const fetchAccountData = async () => {
-    const { getCurrentAccount } = await getWeb3API()
-    const account = await getCurrentAccount()
+    const { Web3 } = await getAPI()
+    const account = await Web3.getCurrentAccount()
 
     return { account }
 }
 
+const fetchNetwork = async () => {
+    const { Web3 } = await getAPI()
+    const network = await Web3.getNetwork()
+
+    return { network }
+}
+
 const fetchETHBalance = async (account) => {
     account = await fillDefaultAccount(account)
-    const { getCurrentBalance } = await getWeb3API()
-    const balance = fromWei((await getCurrentBalance(account)))
+    const { Web3 } = await getAPI()
+    const balance = fromWei((await Web3.getCurrentBalance(account)))
 
-    return { '[ETH] Balance': balance }
+    return { balance }
 }
 
 const fetchBlockTimestamp = async (hashOrNumber = 'latest') => {
-    const { getBlockInfo } = await getWeb3API()
-    const { timestamp } = await getBlockInfo(hashOrNumber)
+    const { Web3 } = await getAPI()
+    const { timestamp } = await Web3.getBlockInfo(hashOrNumber)
 
     return { timestamp }
 }
@@ -38,9 +43,9 @@ const fetchMGNBalances = async () => {
     ] = mapTS(await calculateDxMgnPoolState(), 'fromWei')
 
     return {
-        '[Wallet] MGN Balance': mgnBalance,
-        '[Locked] MGN Balance': mgnLockedBalance,
-        '[Unlocked] MGN Balance': mgnUnlockedBalance,
+        MGN_BALANCE: mgnBalance,
+        LOCKED_MGN_BALANCE: mgnLockedBalance,
+        UNLOCKED_MGN_BALANCE: mgnUnlockedBalance,
     }
 }
 
@@ -71,20 +76,16 @@ const fetchMgnPoolData = async () => {
 
 export const AccountSub = createStatefulSub(fetchAccountData, { account: 'loading...' })
 
-export const ETHbalanceSub = createStatefulSub(fetchETHBalance, { balance: 'loading...' }, {
-    _shouldUpdate(prevState, nextState) {
-        if (!prevState || !prevState['[ETH] Balance'] || !prevState.account) return true
-        return prevState.account !== nextState.account
-            || !prevState['[ETH] Balance'].equals(nextState['[ETH] Balance'])
-    },
-})
+export const NetworkSub = createStatefulSub(fetchNetwork, { network: 'loading...' })
 
+export const ETHbalanceSub = createStatefulSub(fetchETHBalance, { balance: '0' })
+window.ETHbalanceSub = ETHbalanceSub
 export const BlockSub = createStatefulSub(fetchBlockTimestamp, { blockInfo: 'loading...' })
 
 export const MGNBalancesSub = createStatefulSub(fetchMGNBalances, {
-    '[Wallet] MGN Balance': 'loading...',
-    '[Locked] MGN Balance': 'loading...',
-    '[Unlocked] MGN Balance': 'loading...',
+    MGN_BALANCE: 'loading...',
+    LOCKED_MGN_BALANCE: 'loading...',
+    UNLOCKED_MGN_BALANCE: 'loading...',
 })
 
 export const MGNPoolDataSub = createStatefulSub(fetchMgnPoolData, {
@@ -109,51 +110,14 @@ export const MGNPoolDataSub = createStatefulSub(fetchMgnPoolData, {
     },
 })
 
-/* const AccountAndBlockSub = createMultiSub(AccountSub, BlockSub)
-
-AccountAndBlockSub.subscribe(([accountState, blockTimestamp]) => {
-    ETHbalanceSub.update(accountState.account, blockTimestamp)
-    MGNPoolDataSub.update(accountState.account, blockTimestamp)
-    return MGNBalancesSub.update(accountState.account, blockTimestamp)
-}) */
-
-// Subsribe Balances to changes in Accounts.
-// Any change in account will fire an update in ETH balance
-AccountSub.subscribe((accountState) => {
-    ETHbalanceSub.update(accountState.account)
-    MGNPoolDataSub.update()
-    return MGNBalancesSub.update()
-})
-
-BlockSub.subscribe(() => {
+export const GlobalSub = createMultiSub(AccountSub, BlockSub, ETHbalanceSub, MGNBalancesSub, MGNPoolDataSub, NetworkSub)
+// AccountSub.subscribe((accountState) => { console.error('ACCOUNT SUB LOG', accountState) })
+GlobalSub.subscribe(() => {
     ETHbalanceSub.update()
     MGNPoolDataSub.update()
-    return MGNBalancesSub.update()
+    MGNBalancesSub.update()
+    return NetworkSub.update()
 })
-
-export default async function startSubscriptions() {
-    const { web3WS } = await getWeb3API()
-
-    // get initial state populated
-    AccountSub.update()
-    BlockSub.update()
-
-    // create filter listening for latest new blocks
-    const subscription = web3WS.eth.subscribe('newBlockHeaders')
-
-    subscription.on('data', (blockHeader) => {
-        console.debug('New block header - updating AccountSub, BlockSub + subscribers', blockHeader.timestamp)
-        AccountSub.update()
-        BlockSub.update()
-    })
-
-    subscription.on('error', (err) => {
-        console.error('An error in newBlockHeaders WS subscription occurred - unsubscribing.', err.message || err)
-        subscription.unsubscribe()
-    })
-
-    return () => subscription && subscription.unsubscribe()
-}
 
 export const AccountSubscription = createSubscription({
     getCurrentValue(source) {
@@ -170,6 +134,16 @@ export const AccountSubscription = createSubscription({
         return source.subscribe(callback)
     },
 })
+
+export const GlobalSubscription = createSubscription({
+    getCurrentValue(source) {
+        return source.getState()
+    },
+    subscribe(source, callback) {
+        return source.subscribe(callback)
+    },
+})
+
 export const ETHbalanceSubscription = createSubscription({
     getCurrentValue(source) {
         return source.getState()
@@ -205,31 +179,26 @@ export const MGNPoolDataSubscription = createSubscription({
     },
 })
 
-const VisualComp = props => (
-    <pre>
-        {JSON.stringify(props, null, 2)}
-    </pre>
-)
+export default async function startSubscriptions() {
+    const { Web3 } = await getAPI()
 
-export const PropsDisplay = value => <VisualComp {...value} />
+    // get initial state populated
+    AccountSub.update()
+    BlockSub.update()
 
-export const AllSubs = () => (
-    <div>
-        <p>Account Subscription</p>
-        <AccountSubscription source={AccountSub}>
-            {PropsDisplay}
-        </AccountSubscription>
-        <p>Account Balance</p>
-        <ETHbalanceSubscription source={ETHbalanceSub}>
-            {PropsDisplay}
-        </ETHbalanceSubscription>
-        {/* <p>Current Network Subscription</p>
-         <NetworkSubscription source={NetworkAndTokensSub}>
-            {PropsDisplay}
-        </NetworkSubscription> */}
-        <p>Current Block Subscription</p>
-        <BlockSubscription source={BlockSub}>
-            {PropsDisplay}
-        </BlockSubscription>
-    </div>
-)
+    // create filter listening for latest new blocks
+    const subscription = Web3.web3WS.eth.subscribe('newBlockHeaders')
+
+    subscription.on('data', (blockHeader) => {
+        console.debug('New block header - updating AccountSub, BlockSub + subscribers', blockHeader.timestamp)
+        AccountSub.update()
+        BlockSub.update()
+    })
+
+    subscription.on('error', (err) => {
+        console.error('An error in newBlockHeaders WS subscription occurred - unsubscribing.', err.message || err)
+        subscription.unsubscribe()
+    })
+
+    return () => subscription && subscription.unsubscribe()
+}

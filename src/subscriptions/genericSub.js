@@ -48,8 +48,8 @@ const createStatefulSub = (
     }, mixin)
 }
 
-export const createMultiSub = async (...subs) => {
-    const getAllStates = subs.map(sub => sub.getState())
+export const createMultiSub = (...subs) => {
+    const getAllStates = () => subs.map(sub => sub.getState())
 
     const multiSub = createStatefulSub(getAllStates, getAllStates(), {
         _shouldUpdate: () => true,
@@ -60,7 +60,7 @@ export const createMultiSub = async (...subs) => {
     subs.forEach((sub) => {
         sub.subscribe(updateMultiSub)
     })
-
+    
     return multiSub
 }
 
