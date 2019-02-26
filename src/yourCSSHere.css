@@ -12,6 +12,7 @@ body {
 #app {
     display: flex;
     margin: auto;
+    padding: 50px 0;
     flex-flow: column nowrap;
     /* min-height: 100vh; */
     min-width: 80vw;
@@ -32,9 +33,13 @@ pre {
     border-radius: 30px;
 }
 
+pre.poolDataContainer > p {
+    text-align: left;
+}
+
 pre > h1, pre > h2, pre > h3, pre > h4, pre > h5 {
     font-family: 'Major Mono Display';
-    font-weight: 100;
+    font-weight: 900;
     font-style: italic;
 }
 
@@ -74,6 +79,13 @@ hr {
 .data-pre-blue {
     background-color: #e0f7ff;
 }
+.data-pre-purple {
+    background-color: #e7e0ff;
+}
+
+.data-pre-salmon {
+    background-color: #ffe0e0;
+}
 
 .data-pre-error {
     background-color: lightpink;
@@ -96,6 +108,12 @@ form {
 
 input[type="text"] {
     min-width: 250px;
+}
+
+.transition {
+    height: 540px;
+
+    transition: height 0.7s ease-in-out;
 }
 
 .providerChoiceContainer {
@@ -202,7 +220,7 @@ input[type="text"] {
 }
 
 .hideContent {
-    height: 0;
+    height: 0 !important;
 }
 
 button:disabled,
