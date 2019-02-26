@@ -4,14 +4,15 @@ const AsyncActionsHOC = Component => ({
     asyncAction,
     buttonText = 'Submit',
     forceDisable,
-    inputChangeHandler,
+    inputChangeDispatch,
+    globalInput,
     title,
     ...rest
 }) => {
     // State - button blocked disables use of butotn
     // e.g on blockchain action - released on receipt
     const [buttonBlocked, setButtonBlocked] = useState(false)
-    const [inputAmount, setInputAmount] = useState(1)
+    const [inputAmount, setInputAmount] = useState(null)
     const [error, setError] = useState(null)
 
     // useEffect()
@@ -24,26 +25,27 @@ const AsyncActionsHOC = Component => ({
         value = value.replace(/[,]/g, '.')
         
         const validValue = !!(+value)
-        if (!validValue || !value) {
+        if (!validValue && value) {
             return setError('Please enter a valid amount')
         }
         
-        return inputChangeHandler ? inputChangeHandler(value) : setInputAmount(value)
+        return inputChangeDispatch ? inputChangeDispatch(value) : setInputAmount(value)
     }
     
     const handleClick = async () => {
         try {
+            if (!globalInput && !inputAmount) throw new Error('Please enter a valid amount')
             // disable button
             setButtonBlocked(true)
 
             // fire action
             await asyncAction()
-
-            return inputChangeHandler ? inputChangeHandler(null) : setInputAmount(null)   
         } catch (err) {
 			console.error('AsyncActionsHOC ERROR: ', err)
             setError(err.message || err)
         } finally {
+            inputChangeDispatch && inputChangeDispatch(null)
+            setInputAmount(null)  
             // reEnable button
             setButtonBlocked(false)
         }
@@ -61,7 +63,7 @@ const AsyncActionsHOC = Component => ({
                 />}
             <button
                 className="ctaButton"
-                disabled={forceDisable || error || buttonBlocked || !inputAmount}
+                disabled={forceDisable || error || buttonBlocked}
                 onClick={handleClick}
             >
                 {buttonText}

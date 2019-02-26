@@ -14,6 +14,7 @@ const WithdrawMGNandDepositsFromBothPools = AsyncActionsHOC()
 
 const PoolData = ({
     DX_MGN_POOL,
+    INPUT_AMOUNT,
     setDepositAmount,
     setInputAmount,
 }) =>
@@ -35,7 +36,8 @@ const PoolData = ({
                     <DepositToken
                         asyncAction={() => setDepositAmount(1)}
                         forceDisable={DX_MGN_POOL.POOL1.CURRENT_STATE !== POOL_STATES.POOLING}
-                        inputChangeHandler={setInputAmount}
+                        inputChangeDispatch={setInputAmount}
+                        globalInput={INPUT_AMOUNT}
                         title={`deposit [${DX_MGN_POOL.POOL1.DEPOSIT_TOKEN}]`}
                         {...DX_MGN_POOL}
                     />
@@ -54,7 +56,8 @@ const PoolData = ({
                     <DepositToken
                         asyncAction={() => setDepositAmount(2)}
                         forceDisable={DX_MGN_POOL.POOL2.CURRENT_STATE !== POOL_STATES.POOLING}
-                        inputChangeHandler={setInputAmount}
+                        inputChangeDispatch={setInputAmount}
+                        globalInput={INPUT_AMOUNT}
                         title={`deposit [${DX_MGN_POOL.POOL1.SECONDARY_TOKEN.toLowerCase()}]`}
                         {...DX_MGN_POOL}
                     />
@@ -83,12 +86,14 @@ const PoolData = ({
 const mapProps = ({
     state: {
         DX_MGN_POOL,
+        INPUT_AMOUNT,
     },
     setDxMgnPoolState,
     setDepositAmount,
     setInputAmount,
 }) => ({
     DX_MGN_POOL,
+    INPUT_AMOUNT,
     setDxMgnPoolState,
     setDepositAmount,
     setInputAmount,
