@@ -84,8 +84,8 @@ export const getPoolInternalState = async () => {
   const [dxMP1, dxMP2] = await getPoolContracts()
 
   return Promise.all([
-    dxMP1.currentState.call(),
-    dxMP2.currentState.call(),
+    dxMP1.updateAndGetCurrentState.call(),
+    dxMP2.updateAndGetCurrentState.call(),
   ])
 }
 
@@ -204,15 +204,6 @@ export const approveAndDepositIntoDxMgnPool = async (pool, depositAmount, userAc
     },
   } = await getAPI()
 
-  console.debug('approveAndDeposit = ', {
-    dxMP1Address,
-    dxMP2Address,
-    dxMP1DepositTokenAddress, 
-    dxMP1SecondaryTokenAddress, 
-    depositIntoPool1, 
-    depositIntoPool2, 
-  })
-
   const tokenAddress = (pool === 1 ? dxMP1DepositTokenAddress : dxMP1SecondaryTokenAddress)
   const poolAddress = (pool === 1 ? dxMP1Address : dxMP2Address)
   
@@ -239,6 +230,35 @@ export const lockAllMgn = async (userAccount) => {
   return lockMGN(mgnBalance.add(toBN(1)), mgnAddress, userAccount)
 }
 
+/**
+ * calculateClaimableMgnAndDeposits
+ * @description Returns BN numbers in object format
+ * @param {string} userAccount 
+ * @returns {{ totalClaimableMgn: "BN{}", totalClaimableMgn2: "BN{}", totalClaimableDeposit: "BN{}", totalClaimableDeposit2: "BN{}" }}
+ */
+export const calculateClaimableMgnAndDeposits = async (userAccount) => {
+  userAccount = await fillDefaultAccount(userAccount)
+  const { DxPool: { calculateClaimableMgnAndDeposits1, calculateClaimableMgnAndDeposits2 } } = await getAPI()
+
+  const [{ 0: claimableMgn, 1: claimableDeposits }, { 0: claimableMgn2, 1: claimableDeposits2 }] = await Promise.all([
+    calculateClaimableMgnAndDeposits1(userAccount),
+    calculateClaimableMgnAndDeposits2(userAccount),
+  ])
+  
+  // Accum all indices
+  const totalClaimableMgn       = claimableMgn.reduce((accum, item) => accum.add(item), toBN(0))
+  const totalClaimableMgn2      = claimableMgn2.reduce((accum, item) => accum.add(item), toBN(0))
+  const totalClaimableDeposit  = claimableDeposits.reduce((accum, item) => accum.add(item), toBN(0))
+  const totalClaimableDeposit2 = claimableDeposits2.reduce((accum, item) => accum.add(item), toBN(0))
+
+  return {
+    totalClaimableMgn,
+    totalClaimableMgn2,
+    totalClaimableDeposit,
+    totalClaimableDeposit2,
+  }
+}
+window.calculateClaimableMgnAndDeposits = calculateClaimableMgnAndDeposits
 /**
  * calculateDxMgnPoolState
  * @description Grabs all relevant DxMgnPool state as a batch
@@ -406,19 +426,6 @@ export const getState = async ({ account, timestamp: time } = {}) => {
   return refreshedState
 }
 
-async function init() {
-  const [Web3, Tokens, DxPool] = await Promise.all([
-    getWeb3API(),
-    getTokensAPI(),
-    getDxPoolAPI(),
-  ])
-
-  const Contracts = await getAppContracts()
-
-  console.debug('​API init -> ', { Web3, Tokens, DxPool, Contracts })
-  return { Web3, Tokens, DxPool, Contracts }
-}
-
 /* 
  * HELPERS
  */
@@ -435,13 +442,14 @@ async function checkEthTokenBalance(
   weiAmount,
   account,
 ) {
+  // explicit conversion - TODO: fix this brekaing in prod builds
+  weiAmount = toBN(weiAmount)
   // BYPASS[return false] => if token is not ETHER
   const ethAddress = await isETH(tokenAddress)
 
   if (!ethAddress) return false
 
   const wrappedETH = await getTokenBalance(ethAddress, false, account)
-  
   // BYPASS[return false] => if wrapped Eth is enough
   // wrappedETH must be GREATER THAN OR EQUAL to WEI_AMOUNT * 1.1 (10% added for gas costs)
   if (wrappedETH.gte((weiAmount.mul(BN_4_PERCENT).div(toBN(100))))) return (console.debug('Enough WETH balance, skipping deposit.'), false)
@@ -481,4 +489,17 @@ async function depositIfETH(tokenAddress, weiAmount, userAccount) {
   if (wethBalance) return depositETH(tokenAddress, wethBalance, userAccount)
 
   return false
+}
+
+async function init() {
+  const [Web3, Tokens, DxPool] = await Promise.all([
+    getWeb3API(),
+    getTokensAPI(),
+    getDxPoolAPI(),
+  ])
+
+  const Contracts = await getAppContracts()
+
+  console.debug('​API init -> ', { Web3, Tokens, DxPool, Contracts })
+  return { Web3, Tokens, DxPool, Contracts }
 }

@@ -1,8 +1,12 @@
 import { createSubscription } from 'create-subscription'
 
-import { getAPI, calculateDxMgnPoolState, fillDefaultAccount } from '../api'
+import { 
+    getAPI, 
+    fillDefaultAccount,
+    calculateClaimableMgnAndDeposits, 
+    calculateDxMgnPoolState, 
+} from '../api'
 import { fromWei, mapTS, poolStateIdToName } from '../api/utils'
-
 import createStatefulSub, { createMultiSub } from './genericSub'
 
 const fetchAccountData = async () => {
@@ -51,32 +55,56 @@ const fetchMGNBalances = async () => {
 }
 
 const fetchMgnPoolData = async () => {
-    const {
-        totalShare1,
-        totalShare2,
-        totalContribution1,
-        totalContribution2,
-        pool1State,
-        pool2State,
-        depositTokenObj: { balance },
-        secondaryTokenObj: { balance: balance2 },       
-     } = await calculateDxMgnPoolState()
-
-    const [ts1, ts2, tc1, tc2] = mapTS([totalShare1, totalShare2, totalContribution1, totalContribution2, pool1State, pool2State], 'fromWei')
-
-    return {
-        POOL1: {
-            CURRENT_STATE: poolStateIdToName(pool1State.toString()),
-            TOTAL_SHARE: ts1,
-            YOUR_SHARE: tc1,
-            TOKEN_BALANCE: balance,
-        },
-        POOL2: {
-            CURRENT_STATE: poolStateIdToName(pool2State.toString()),
-            TOTAL_SHARE: ts2,
-            YOUR_SHARE: tc2,
-            TOKEN_BALANCE: balance2,
-        },
+    try {
+        const [
+            {
+                totalShare1,
+                totalShare2,
+                totalContribution1,
+                totalContribution2,
+                pool1State,
+                pool2State,
+                depositTokenObj: { balance, decimals },
+                secondaryTokenObj: { balance: balance2, decimals: decimals2 },       
+            },
+            {
+                totalClaimableMgn,
+                totalClaimableMgn2,
+                totalClaimableDeposit,
+                totalClaimableDeposit2,
+            },
+        ] = await Promise.all([
+            calculateDxMgnPoolState(),
+            calculateClaimableMgnAndDeposits(),
+        ])
+    
+        const [
+            ts1, 
+            ts2, 
+            tc1, 
+            tc2, 
+        ] = [totalShare1, totalShare2, totalContribution1, totalContribution2].map(i => i.toString() / 10 ** 18)
+        
+        return {
+            POOL1: {
+                CURRENT_STATE: poolStateIdToName(pool1State.toString()),
+                TOTAL_SHARE: ts1,
+                YOUR_SHARE: tc1,
+                TOTAL_CLAIMABLE_MGN: (totalClaimableMgn.toString() / (10 ** 18)),
+                TOTAL_CLAIMABLE_DEPOSIT: (totalClaimableDeposit.toString() / (10 ** decimals)),
+                TOKEN_BALANCE: (balance.toString() / (10 ** decimals)),
+            },
+            POOL2: {
+                CURRENT_STATE: poolStateIdToName(pool2State.toString()),
+                TOTAL_SHARE: ts2,
+                YOUR_SHARE: tc2,
+                TOTAL_CLAIMABLE_MGN: (totalClaimableMgn2.toString() / (10 ** 18)),
+                TOTAL_CLAIMABLE_DEPOSIT: (totalClaimableDeposit2.toString() / (10 ** decimals2)),
+                TOKEN_BALANCE: (balance2.toString() / (10 ** decimals2)),
+            },
+        }  
+    } catch (error) {
+        console.error(error)
     }
 }
 
@@ -98,12 +126,16 @@ export const MGNPoolDataSub = createStatefulSub(fetchMgnPoolData, {
         CURRENT_STATE: 'loading...',
         TOTAL_SHARE: 'loading...',
         YOUR_SHARE: 'loading...',
+        TOTAL_CLAIMABLE_MGN: 'loading...',
+        TOTAL_CLAIMABLE_DEPOSIT: 'loading...',
         TOKEN_BALANCE: 'loading...',
     },
     POOL2: {
         CURRENT_STATE: 'loading...',
         TOTAL_SHARE: 'loading...',
         YOUR_SHARE: 'loading...',
+        TOTAL_CLAIMABLE_MGN: 'loading...',
+        TOTAL_CLAIMABLE_DEPOSIT: 'loading...',
         TOKEN_BALANCE: 'loading...',
     },
 }, {
@@ -116,6 +148,10 @@ export const MGNPoolDataSub = createStatefulSub(fetchMgnPoolData, {
             || prevState.POOL2.TOTAL_SHARE !== (nextState.POOL2.TOTAL_SHARE)
             || prevState.POOL1.CURRENT_STATE !== (nextState.POOL1.CURRENT_STATE)
             || prevState.POOL2.CURRENT_STATE !== (nextState.POOL2.CURRENT_STATE)
+            || prevState.POOL1.TOTAL_CLAIMABLE_MGN !== (nextState.POOL1.TOTAL_CLAIMABLE_MGN)
+            || prevState.POOL2.TOTAL_CLAIMABLE_MGN !== (nextState.POOL2.TOTAL_CLAIMABLE_MGN)
+            || prevState.POOL1.TOTAL_CLAIMABLE_DEPOSIT !== (nextState.POOL1.TOTAL_CLAIMABLE_DEPOSIT)
+            || prevState.POOL2.TOTAL_CLAIMABLE_DEPOSIT !== (nextState.POOL2.TOTAL_CLAIMABLE_DEPOSIT)
     },
 })
 
@@ -193,7 +229,7 @@ export default async function startSubscriptions() {
 
     // get initial state populated
     AccountSub.update()
-    // BlockSub.update()
+    BlockSub.update()
 
     // create filter listening for latest new blocks
     const subscription = Web3.web3WS.eth.subscribe('newBlockHeaders')
@@ -201,7 +237,7 @@ export default async function startSubscriptions() {
     subscription.on('data', (blockHeader) => {
         console.debug('New block header - updating AccountSub, BlockSub + subscribers', blockHeader.timestamp)
         AccountSub.update()
-        // BlockSub.update()
+        BlockSub.update()
     })
 
     subscription.on('error', (err) => {

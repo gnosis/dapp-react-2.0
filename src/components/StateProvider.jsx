@@ -282,7 +282,24 @@ function AppProvider(props) {
       { timestamp }, 
       { balance: ETHBalance }, 
       { MGN_BALANCE, LOCKED_MGN_BALANCE, UNLOCKED_MGN_BALANCE }, 
-      { POOL1: { CURRENT_STATE, TOTAL_SHARE, YOUR_SHARE, TOKEN_BALANCE }, POOL2: { CURRENT_STATE: CURRENT_STATE2, TOTAL_SHARE: TOTAL_SHARE2, YOUR_SHARE: YOUR_SHARE2, TOKEN_BALANCE: TOKEN_BALANCE2 } }, 
+      { 
+        POOL1: { 
+          CURRENT_STATE, 
+          TOTAL_SHARE, 
+          YOUR_SHARE, 
+          TOKEN_BALANCE, 
+          TOTAL_CLAIMABLE_MGN, 
+          TOTAL_CLAIMABLE_DEPOSIT, 
+        }, 
+        POOL2: { 
+          CURRENT_STATE: CURRENT_STATE2, 
+          TOTAL_SHARE: TOTAL_SHARE2, 
+          YOUR_SHARE: YOUR_SHARE2, 
+          TOKEN_BALANCE: TOKEN_BALANCE2, 
+          TOTAL_CLAIMABLE_MGN: TOTAL_CLAIMABLE_MGN2, 
+          TOTAL_CLAIMABLE_DEPOSIT: TOTAL_CLAIMABLE_DEPOSIT2, 
+        },
+      }, 
       { network },
     ],
   } = props
@@ -326,10 +343,12 @@ function AppProvider(props) {
         CURRENT_STATE,
         TOTAL_SHARE,
         YOUR_SHARE,
+        TOTAL_CLAIMABLE_MGN,
+        TOTAL_CLAIMABLE_DEPOSIT,
         TOKEN_BALANCE,
       },
     }) 
-  }, [CURRENT_STATE, TOTAL_SHARE, YOUR_SHARE, TOKEN_BALANCE])
+  }, [CURRENT_STATE, TOTAL_SHARE, YOUR_SHARE, TOKEN_BALANCE, TOTAL_CLAIMABLE_MGN, TOTAL_CLAIMABLE_DEPOSIT])
 
   // useEffect - only update State when subscriber user Account changes
   useEffect(() => {
@@ -340,10 +359,12 @@ function AppProvider(props) {
         CURRENT_STATE: CURRENT_STATE2,
         TOTAL_SHARE: TOTAL_SHARE2,
         YOUR_SHARE: YOUR_SHARE2,
+        TOTAL_CLAIMABLE_MGN: TOTAL_CLAIMABLE_MGN2,
+        TOTAL_CLAIMABLE_DEPOSIT: TOTAL_CLAIMABLE_DEPOSIT2,
         TOKEN_BALANCE: TOKEN_BALANCE2,
       },
     }) 
-  }, [CURRENT_STATE2, TOTAL_SHARE2, YOUR_SHARE2, TOKEN_BALANCE2])
+  }, [CURRENT_STATE2, TOTAL_SHARE2, YOUR_SHARE2, TOKEN_BALANCE2, TOTAL_CLAIMABLE_MGN2, TOTAL_CLAIMABLE_DEPOSIT2])
 
   const dispatchers = {
     // DX-MGN DISPATCHERS
@@ -359,7 +380,7 @@ function AppProvider(props) {
         INPUT_AMOUNT,
       } = state
 
-      const receipt = await approveAndDepositIntoDxMgnPool(poolNumber, toBN(toWei(INPUT_AMOUNT)), ACCOUNT)
+      const receipt = await approveAndDepositIntoDxMgnPool(poolNumber, toWei(INPUT_AMOUNT), ACCOUNT)
 			console.debug('APPROVE and DEPOSIT into DX-MGN-POOL TX RECEIPT: ', receipt)
     },
 
@@ -414,11 +435,13 @@ function AppProvider(props) {
           name,
           symbol,
           balance,
+          decimals,
         },
         {
           name: name2,
           symbol: symbol2,
           balance: balance2,
+          decimals: decimals2,
         },
       ] = await getPoolTokensInfo()
       
@@ -427,10 +450,10 @@ function AppProvider(props) {
         payload: {
           name,
           symbol,
-          balance,
+          balance: balance && (balance.toString() / 10 ** decimals),
           name2,
           symbol2,
-          balance2,
+          balance2: balance2 && (balance2.toString() / 10 ** decimals2),
         },
       })
     },

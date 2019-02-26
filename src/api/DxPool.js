@@ -102,7 +102,7 @@ async function init() {
    * @param { string } address - Address
    * @param { string } userAddress - Address 
    */
-  const lockMGN = async (amount, address, userAddress) => (await getTokenMGN(address)).lockTokens(amount, { from: userAddress })  
+  const lockMGN = async (amount, address, userAddress) => (await getTokenMGN(address)).lockTokens(amount, { from: userAddress, gas: GAS_LIMIT, gasPrice: GAS_PRICE })  
 
   /**
    * depositIntoPool1
@@ -124,9 +124,16 @@ async function init() {
   ) => dxMP2.deposit(amount, { from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
 
   /**
+   * calculateClaimableMgnAndDeposits1
+   * @returns {Promise<{ '0': string, '1': string }>} - Promise<{ '0': ClaimableMGN | string, '1': ClaimableDeposits | string }>
+   */
+  const calculateClaimableMgnAndDeposits1 = async userAccount => dxMP1.getAllClaimableMgnAndDeposits.call(userAccount)
+  const calculateClaimableMgnAndDeposits2 = async userAccount => dxMP2.getAllClaimableMgnAndDeposits.call(userAccount)
+
+  /**
    * withdrawMGNandDepositsFromPools
    */
-  const withdrawMGNandDepositsFromPools = async () => coord.withdrawMGNandDepositsFromBothPools()
+  const withdrawMGNandDepositsFromPools = async () => coord.withdrawMGNandDepositsFromBothPools({ gas: GAS_LIMIT, gasPrice: GAS_PRICE })
 
   /* 
   const getLatestAuctionIndex = ({ sell: { address: t1 }, buy: { address: t2 } }) =>
@@ -170,6 +177,8 @@ async function init() {
     lockMGN,
     depositIntoPool1,
     depositIntoPool2,
+    calculateClaimableMgnAndDeposits1,
+    calculateClaimableMgnAndDeposits2,
     withdrawMGNandDepositsFromPools,
     // event,
     // allEvents,

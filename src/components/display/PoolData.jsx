@@ -6,7 +6,8 @@ import { TextInput } from '../controls/ControlledInput'
 
 import { withdrawMGNandDepositsFromAllPools } from '../../api'
 import { cleanData } from '../../api/utils'
-import { POOL_STATES } from '../../globals';
+import { POOL_STATES } from '../../globals'
+import DataDisplayVisualContainer from './DataDisplay';
 
 const DepositToken = AsyncActionsHOC(TextInput)
 const WithdrawMGNandDepositsFromBothPools = AsyncActionsHOC()
@@ -26,6 +27,8 @@ const PoolData = ({
                     <p>Status: {DX_MGN_POOL.POOL1.CURRENT_STATE}</p>
                     <p>TOTAL POOL SHARE: {DX_MGN_POOL.POOL1.TOTAL_SHARE}</p>
                     <p>YOUR TOTAL SHARE: {DX_MGN_POOL.POOL1.YOUR_SHARE}</p>
+                    <p>TOTAL CLAIMABLE MGN: {DX_MGN_POOL.POOL1.TOTAL_CLAIMABLE_MGN}</p>
+                    <p>TOTAL CLAIMABLE DEPOSIT: {DX_MGN_POOL.POOL1.TOTAL_CLAIMABLE_DEPOSIT}</p>
                     <p>{DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL} WALLET BALANCE: {cleanData(DX_MGN_POOL.POOL1.TOKEN_BALANCE)}</p>
 
                     <hr />
@@ -38,11 +41,13 @@ const PoolData = ({
                     />
                 </pre>
                 {/* POOL 2 */}
-                <pre className="poolDataContainer data-pre-green">
+                <pre className="poolDataContainer data-pre-purple">
                     <h4>- {DX_MGN_POOL.POOL1.SECONDARY_TOKEN} [{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL.toLowerCase()}] -</h4>
                     <p>Status: {DX_MGN_POOL.POOL2.CURRENT_STATE}</p>
                     <p>TOTAL POOL SHARE: {DX_MGN_POOL.POOL2.TOTAL_SHARE}</p>
                     <p>YOUR TOTAL SHARE: {DX_MGN_POOL.POOL2.YOUR_SHARE}</p>
+                    <p>TOTAL CLAIMABLE MGN: {DX_MGN_POOL.POOL2.TOTAL_CLAIMABLE_MGN}</p>
+                    <p>TOTAL CLAIMABLE DEPOSIT: {DX_MGN_POOL.POOL2.TOTAL_CLAIMABLE_DEPOSIT}</p>
                     <p>{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL} WALLET BALANCE: {cleanData(DX_MGN_POOL.POOL2.TOKEN_BALANCE)}</p>
 
                     <hr />
@@ -58,11 +63,19 @@ const PoolData = ({
             {
                 DX_MGN_POOL.POOL1.CURRENT_STATE === POOL_STATES.MGN_UNLOCKED 
                 && DX_MGN_POOL.POOL2.CURRENT_STATE === POOL_STATES.MGN_UNLOCKED 
-                && <WithdrawMGNandDepositsFromBothPools 
-                    asyncAction={withdrawMGNandDepositsFromAllPools}
-                    title="Withdraw All MGn + deposits from both pooLs"
-                    buttonText="Withdraw"
-                />
+                && 
+                <DataDisplayVisualContainer
+                    colour="green"
+                    title={null}
+                >
+                    {() =>
+                        <WithdrawMGNandDepositsFromBothPools 
+                            asyncAction={withdrawMGNandDepositsFromAllPools}
+                            title="Withdraw All MGn + deposits from both pooLs"
+                            buttonText="Withdraw"
+                        />
+                    }
+                </DataDisplayVisualContainer>
             }
         </div>
     </>
