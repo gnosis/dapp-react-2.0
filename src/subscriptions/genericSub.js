@@ -24,12 +24,16 @@ const StatefulSubBase = {
     },
     
     async update(...args) {
+        // const cachedState = this._state
+        // this._state = this._defaultState
         const nextState = await this._getNewState(...args)
 
         if (this._shouldUpdate(this._state, nextState)) {
             this._state = nextState
             this._subscriptions.forEach((cb) => { cb(nextState) })
-        }
+        } /* else {
+            this._state = cachedState
+        } */
     },
 }
 
@@ -44,6 +48,7 @@ const createStatefulSub = (
     return Object.assign(statefulChildSub, {
         _getNewState: getNewState,
         _state: initialState,
+        _defaultState: initialState,
         _subscriptions: [],
     }, mixin)
 }

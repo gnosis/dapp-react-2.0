@@ -216,7 +216,7 @@ button[disabled]{
 
 button {
     background-color: #fff; /* Green */
-    border: 1px solid #4CAF50;
+    border: 1px solid #000;
     border-radius: 10px;
     color: #000;
     
@@ -242,7 +242,7 @@ button[disabled]:hover {
 }
 
 button:hover {
-    background-color: #4CAF50;
+    background-color: #000;
     color: #fff;
 }
 

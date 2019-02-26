@@ -193,7 +193,7 @@ export default async function startSubscriptions() {
 
     // get initial state populated
     AccountSub.update()
-    BlockSub.update()
+    // BlockSub.update()
 
     // create filter listening for latest new blocks
     const subscription = Web3.web3WS.eth.subscribe('newBlockHeaders')
@@ -201,7 +201,7 @@ export default async function startSubscriptions() {
     subscription.on('data', (blockHeader) => {
         console.debug('New block header - updating AccountSub, BlockSub + subscribers', blockHeader.timestamp)
         AccountSub.update()
-        BlockSub.update()
+        // BlockSub.update()
     })
 
     subscription.on('error', (err) => {
