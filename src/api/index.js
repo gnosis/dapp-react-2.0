@@ -279,6 +279,15 @@ export const calculateDxMgnPoolState = async (userAccount) => {
   }
 }
 
+/**
+ * withdrawMGNandDepositsFromAllPools
+ */
+export const withdrawMGNandDepositsFromAllPools = async () => {
+  const { DxPool } = await getAPI()
+
+  return DxPool.withdrawMGNandDepositsFromPools()
+}
+
 // ============
 // MISC
 // ============

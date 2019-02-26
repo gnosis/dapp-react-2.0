@@ -123,6 +123,11 @@ async function init() {
     userAccount,
   ) => dxMP2.deposit(amount, { from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
 
+  /**
+   * withdrawMGNandDepositsFromPools
+   */
+  const withdrawMGNandDepositsFromPools = async () => coord.withdrawMGNandDepositsFromBothPools()
+
   /* 
   const getLatestAuctionIndex = ({ sell: { address: t1 }, buy: { address: t2 } }) =>
     dx.getAuctionIndex.call(t1, t2)
@@ -165,6 +170,7 @@ async function init() {
     lockMGN,
     depositIntoPool1,
     depositIntoPool2,
+    withdrawMGNandDepositsFromPools,
     // event,
     // allEvents,
   }

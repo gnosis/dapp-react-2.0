@@ -3,6 +3,7 @@ import React, { /* useEffect, */ useState } from 'react'
 const AsyncActionsHOC = Component => ({
     asyncAction,
     buttonText = 'Submit',
+    forceDisable,
     inputChangeHandler,
     title,
     ...rest
@@ -53,14 +54,14 @@ const AsyncActionsHOC = Component => ({
             <h5>{title}</h5>
             {Component && 
                 <Component
-                    disabled={buttonBlocked}
+                    disabled={forceDisable || buttonBlocked}
                     onChange={handleChange}
                     value={inputAmount}
                     {...rest} 
                 />}
             <button
                 className="ctaButton"
-                disabled={error || buttonBlocked || !inputAmount}
+                disabled={forceDisable || error || buttonBlocked || !inputAmount}
                 onClick={handleClick}
             >
                 {buttonText}

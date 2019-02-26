@@ -4,9 +4,12 @@ import { connect } from '../StateProvider'
 import AsyncActionsHOC from '../hoc/AsyncActionsHOC'
 import { TextInput } from '../controls/ControlledInput'
 
+import { withdrawMGNandDepositsFromAllPools } from '../../api'
 import { cleanData } from '../../api/utils'
+import { POOL_STATES } from '../../globals';
 
 const DepositToken = AsyncActionsHOC(TextInput)
+const WithdrawMGNandDepositsFromBothPools = AsyncActionsHOC()
 
 const PoolData = ({
     DX_MGN_POOL,
@@ -28,6 +31,7 @@ const PoolData = ({
                     <hr />
                     <DepositToken
                         asyncAction={() => setDepositAmount(1)}
+                        forceDisable={DX_MGN_POOL.POOL1.CURRENT_STATE !== POOL_STATES.POOLING}
                         inputChangeHandler={setInputAmount}
                         title={`deposit [${DX_MGN_POOL.POOL1.DEPOSIT_TOKEN}]`}
                         {...DX_MGN_POOL}
@@ -44,12 +48,22 @@ const PoolData = ({
                     <hr />
                     <DepositToken
                         asyncAction={() => setDepositAmount(2)}
+                        forceDisable={DX_MGN_POOL.POOL2.CURRENT_STATE !== POOL_STATES.POOLING}
                         inputChangeHandler={setInputAmount}
                         title={`deposit [${DX_MGN_POOL.POOL1.SECONDARY_TOKEN.toLowerCase()}]`}
                         {...DX_MGN_POOL}
                     />
                 </pre>
             </div>
+            {
+                DX_MGN_POOL.POOL1.CURRENT_STATE === POOL_STATES.MGN_UNLOCKED 
+                && DX_MGN_POOL.POOL2.CURRENT_STATE === POOL_STATES.MGN_UNLOCKED 
+                && <WithdrawMGNandDepositsFromBothPools 
+                    asyncAction={withdrawMGNandDepositsFromAllPools}
+                    title="Withdraw All MGn + deposits from both pooLs"
+                    buttonText="Withdraw"
+                />
+            }
         </div>
     </>
 

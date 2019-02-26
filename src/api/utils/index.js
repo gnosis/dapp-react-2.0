@@ -1,5 +1,5 @@
 import { isBN, toBN, toWei, fromWei } from 'web3-utils'
-import { WEBSOCKET_URLS } from '../../globals'
+import { WEBSOCKET_URLS, POOL_STATES } from '../../globals'
 
 // eslint-disable-next-line import/prefer-default-
 const windowLoaded = new Promise((resolve) => {
@@ -131,16 +131,16 @@ const poolStateIdToName = (id) => {
   switch (id) {
     case '0':
     case 0:
-      return 'Pooling'
+      return POOL_STATES.POOLING
     case '1':
     case 1:
-      return 'PoolingEnded'
+      return POOL_STATES.POOLING_ENDED
     case '2':
     case 2:
-      return 'DepositWithdrawnFromDx'
+      return POOL_STATES.DEPOSIT_WITHDRAW_FROM_DX
     case '3':
     case 3:
-      return 'MgnUnlocked'
+      return POOL_STATES.MGN_UNLOCKED
     default: 
       return 'Unknown Contract State' 
   }
