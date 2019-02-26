@@ -5,7 +5,6 @@ import Providers from '../../api/providers'
 import { connect } from '../StateProvider'
 import { getAPI } from '../../api'
 import { getAppContracts } from '../../api/Contracts'
-import { cleanData } from '../../api/utils'
 
 import ConfigDisplayerHOC from '../hoc/ConfigDisplayHOC'
 import ModalHOC from '../hoc/ModalHOC'
@@ -132,19 +131,8 @@ const mapProps = ({
   // state properties
   state: {
     PROVIDER: { ACTIVE_PROVIDER },
-    DX_MGN_POOL: {
-      POOL1: {
-        TOTAL_SHARE: TOTAL_SHARE1,
-        YOUR_SHARE: YOUR_SHARE1,
-      },
-      POOL2: {
-        TOTAL_SHARE: TOTAL_SHARE2,
-        YOUR_SHARE: YOUR_SHARE2,
-      },
-    },
     TOKEN_MGN: {
       ADDRESS,
-      BALANCE,
     },
     LOADING,
     SHOW_MODAL,
@@ -161,12 +149,7 @@ const mapProps = ({
 }) => ({
   // state properties
   state: {
-    "[Pool #1] Total Share": cleanData(TOTAL_SHARE1),
-    "[Pool #1] User's Share": cleanData(YOUR_SHARE1),
-    "[Pool #2] Total Share": cleanData(TOTAL_SHARE2),
-    "[Pool #2] User's Share": cleanData(YOUR_SHARE2),
     "[MGN] Address": ADDRESS,
-    "[MGN] Balance": cleanData(BALANCE),
     ACTIVE_PROVIDER,
     LOADING,
     SHOW_MODAL,
