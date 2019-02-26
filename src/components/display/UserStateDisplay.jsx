@@ -14,22 +14,24 @@ const LockMGN = AsyncActionsHOC()
 const UserStateDisplay = ({ NETWORK, USER, MGN_BALANCES }) =>
   <DataDisplayVisualContainer
     title="Connected Wallet"
-    colour="violet"
+    colour="salmon"
+    transition
   >
     {() =>
     <>
-      <h5>Account + netWoRk</h5>
+      <h5>- Account + netWoRk -</h5>
       <p>ACCOUNT: {USER.ACCOUNT}</p>
       <p>[ETH] BALANCE: {USER.BALANCE && USER.BALANCE}</p>
       <p>NETWORK: {NETWORK}</p>
 
       <hr />
 
-      <h5>mgn bAlances</h5>
+      <h5>- mgn bAlances -</h5>
       {Object.keys(MGN_BALANCES).map(key => <p key={key + Math.random()}>{key.toUpperCase().split('_').join(' ')}: {MGN_BALANCES[key]}</p>)}
       
       <LockMGN 
         asyncAction={lockAllMgn}
+        forceDisable={MGN_BALANCES.BALANCE === 'loading...' || MGN_BALANCES.BALANCE <= 0}
         buttonText="Lock"
         title="Lock Mgn Tokens"
       />

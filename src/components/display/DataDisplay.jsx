@@ -14,9 +14,10 @@ export const DataDisplay = props =>
 
 const DataDisplayVisualContainer = (props) => {
     const { 
-      title = 'Untitled Data', 
+      title, 
       colour = 'gray', 
       startOpen = true,
+      transition,
       children,
       ...rest 
     } = props
@@ -25,8 +26,8 @@ const DataDisplayVisualContainer = (props) => {
     
     return (
       <>
-        <h3 className="clickableHeader" onClick={() => setOpen(!open)}>{title} (show/hide)</h3>
-        <pre className={`data-pre-${colour} word-wrap${!open ? ' hideContent' : ''}`}>
+        {title && <h3 className="clickableHeader" onClick={() => setOpen(!open)}>{title} (show/hide)</h3>}
+        <pre className={`data-pre-${colour} word-wrap${!open ? ' hideContent' : ''}${transition ? ' transition' : ''}`}>
           {children && children()}
           {<DataDisplay {...rest} />}
         </pre>
