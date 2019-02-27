@@ -15,6 +15,7 @@ const UserStateDisplay = ({ NETWORK, USER, MGN_BALANCES }) =>
   <DataDisplayVisualContainer
     title="Connected Wallet"
     colour="salmon"
+    height={540}
     transition
   >
     {() =>

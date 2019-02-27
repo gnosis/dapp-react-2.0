@@ -1,6 +1,7 @@
 import React from 'react'
-import DataDisplayContainer from '../display/DataDisplay'
+import contractNetworks from '@gnosis.pm/dx-mgn-pool/networks.json'
 
+import DataDisplayContainer from '../display/DataDisplay'
 /**
  * Configuration Displayer HOC
  * @param {*} Component Component to wrap
@@ -14,11 +15,31 @@ const ConfigDisplayerHOC = Component =>
     render() {
       return (
         <>
-          <h3>Development Context</h3>
-          {Object.keys(this.state).map(stateKey => (
-            <pre className="data-pre-yellow word-wrap" key={stateKey}>{`${stateKey}: ${this.state[stateKey]}`}</pre>
-          ))}
+          {/* DEV CONTEXT */}
+          <DataDisplayContainer
+            title="Development Context"
+            colour="yellow"
+            height={600}
+            startOpen={false}
+            transition
+          >
+            {() => 
+              <>
+                {Object.keys(this.state).map(stateKey => (
+                  <pre key={stateKey}>{`${stateKey}: ${this.state[stateKey]}`}</pre>
+                ))}
+                <h5>- Contracts in use -</h5>
+                {Object.keys(contractNetworks).map(contract => (
+                  <pre key={contract}>{`${contract}: ${JSON.stringify(contractNetworks[contract], undefined, 2)}`}</pre>
+                ))}
+              </>
+            }
+          </DataDisplayContainer>
+
+          {/* MAIN APP */}
           <Component {...this.props} {...this.state} />
+          
+          {/* APP STATE */}
           <DataDisplayContainer title="App state" startOpen={false} colour="pink" {...this.props.state} />
         </>
       )
