@@ -14,7 +14,7 @@ import { DATA_LOAD_STRING } from '../../globals'
 
 const LockMGN = AsyncActionsHOC()
 
-const UserStateDisplay = ({ BLOCK_TIMESTAMP, NETWORK, USER, MGN_BALANCES }) =>
+const UserStateDisplay = ({ NETWORK, USER, MGN_BALANCES }) =>
   <DataDisplayVisualContainer
     title="Connected Wallet"
     colour="salmon"
@@ -25,9 +25,8 @@ const UserStateDisplay = ({ BLOCK_TIMESTAMP, NETWORK, USER, MGN_BALANCES }) =>
     <>
       <h5>- Account + netWoRk -</h5>
       <p>ACCOUNT: {USER.ACCOUNT}</p>
-      <p>[ETH] BALANCE: {USER.BALANCE && USER.BALANCE}</p>
       <p>NETWORK: {NETWORK}</p>
-      <p>BLOCKCHAIN TIME: {BLOCK_TIMESTAMP && new Date(BLOCK_TIMESTAMP * 1000).toString()}</p>
+      <p>[ETH] BALANCE: {USER.BALANCE && USER.BALANCE}</p>
       <hr />
 
       <h5>- mgn bAlances -</h5>
@@ -47,7 +46,7 @@ const mapState = ({
   state,
   state: { 
     USER, 
-    PROVIDER: { BLOCK_TIMESTAMP, NETWORK }, 
+    PROVIDER: { NETWORK }, 
     TOKEN_MGN: {
       MGN_BALANCE,
       LOCKED_MGN_BALANCE,
@@ -58,7 +57,6 @@ const mapState = ({
   state,
   NETWORK,
   USER,
-  BLOCK_TIMESTAMP,
   MGN_BALANCES: {
     BALANCE: MGN_BALANCE,
     LOCKED_BALANCE: LOCKED_MGN_BALANCE,
