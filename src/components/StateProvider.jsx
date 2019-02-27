@@ -6,7 +6,7 @@ import {
   calculateDxMgnPoolState,
 } from '../api'
 
-import { toBN, toWei } from '../api/utils'
+import { toWei, cleanDataNative } from '../api/utils'
 
 const defaultState = {
   USER: {
@@ -14,9 +14,10 @@ const defaultState = {
     BALANCE: undefined,
   },
   PROVIDER: {
-    ACTIVE_PROVIDER: null,
-    NETWORK: 'NETWORK NOT SUPPORTED',
+    ACTIVE_PROVIDER: undefined,
     PROVIDERS: [],
+    NETWORK: 'NETWORK NOT SUPPORTED',
+    BLOCK_TIMESTAMP: undefined,
   },
   DX_MGN_POOL: {
     POOL1: {
@@ -43,10 +44,10 @@ const defaultState = {
     },
   },
   TOKEN_MGN: {
-    ADDRESS: undefined,
-    BALANCE: undefined,
-    LOCKED_BALANCE: undefined,
-    UNLOCKED_BALANCE: undefined,
+    ADDRESS: '...',
+    BALANCE: '...',
+    LOCKED_BALANCE: '...',
+    UNLOCKED_BALANCE: '...',
   },
   CONTRACTS: {},
   SHOW_MODAL: undefined,
@@ -317,10 +318,11 @@ function AppProvider(props) {
         },
         PROVIDER: {
           NETWORK: network,
+          BLOCK_TIMESTAMP: timestamp,
         },
       },
     }) 
-  }, [account, ETHBalance, network])
+  }, [account, ETHBalance, network, timestamp])
 
   // useEffect - only update State when subscriber user Account changes
   useEffect(() => {
@@ -450,10 +452,10 @@ function AppProvider(props) {
         payload: {
           name,
           symbol,
-          balance: balance && (balance.toString() / 10 ** decimals),
+          balance: cleanDataNative(balance, decimals), // balance && (balance.toString() / 10 ** decimals),
           name2,
           symbol2,
-          balance2: balance2 && (balance2.toString() / 10 ** decimals2),
+          balance2: cleanDataNative(balance2, decimals2), // balance2 && (balance2.toString() / 10 ** decimals2),
         },
       })
     },
