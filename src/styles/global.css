@@ -87,6 +87,10 @@ hr {
     background-color: #ffe0e0;
 }
 
+.data-pre-lightSalmon {
+    background-color: #fdf6fc;
+}
+
 .data-pre-error {
     background-color: lightpink;
     font-size: 12px;
