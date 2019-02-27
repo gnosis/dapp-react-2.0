@@ -142,7 +142,12 @@ export const EtherToken = TruffleContract(require('@gnosis.pm/util-contracts/bui
 const setContractProvider =
   provider =>
     TruffleWrappedContractArtifacts
-      .concat([HumanFriendlyToken, DxMgnPool, TokenMGN, EtherToken])
+      .concat([
+        DxMgnPool, 
+        EtherToken,
+        HumanFriendlyToken, 
+        TokenMGN, 
+      ])
       .forEach((c) => { c.setProvider(provider) })
 
 /**
