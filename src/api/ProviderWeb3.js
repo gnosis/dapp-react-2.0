@@ -111,7 +111,7 @@ async function init() {
   const fromWei = (amount, x) => utils.fromWei(amount, x)
   const toBN = amount => utils.toBN(amount)
 
-  const getBlockInfo = blockNumber => web3.eth.getBlock(blockNumber)
+  const getBlockInfo = async (blockNumber = "pending") => web3.eth.getBlock(blockNumber)
 
   return {
     web3,

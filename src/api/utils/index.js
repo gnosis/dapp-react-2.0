@@ -1,5 +1,5 @@
 import { isBN, toBN, toWei, fromWei } from 'web3-utils'
-import { WEBSOCKET_URLS, POOL_STATES } from '../../globals'
+import { DATA_LOAD_STRING, FIXED_DECIMAL_AMOUNT, WEBSOCKET_URLS, POOL_STATES } from '../../globals'
 
 // eslint-disable-next-line import/prefer-default-
 const windowLoaded = new Promise((resolve) => {
@@ -42,8 +42,6 @@ const displayTime = (sec, locale = 'de-DE', timeZone = 'Europe/Berlin') => (sec 
   day: 'numeric',
   timeZone,
 }))
-
-const mapTS = (arr, type) => (Array.isArray(arr) ? arr : [arr]).map(item => (type === 'fromWei' && isBN(item) ? fromWei(item) : item).toString())
 
 const netIdToName = (id) => {
   switch (id) {
@@ -97,8 +95,10 @@ const netIdToWebsocket = (id) => {
   }
 }
 
-const cleanData = data => (data && isBN(data) ? fromWei(data) : data)
-// const cleanData = data => data && fromWei(toBN(data))
+// const cleanData = data => (data && isBN(data) ? fromWei(data) : data)
+const cleanDataFromWei = data => (data && data !== DATA_LOAD_STRING) && Number(fromWei(data)).toFixed(FIXED_DECIMAL_AMOUNT)
+const cleanDataNative = (data, dec) => (data && data !== DATA_LOAD_STRING) && Number(toBN(data).div(toBN(10).pow(toBN(dec)))).toFixed(FIXED_DECIMAL_AMOUNT)
+const mapTS = (arr, type) => (Array.isArray(arr) ? arr : [arr]).map(item => (type === 'fromWei' && isBN(item) ? fromWei(item) : item).toString())
 
 const flattener = obj => Object.assign(
   {},
@@ -151,7 +151,8 @@ export {
   isBN,
   toWei,
   fromWei,
-  cleanData,
+  cleanDataNative,
+  cleanDataFromWei,
   mapTS,
   displayTime,
   timeValidator,

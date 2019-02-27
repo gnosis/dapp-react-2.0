@@ -1,13 +1,16 @@
 import { createSubscription } from 'create-subscription'
 
-import { 
-    getAPI, 
+import {
+    getAPI,
     fillDefaultAccount,
-    calculateClaimableMgnAndDeposits, 
-    calculateDxMgnPoolState, 
+    calculateClaimableMgnAndDeposits,
+    calculateDxMgnPoolState,
 } from '../api'
-import { fromWei, mapTS, poolStateIdToName } from '../api/utils'
+import { fromWei, mapTS, poolStateIdToName, cleanDataFromWei, cleanDataNative } from '../api/utils'
+
 import createStatefulSub, { createMultiSub } from './genericSub'
+
+import { DATA_LOAD_STRING, FIXED_DECIMAL_AMOUNT } from '../globals'
 
 const fetchAccountData = async () => {
     const { Web3 } = await getAPI()
@@ -26,16 +29,18 @@ const fetchNetwork = async () => {
 const fetchETHBalance = async (account) => {
     account = await fillDefaultAccount(account)
     const { Web3 } = await getAPI()
-    const balance = fromWei((await Web3.getCurrentBalance(account)))
+    const balance = Number(fromWei((await Web3.getCurrentBalance(account)))).toFixed(FIXED_DECIMAL_AMOUNT)
 
     return { balance }
 }
 
-const fetchBlockTimestamp = async (hashOrNumber = 'latest') => {
+const fetchBlockTimestamp = async (hashOrNumber = 'pending') => {
     const { Web3 } = await getAPI()
-    const { timestamp } = await Web3.getBlockInfo(hashOrNumber)
+    const block = await Web3.getBlockInfo(hashOrNumber)
 
-    return { timestamp }
+    if (!block) return {}
+
+    return { timestamp: block.timestamp }
 }
 
 const fetchMGNBalances = async () => {
@@ -43,9 +48,13 @@ const fetchMGNBalances = async () => {
         mgnLockedBalance,
         mgnUnlockedBalance,
         mgnBalance,
-     } = await calculateDxMgnPoolState()
+    } = await calculateDxMgnPoolState()
 
-    const [mgnLockedBalanceWEI, mgnUnlockedBalanceWEI, mgnBalanceWEI] = mapTS([mgnLockedBalance, mgnUnlockedBalance, mgnBalance], 'fromWei')
+    const [
+        mgnLockedBalanceWEI,
+        mgnUnlockedBalanceWEI,
+        mgnBalanceWEI,
+    ] = mapTS([mgnLockedBalance, mgnUnlockedBalance, mgnBalance], 'fromWei') // .map(i => cleanDataFromWei(i))
 
     return {
         MGN_BALANCE: mgnBalanceWEI,
@@ -65,7 +74,7 @@ const fetchMgnPoolData = async () => {
                 pool1State,
                 pool2State,
                 depositTokenObj: { balance, decimals },
-                secondaryTokenObj: { balance: balance2, decimals: decimals2 },       
+                secondaryTokenObj: { balance: balance2, decimals: decimals2 },
             },
             {
                 totalClaimableMgn,
@@ -77,90 +86,99 @@ const fetchMgnPoolData = async () => {
             calculateDxMgnPoolState(),
             calculateClaimableMgnAndDeposits(),
         ])
-    
+
         const [
-            ts1, 
-            ts2, 
-            tc1, 
-            tc2, 
-        ] = [totalShare1, totalShare2, totalContribution1, totalContribution2].map(i => i.toString() / 10 ** 18)
-        
+            ts1,
+            ts2,
+            tc1,
+            tc2,
+            tcMgnEth,
+            tcMgnEth2,
+        ] = [
+            totalShare1,
+            totalShare2,
+            totalContribution1,
+            totalContribution2,
+            totalClaimableMgn,
+            totalClaimableMgn2,
+        ].map(i => cleanDataFromWei(i))
+
         return {
             POOL1: {
                 CURRENT_STATE: poolStateIdToName(pool1State.toString()),
                 TOTAL_SHARE: ts1,
                 YOUR_SHARE: tc1,
-                TOTAL_CLAIMABLE_MGN: (totalClaimableMgn.toString() / (10 ** 18)),
-                TOTAL_CLAIMABLE_DEPOSIT: (totalClaimableDeposit.toString() / (10 ** decimals)),
-                TOKEN_BALANCE: (balance.toString() / (10 ** decimals)),
+                TOTAL_CLAIMABLE_MGN: tcMgnEth,
+                TOTAL_CLAIMABLE_DEPOSIT: cleanDataNative(totalClaimableDeposit, decimals), // (totalClaimableDeposit.toString() / (10 ** decimals)),
+                TOKEN_BALANCE: cleanDataNative(balance, decimals), // (balance.toString() / (10 ** decimals)),
             },
             POOL2: {
                 CURRENT_STATE: poolStateIdToName(pool2State.toString()),
                 TOTAL_SHARE: ts2,
                 YOUR_SHARE: tc2,
-                TOTAL_CLAIMABLE_MGN: (totalClaimableMgn2.toString() / (10 ** 18)),
-                TOTAL_CLAIMABLE_DEPOSIT: (totalClaimableDeposit2.toString() / (10 ** decimals2)),
-                TOKEN_BALANCE: (balance2.toString() / (10 ** decimals2)),
+                TOTAL_CLAIMABLE_MGN: tcMgnEth2,
+                TOTAL_CLAIMABLE_DEPOSIT: cleanDataNative(totalClaimableDeposit2, decimals2), // (totalClaimableDeposit2.toString() / (10 ** decimals2)),
+                TOKEN_BALANCE: cleanDataNative(balance2, decimals2), // (balance2.toString() / (10 ** decimals2)),
             },
-        }  
+        }
     } catch (error) {
         console.error(error)
     }
 }
 
-export const AccountSub = createStatefulSub(fetchAccountData, { account: 'loading...' })
+export const AccountSub = createStatefulSub(fetchAccountData, { account: DATA_LOAD_STRING })
 
-export const NetworkSub = createStatefulSub(fetchNetwork, { network: 'loading...' })
+export const NetworkSub = createStatefulSub(fetchNetwork, { network: DATA_LOAD_STRING })
 
 export const ETHbalanceSub = createStatefulSub(fetchETHBalance, { balance: '0' })
-export const BlockSub = createStatefulSub(fetchBlockTimestamp, { blockInfo: 'loading...' })
+export const BlockSub = createStatefulSub(fetchBlockTimestamp, { blockInfo: DATA_LOAD_STRING })
 
 export const MGNBalancesSub = createStatefulSub(fetchMGNBalances, {
-    MGN_BALANCE: 'loading...',
-    LOCKED_MGN_BALANCE: 'loading...',
-    UNLOCKED_MGN_BALANCE: 'loading...',
+    MGN_BALANCE: DATA_LOAD_STRING,
+    LOCKED_MGN_BALANCE: DATA_LOAD_STRING,
+    UNLOCKED_MGN_BALANCE: DATA_LOAD_STRING,
 })
 
 export const MGNPoolDataSub = createStatefulSub(fetchMgnPoolData, {
     POOL1: {
-        CURRENT_STATE: 'loading...',
-        TOTAL_SHARE: 'loading...',
-        YOUR_SHARE: 'loading...',
-        TOTAL_CLAIMABLE_MGN: 'loading...',
-        TOTAL_CLAIMABLE_DEPOSIT: 'loading...',
-        TOKEN_BALANCE: 'loading...',
+        CURRENT_STATE: DATA_LOAD_STRING,
+        TOTAL_SHARE: DATA_LOAD_STRING,
+        YOUR_SHARE: DATA_LOAD_STRING,
+        TOTAL_CLAIMABLE_MGN: DATA_LOAD_STRING,
+        TOTAL_CLAIMABLE_DEPOSIT: DATA_LOAD_STRING,
+        TOKEN_BALANCE: DATA_LOAD_STRING,
     },
     POOL2: {
-        CURRENT_STATE: 'loading...',
-        TOTAL_SHARE: 'loading...',
-        YOUR_SHARE: 'loading...',
-        TOTAL_CLAIMABLE_MGN: 'loading...',
-        TOTAL_CLAIMABLE_DEPOSIT: 'loading...',
-        TOKEN_BALANCE: 'loading...',
+        CURRENT_STATE: DATA_LOAD_STRING,
+        TOTAL_SHARE: DATA_LOAD_STRING,
+        YOUR_SHARE: DATA_LOAD_STRING,
+        TOTAL_CLAIMABLE_MGN: DATA_LOAD_STRING,
+        TOTAL_CLAIMABLE_DEPOSIT: DATA_LOAD_STRING,
+        TOKEN_BALANCE: DATA_LOAD_STRING,
     },
 }, {
-    _shouldUpdate(prevState, nextState) {
-        if (!prevState) return true
-        
-        return prevState.POOL1.YOUR_SHARE !== (nextState.POOL1.YOUR_SHARE)
-            || prevState.POOL2.YOUR_SHARE !== (nextState.POOL2.YOUR_SHARE)
-            || prevState.POOL1.TOTAL_SHARE !== (nextState.POOL1.TOTAL_SHARE)
-            || prevState.POOL2.TOTAL_SHARE !== (nextState.POOL2.TOTAL_SHARE)
-            || prevState.POOL1.CURRENT_STATE !== (nextState.POOL1.CURRENT_STATE)
-            || prevState.POOL2.CURRENT_STATE !== (nextState.POOL2.CURRENT_STATE)
-            || prevState.POOL1.TOTAL_CLAIMABLE_MGN !== (nextState.POOL1.TOTAL_CLAIMABLE_MGN)
-            || prevState.POOL2.TOTAL_CLAIMABLE_MGN !== (nextState.POOL2.TOTAL_CLAIMABLE_MGN)
-            || prevState.POOL1.TOTAL_CLAIMABLE_DEPOSIT !== (nextState.POOL1.TOTAL_CLAIMABLE_DEPOSIT)
-            || prevState.POOL2.TOTAL_CLAIMABLE_DEPOSIT !== (nextState.POOL2.TOTAL_CLAIMABLE_DEPOSIT)
-    },
-})
+        _shouldUpdate(prevState, nextState) {
+            if (!prevState) return true
+
+            return prevState.POOL1.YOUR_SHARE !== (nextState.POOL1.YOUR_SHARE)
+                || prevState.POOL2.YOUR_SHARE !== (nextState.POOL2.YOUR_SHARE)
+                || prevState.POOL1.TOTAL_SHARE !== (nextState.POOL1.TOTAL_SHARE)
+                || prevState.POOL2.TOTAL_SHARE !== (nextState.POOL2.TOTAL_SHARE)
+                || prevState.POOL1.CURRENT_STATE !== (nextState.POOL1.CURRENT_STATE)
+                || prevState.POOL2.CURRENT_STATE !== (nextState.POOL2.CURRENT_STATE)
+                || prevState.POOL1.TOTAL_CLAIMABLE_MGN !== (nextState.POOL1.TOTAL_CLAIMABLE_MGN)
+                || prevState.POOL2.TOTAL_CLAIMABLE_MGN !== (nextState.POOL2.TOTAL_CLAIMABLE_MGN)
+                || prevState.POOL1.TOTAL_CLAIMABLE_DEPOSIT !== (nextState.POOL1.TOTAL_CLAIMABLE_DEPOSIT)
+                || prevState.POOL2.TOTAL_CLAIMABLE_DEPOSIT !== (nextState.POOL2.TOTAL_CLAIMABLE_DEPOSIT)
+        },
+    })
 
 export const GlobalSub = createMultiSub(AccountSub, BlockSub, ETHbalanceSub, MGNBalancesSub, MGNPoolDataSub, NetworkSub)
 
 GlobalSub.subscribe(() => {
     ETHbalanceSub.update()
     MGNPoolDataSub.update()
-    MGNBalancesSub.update()
+    // MGNBalancesSub.update()
     return NetworkSub.update()
 })
 

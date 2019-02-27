@@ -20,6 +20,9 @@ export const networkById = {
 export const GAS_LIMIT = 400000
 export const GAS_PRICE = 5e9
 
+export const FIXED_DECIMAL_AMOUNT = 4
+export const DATA_LOAD_STRING = 'loading...'
+
 export const WEBSOCKET_URLS = {
   MAIN: 'wss://mainnet.infura.io/ws/v3/fb2b930672ff4872bfcad69671f2dfd4',
   RINKEBY: 'wss://rinkeby.infura.io/ws/v3/fb2b930672ff4872bfcad69671f2dfd4',
