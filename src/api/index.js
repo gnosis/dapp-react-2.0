@@ -258,7 +258,22 @@ export const calculateClaimableMgnAndDeposits = async (userAccount) => {
     totalClaimableDeposit2,
   }
 }
-window.calculateClaimableMgnAndDeposits = calculateClaimableMgnAndDeposits
+
+/**
+ * getCurrentPoolingEndTimes
+ * @returns { Promise<"BN"[]> } - Promise<BN[]>
+ */
+export const getCurrentPoolingEndTimes = async () => {
+  const { DxPool: { getCurrentPoolingEndTime1, getCurrentPoolingEndTime2 } } = await getAPI()
+
+  const [currentPoolingEndTime1, currentPoolingEndTime2] = await Promise.all([
+    getCurrentPoolingEndTime1(),
+    getCurrentPoolingEndTime2(),
+  ])
+
+  return [currentPoolingEndTime1, currentPoolingEndTime2]
+}
+
 /**
  * calculateDxMgnPoolState
  * @description Grabs all relevant DxMgnPool state as a batch
@@ -274,6 +289,7 @@ export const calculateDxMgnPoolState = async (userAccount) => {
     [totalContribution1, totalContribution2],
     [depositTokenObj, secondaryTokenObj],
     [pool1State, pool2State],
+    [currentPoolingEndTime1, currentPoolingEndTime2],
   ] = await Promise.all([
     getMGNTokenAddress(),
     getAllMGNTokenBalances(userAccount),
@@ -281,6 +297,7 @@ export const calculateDxMgnPoolState = async (userAccount) => {
     calculateUserParticipation(userAccount),
     getPoolTokensInfo(),
     getPoolInternalState(),
+    getCurrentPoolingEndTimes(),
   ])
 
   return {
@@ -296,6 +313,8 @@ export const calculateDxMgnPoolState = async (userAccount) => {
     secondaryTokenObj,
     pool1State, 
     pool2State,
+    currentPoolingEndTime1,
+    currentPoolingEndTime2,
   }
 }
 

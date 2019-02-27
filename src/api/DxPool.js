@@ -131,6 +131,17 @@ async function init() {
   const calculateClaimableMgnAndDeposits2 = async userAccount => dxMP2.getAllClaimableMgnAndDeposits.call(userAccount)
 
   /**
+   * calculateClaimableMgnAndDeposits1
+   * @returns { Promise<"BN"> } - Promise<BN>
+   */
+  const getCurrentPoolingEndTime1 = async () => dxMP1.poolingPeriodEndTime.call()
+  /**
+   * calculateClaimableMgnAndDeposits2
+   * @returns { Promise<"BN"> } - Promise<BN>
+   */
+  const getCurrentPoolingEndTime2 = async () => dxMP2.poolingPeriodEndTime.call()
+
+  /**
    * withdrawMGNandDepositsFromPools
    */
   const withdrawMGNandDepositsFromPools = async () => coord.withdrawMGNandDepositsFromBothPools({ gas: GAS_LIMIT, gasPrice: GAS_PRICE })
@@ -177,6 +188,8 @@ async function init() {
     lockMGN,
     depositIntoPool1,
     depositIntoPool2,
+    getCurrentPoolingEndTime1,
+    getCurrentPoolingEndTime2,
     calculateClaimableMgnAndDeposits1,
     calculateClaimableMgnAndDeposits2,
     withdrawMGNandDepositsFromPools,

@@ -285,7 +285,8 @@ function AppProvider(props) {
       { MGN_BALANCE, LOCKED_MGN_BALANCE, UNLOCKED_MGN_BALANCE }, 
       { 
         POOL1: { 
-          CURRENT_STATE, 
+          CURRENT_STATE,
+          POOLING_PERIOD_END,
           TOTAL_SHARE, 
           YOUR_SHARE, 
           TOKEN_BALANCE, 
@@ -293,7 +294,8 @@ function AppProvider(props) {
           TOTAL_CLAIMABLE_DEPOSIT, 
         }, 
         POOL2: { 
-          CURRENT_STATE: CURRENT_STATE2, 
+          CURRENT_STATE: CURRENT_STATE2,
+          POOLING_PERIOD_END: POOLING_PERIOD_END2,
           TOTAL_SHARE: TOTAL_SHARE2, 
           YOUR_SHARE: YOUR_SHARE2, 
           TOKEN_BALANCE: TOKEN_BALANCE2, 
@@ -343,6 +345,7 @@ function AppProvider(props) {
       pool: 'POOL1',
       payload: {
         CURRENT_STATE,
+        POOLING_PERIOD_END,
         TOTAL_SHARE,
         YOUR_SHARE,
         TOTAL_CLAIMABLE_MGN,
@@ -350,7 +353,7 @@ function AppProvider(props) {
         TOKEN_BALANCE,
       },
     }) 
-  }, [CURRENT_STATE, TOTAL_SHARE, YOUR_SHARE, TOKEN_BALANCE, TOTAL_CLAIMABLE_MGN, TOTAL_CLAIMABLE_DEPOSIT])
+  }, [CURRENT_STATE, POOLING_PERIOD_END, TOTAL_SHARE, YOUR_SHARE, TOKEN_BALANCE, TOTAL_CLAIMABLE_MGN, TOTAL_CLAIMABLE_DEPOSIT])
 
   // useEffect - only update State when subscriber user Account changes
   useEffect(() => {
@@ -359,6 +362,7 @@ function AppProvider(props) {
       pool: 'POOL2',
       payload: {
         CURRENT_STATE: CURRENT_STATE2,
+        POOLING_PERIOD_END: POOLING_PERIOD_END2,
         TOTAL_SHARE: TOTAL_SHARE2,
         YOUR_SHARE: YOUR_SHARE2,
         TOTAL_CLAIMABLE_MGN: TOTAL_CLAIMABLE_MGN2,
@@ -366,7 +370,7 @@ function AppProvider(props) {
         TOKEN_BALANCE: TOKEN_BALANCE2,
       },
     }) 
-  }, [CURRENT_STATE2, TOTAL_SHARE2, YOUR_SHARE2, TOKEN_BALANCE2, TOTAL_CLAIMABLE_MGN2, TOTAL_CLAIMABLE_DEPOSIT2])
+  }, [CURRENT_STATE2, POOLING_PERIOD_END2, TOTAL_SHARE2, YOUR_SHARE2, TOKEN_BALANCE2, TOTAL_CLAIMABLE_MGN2, TOTAL_CLAIMABLE_DEPOSIT2])
 
   const dispatchers = {
     // DX-MGN DISPATCHERS

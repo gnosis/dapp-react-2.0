@@ -75,6 +75,8 @@ const fetchMgnPoolData = async () => {
                 pool2State,
                 depositTokenObj: { balance, decimals },
                 secondaryTokenObj: { balance: balance2, decimals: decimals2 },
+                currentPoolingEndTime1,
+                currentPoolingEndTime2,
             },
             {
                 totalClaimableMgn,
@@ -106,6 +108,7 @@ const fetchMgnPoolData = async () => {
         return {
             POOL1: {
                 CURRENT_STATE: poolStateIdToName(pool1State.toString()),
+                POOLING_PERIOD_END: currentPoolingEndTime1.toString(),
                 TOTAL_SHARE: ts1,
                 YOUR_SHARE: tc1,
                 TOTAL_CLAIMABLE_MGN: tcMgnEth,
@@ -114,6 +117,7 @@ const fetchMgnPoolData = async () => {
             },
             POOL2: {
                 CURRENT_STATE: poolStateIdToName(pool2State.toString()),
+                POOLING_PERIOD_END: currentPoolingEndTime2.toString(),
                 TOTAL_SHARE: ts2,
                 YOUR_SHARE: tc2,
                 TOTAL_CLAIMABLE_MGN: tcMgnEth2,
@@ -142,6 +146,7 @@ export const MGNBalancesSub = createStatefulSub(fetchMGNBalances, {
 export const MGNPoolDataSub = createStatefulSub(fetchMgnPoolData, {
     POOL1: {
         CURRENT_STATE: DATA_LOAD_STRING,
+        POOLING_PERIOD_END: null,
         TOTAL_SHARE: DATA_LOAD_STRING,
         YOUR_SHARE: DATA_LOAD_STRING,
         TOTAL_CLAIMABLE_MGN: DATA_LOAD_STRING,
@@ -150,6 +155,7 @@ export const MGNPoolDataSub = createStatefulSub(fetchMgnPoolData, {
     },
     POOL2: {
         CURRENT_STATE: DATA_LOAD_STRING,
+        POOLING_PERIOD_END: null,
         TOTAL_SHARE: DATA_LOAD_STRING,
         YOUR_SHARE: DATA_LOAD_STRING,
         TOTAL_CLAIMABLE_MGN: DATA_LOAD_STRING,
@@ -166,6 +172,8 @@ export const MGNPoolDataSub = createStatefulSub(fetchMgnPoolData, {
                 || prevState.POOL2.TOTAL_SHARE !== (nextState.POOL2.TOTAL_SHARE)
                 || prevState.POOL1.CURRENT_STATE !== (nextState.POOL1.CURRENT_STATE)
                 || prevState.POOL2.CURRENT_STATE !== (nextState.POOL2.CURRENT_STATE)
+                || prevState.POOL1.POOLING_PERIOD_END !== (nextState.POOL1.POOLING_PERIOD_END)
+                || prevState.POOL2.POOLING_PERIOD_END !== (nextState.POOL2.POOLING_PERIOD_END)
                 || prevState.POOL1.TOTAL_CLAIMABLE_MGN !== (nextState.POOL1.TOTAL_CLAIMABLE_MGN)
                 || prevState.POOL2.TOTAL_CLAIMABLE_MGN !== (nextState.POOL2.TOTAL_CLAIMABLE_MGN)
                 || prevState.POOL1.TOTAL_CLAIMABLE_DEPOSIT !== (nextState.POOL1.TOTAL_CLAIMABLE_DEPOSIT)
@@ -178,7 +186,7 @@ export const GlobalSub = createMultiSub(AccountSub, BlockSub, ETHbalanceSub, MGN
 GlobalSub.subscribe(() => {
     ETHbalanceSub.update()
     MGNPoolDataSub.update()
-    // MGNBalancesSub.update()
+    MGNBalancesSub.update()
     return NetworkSub.update()
 })
 
