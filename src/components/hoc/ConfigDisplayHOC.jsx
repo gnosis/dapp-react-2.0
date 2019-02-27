@@ -46,6 +46,4 @@ const ConfigDisplayerHOC = Component =>
     }
   }
 
-/* <div className="loadingHOC"><h1>LOADING . . .</h1></div> */
-
 export default ConfigDisplayerHOC

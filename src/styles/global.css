@@ -22,7 +22,7 @@ body::-webkit-scrollbar-track {
  
 body::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.767);
+    background-color: rgba(0, 0, 0, 0.507);
     outline: 1px solid slategrey;
 }
 
@@ -38,6 +38,10 @@ body::-webkit-scrollbar-thumb {
 section {
     margin: auto;
     width: 100%;
+}
+
+small {
+    font-size: 14px;
 }
 
 li {

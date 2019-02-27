@@ -38,7 +38,10 @@ function WalletIntegration({
 
     startSubscriptions().then((i) => {
       sub = i
-    }).catch(console.error)
+    }).catch((err) => {
+      console.error(err)
+      return sub()
+    })
 
     return () => sub()
   }, [])
@@ -73,9 +76,6 @@ function WalletIntegration({
       // interface with contracts & connect entire DX API
       // grabbing eth here to show contrived example of state
       await getAppContracts()
-
-      // registers/saves contracts to StateProvider
-      // saveContractToState(contracts)
 
       // INIT main API
       await getAPI()

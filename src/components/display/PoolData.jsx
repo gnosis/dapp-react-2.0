@@ -2,12 +2,11 @@ import React from 'react'
 import { connect } from '../StateProvider'
 
 import AsyncActionsHOC from '../hoc/AsyncActionsHOC'
+import DataDisplayVisualContainer from './DataDisplay'
 import { TextInput } from '../controls/ControlledInput'
 
 import { withdrawMGNandDepositsFromAllPools } from '../../api'
-import { cleanData } from '../../api/utils'
 import { POOL_STATES } from '../../globals'
-import DataDisplayVisualContainer from './DataDisplay';
 
 const DepositToken = AsyncActionsHOC(TextInput)
 const WithdrawMGNandDepositsFromBothPools = AsyncActionsHOC()
@@ -25,12 +24,15 @@ const PoolData = ({
                 {/* POOL 1 */}
                 <pre className="poolDataContainer data-pre-blue">
                     <h4>- {DX_MGN_POOL.POOL1.DEPOSIT_TOKEN} [{DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL.toLowerCase()}] -</h4>
-                    <p>Status: {DX_MGN_POOL.POOL1.CURRENT_STATE}</p>
+                    <p>Status: <strong>{DX_MGN_POOL.POOL1.CURRENT_STATE.toUpperCase()}</strong></p>
+                    <hr />
                     <p>TOTAL POOL SHARE: {DX_MGN_POOL.POOL1.TOTAL_SHARE}</p>
-                    <p>YOUR TOTAL SHARE: {DX_MGN_POOL.POOL1.YOUR_SHARE}</p>
+                    <p>YOUR CONTRIBUTION: {DX_MGN_POOL.POOL1.YOUR_SHARE}</p>
+                    <hr />
                     <p>TOTAL CLAIMABLE MGN: {DX_MGN_POOL.POOL1.TOTAL_CLAIMABLE_MGN}</p>
                     <p>TOTAL CLAIMABLE DEPOSIT: {DX_MGN_POOL.POOL1.TOTAL_CLAIMABLE_DEPOSIT}</p>
-                    <p>{DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL} WALLET BALANCE: {cleanData(DX_MGN_POOL.POOL1.TOKEN_BALANCE)}</p>
+                    <hr />
+                    <p>[<strong>{DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL}</strong>] WALLET BALANCE: {DX_MGN_POOL.POOL1.TOKEN_BALANCE}</p>
 
                     <hr />
                     <DepositToken
@@ -45,12 +47,15 @@ const PoolData = ({
                 {/* POOL 2 */}
                 <pre className="poolDataContainer data-pre-purple">
                     <h4>- {DX_MGN_POOL.POOL1.SECONDARY_TOKEN} [{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL.toLowerCase()}] -</h4>
-                    <p>Status: {DX_MGN_POOL.POOL2.CURRENT_STATE}</p>
+                    <p>Status: <strong>{DX_MGN_POOL.POOL2.CURRENT_STATE.toUpperCase()}</strong></p>
+                    <hr />
                     <p>TOTAL POOL SHARE: {DX_MGN_POOL.POOL2.TOTAL_SHARE}</p>
-                    <p>YOUR TOTAL SHARE: {DX_MGN_POOL.POOL2.YOUR_SHARE}</p>
+                    <p>YOUR CONTRIBUTION: {DX_MGN_POOL.POOL2.YOUR_SHARE}</p>
+                    <hr />
                     <p>TOTAL CLAIMABLE MGN: {DX_MGN_POOL.POOL2.TOTAL_CLAIMABLE_MGN}</p>
                     <p>TOTAL CLAIMABLE DEPOSIT: {DX_MGN_POOL.POOL2.TOTAL_CLAIMABLE_DEPOSIT}</p>
-                    <p>{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL} WALLET BALANCE: {cleanData(DX_MGN_POOL.POOL2.TOKEN_BALANCE)}</p>
+                    <hr />
+                    <p>[<strong>{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL}</strong>] WALLET BALANCE: {DX_MGN_POOL.POOL2.TOKEN_BALANCE}</p>
 
                     <hr />
                     <DepositToken
@@ -88,13 +93,11 @@ const mapProps = ({
         DX_MGN_POOL,
         INPUT_AMOUNT,
     },
-    setDxMgnPoolState,
     setDepositAmount,
     setInputAmount,
 }) => ({
     DX_MGN_POOL,
     INPUT_AMOUNT,
-    setDxMgnPoolState,
     setDepositAmount,
     setInputAmount,
 })

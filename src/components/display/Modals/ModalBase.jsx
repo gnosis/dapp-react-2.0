@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom'
 const modalRoot = document.getElementById('modal')
 
 function ModalBase({
-    // header = 'Loading . . . ',
     children,
 }) {
     const element = document.createElement('div')
@@ -23,10 +22,5 @@ function ModalBase({
         element,
     )
 }
-
-/* <div className="loadingHOC">
-    <h1>{header}</h1>
-    {render}
-</div> */
 
 export default ModalBase
