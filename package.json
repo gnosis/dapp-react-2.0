@@ -15,7 +15,7 @@
     "migrate": "npx truffle migrate --reset",
     "start": "npm run dev",
     "start:local": "npm run dev",
-    "start:localProd": "cross-env SHOW_APP_DATA=true NODE_ENV='production' npm run dev",
+    "start:localProd": "cross-env SHOW_APP_DATA=true FE_CONDITIONAL_ENV='production' npm run dev",
     "rpc": "npx ganache-cli -d --mnemonic 'candy maple cake sugar pudding cream honey rich smooth crumble sweet treat' --defaultBalanceEther '5000'",
     "deploy": "npm run setup-rpc",
     "setup-rpc": "npx truffle migrate",
