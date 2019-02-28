@@ -104,7 +104,7 @@ const fetchMgnPoolData = async () => {
             totalClaimableMgn,
             totalClaimableMgn2,
         ].map(i => cleanDataFromWei(i))
-
+        
         return {
             POOL1: {
                 CURRENT_STATE: poolStateIdToName(pool1State.toString()),

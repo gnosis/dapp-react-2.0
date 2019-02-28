@@ -96,7 +96,7 @@ const netIdToWebsocket = (id) => {
 }
 
 // const cleanData = data => (data && isBN(data) ? fromWei(data) : data)
-const cleanDataFromWei = data => (data && data !== DATA_LOAD_STRING) && Number(fromWei(data)).toFixed(FIXED_DECIMAL_AMOUNT)
+const cleanDataFromWei = data => (data && data !== DATA_LOAD_STRING) && Number(fromWei(data.toString())).toFixed(FIXED_DECIMAL_AMOUNT)
 const cleanDataNative = (data, dec) => (data && data !== DATA_LOAD_STRING) && Number(toBN(data).div(toBN(10).pow(toBN(dec)))).toFixed(FIXED_DECIMAL_AMOUNT)
 const mapTS = (arr, type) => (Array.isArray(arr) ? arr : [arr]).map(item => (type === 'fromWei' && isBN(item) ? fromWei(item) : item).toString())
 
