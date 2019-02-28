@@ -18,27 +18,28 @@ const UserStateDisplay = ({ NETWORK, USER, MGN_BALANCES }) =>
   <DataDisplayVisualContainer
     title="Connected Wallet"
     colour="salmon"
-    height={540}
+    height={560}
     transition
   >
     {() =>
-    <>
-      <h5>- Account + netWoRk -</h5>
-      <p>ACCOUNT: {USER.ACCOUNT}</p>
-      <p>NETWORK: {NETWORK}</p>
-      <p>[ETH] BALANCE: {USER.BALANCE && USER.BALANCE}</p>
-      <hr />
+      <>
+        <h5>- Account + netWoRk -</h5>
+        <p>ACCOUNT: {USER.ACCOUNT}</p>
+        <p>NETWORK: {NETWORK}</p>
+        <p>[ETH] BALANCE: {USER.BALANCE && USER.BALANCE}</p>
+        <hr />
 
-      <h5>- mgn bAlances -</h5>
-      {Object.keys(MGN_BALANCES).map(key => <p key={key + Math.random()}>{key.toUpperCase().split('_').join(' ')}: {cleanDataFromWei(MGN_BALANCES[key])}</p>)}
-      
-      <LockMGN 
-        asyncAction={lockAllMgn}
-        forceDisable={MGN_BALANCES.BALANCE === DATA_LOAD_STRING || MGN_BALANCES.BALANCE <= 0}
-        buttonText="Lock"
-        title="Lock Mgn Tokens"
-      />
-    </>
+        <h5>- mgn bAlances -</h5>
+        {Object.keys(MGN_BALANCES).map(key => <p key={key + Math.random()}>{key.toUpperCase().split('_').join(' ')}: {cleanDataFromWei(MGN_BALANCES[key])}</p>)}
+        <hr />
+        <LockMGN 
+          asyncAction={lockAllMgn}
+          buttonText="Lock"
+          forceDisable={MGN_BALANCES.BALANCE === DATA_LOAD_STRING || MGN_BALANCES.BALANCE <= 0}
+          info="Lock all your MGN at the end of the Pooling period - button will automatically enable itself"
+          title="Lock Mgn Tokens"
+        />
+      </>
     }
   </DataDisplayVisualContainer>
 

@@ -59,7 +59,7 @@ const AsyncActionsHOC = Component => ({
 
     return (
         <div className="asyncActionContainer">  
-            <h5>{title} {info && <span className="info" onClick={handleInfoButtonClick}>info</span>} </h5>
+            <h5>{title} {info && <span className="info" title="Click for more info" onClick={handleInfoButtonClick}>info</span>} </h5>
             {info && viewInfoStatus && 
                 <DataDisplayVisualContainer
                     colour="info"

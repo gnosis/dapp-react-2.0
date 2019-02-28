@@ -2,7 +2,7 @@
 
 body {
     font-family: 'Major Mono Display', monospace;
-    min-width: 630px;
+    min-width: 500px;
     font-size: 1.4rem;
 
     display: flex;
@@ -123,6 +123,15 @@ hr {
     background-color: #fdf6fc;
 }
 
+.data-pre-greenGradient {
+    background: linear-gradient(-45deg, #a8ff78, #78ffd6);
+    background-size: 600% 600%;
+
+    -webkit-animation: GradientAnimation 9s ease infinite;
+    -moz-animation: GradientAnimation 9s ease infinite;
+    animation: GradientAnimation 9s ease infinite;
+}
+
 .data-pre-error {
     background-color: lightpink;
     font-size: 12px;
@@ -136,10 +145,11 @@ hr {
     background: lightyellow;
     font-size: 10px;
     font-weight: 600;
+    text-align: center;
     white-space: pre-wrap;
     
     margin: -17px 0 15px;
-    padding: 3px 8px;
+    padding: 5px 10px;
     width: auto;
 }
 

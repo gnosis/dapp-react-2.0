@@ -5,7 +5,7 @@ function Countdown({
     BLOCK_TIMESTAMP,
     POOLING_PERIOD_END,
 }) { 
-    const [timeDifference, setTimeDifference] = useState(POOLING_PERIOD_END - BLOCK_TIMESTAMP)
+    const [timeDifference, setTimeDifference] = useState((POOLING_PERIOD_END - BLOCK_TIMESTAMP) || '...')
 
     useEffect(() => {
         if (BLOCK_TIMESTAMP && POOLING_PERIOD_END) {

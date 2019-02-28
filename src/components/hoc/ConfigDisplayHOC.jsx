@@ -10,7 +10,6 @@ const ConfigDisplayerHOC = Component =>
   class extends React.Component {
     state = {
       ENV: process.env.NODE_ENV,
-      TIME: (new Date()).toString(),
     }
     render() {
       return (
@@ -19,7 +18,7 @@ const ConfigDisplayerHOC = Component =>
           <DataDisplayContainer
             title="Development Context"
             colour="yellow"
-            height={600}
+            height={440}
             startOpen={false}
             transition
           >
@@ -30,7 +29,7 @@ const ConfigDisplayerHOC = Component =>
                 ))}
                 <h5>- Contracts in use -</h5>
                 {Object.keys(contractNetworks).map(contract => (
-                  <pre key={contract}>{`${contract}: ${JSON.stringify(contractNetworks[contract], undefined, 2)}`}</pre>
+                  <pre key={contract} style={{ fontSize: 10, whiteSpace: 'pre-wrap' }}>{`${contract}: ${JSON.stringify(contractNetworks[contract], undefined, 2)}`}</pre>
                 ))}
               </>
             }

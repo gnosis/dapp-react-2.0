@@ -82,25 +82,25 @@ const PoolData = ({
                     />
                     <Countdown POOLING_PERIOD_END={DX_MGN_POOL.POOL2.POOLING_PERIOD_END} />
                 </pre>
-            </div>
-            
-            {
+                {
                 DX_MGN_POOL.POOL1.CURRENT_STATE === POOL_STATES.MGN_UNLOCKED 
                 && DX_MGN_POOL.POOL2.CURRENT_STATE === POOL_STATES.MGN_UNLOCKED 
                 && 
                 <DataDisplayVisualContainer
-                    colour="green"
+                    colour="greenGradient"
                     title={null}
                 >
                     {() =>
                         <WithdrawMGNandDepositsFromBothPools 
                             asyncAction={withdrawMGNandDepositsFromAllPools}
-                            title="Withdraw All MGn + deposits from both pooLs"
+                            title="Withdraw MGn + deposits [both pooLs]"
                             buttonText="Withdraw"
+                            info="Withdraw any of your MGN + Deposits from both pools"
                         />
                     }
                 </DataDisplayVisualContainer>
             }
+            </div>
         </div>
     </>
 
