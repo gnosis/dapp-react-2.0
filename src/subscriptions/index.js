@@ -2,9 +2,9 @@ import { createSubscription } from 'create-subscription'
 
 import {
     getAPI,
-    fillDefaultAccount,
     calculateClaimableMgnAndDeposits,
     calculateDxMgnPoolState,
+    fillDefaultAccount,
 } from '../api'
 import { fromWei, mapTS, poolStateIdToName, cleanDataFromWei, cleanDataNative } from '../api/utils'
 

@@ -33,31 +33,17 @@ function WalletIntegration({
     providersArray.forEach(() => { registerProviders(providersArray) })
   }, [])
 
-  useEffect(() => {
-    let sub
-
-    startSubscriptions().then((i) => {
-      sub = i
-    }).catch((err) => {
-      console.error(err)
-      return sub()
-    })
-
-    return () => sub()
-  }, [])
-
-  // const saveContractToState = contracts => Object.keys(contracts).forEach(name => saveContract({ name, contract: contracts[name] }))
-
   /**
    * onChange Event Handler
    * @param { providerInfo } @type { ProviderObject }
    * @memberof WalletIntegration
    */
   const onChange = async (providerInfo) => {
+    // App state subscriptions
+    let unsub
     try {
       // Set Modal
       showModal('Loading user data . . .')
-      // appLoading(true)
 
       // State setters
       _setError(undefined)
@@ -74,27 +60,30 @@ function WalletIntegration({
       _setActiveProviderState(true)
 
       // interface with contracts & connect entire DX API
-      // grabbing eth here to show contrived example of state
       await getAppContracts()
 
       // INIT main API
       await getAPI()
 
-      // Set pool token info
+      // Start socket state subscriptions
+      unsub = await startSubscriptions()
+
+      // Lazy load pool token info
       setPoolTokenInfo()
 
       // Hide Modal, all good!
       showModal(undefined)
-      // appLoading(false)
 
       return _setInitialising(false)
     } catch (err) {
       console.error(err)
-      showModal(undefined)
-      // appLoading(false)
-      
+
+      showModal(undefined)      
       _setInitialising(false)
-      return _setError(error)
+      _setError(error)
+
+      // Unsubscribe
+      return unsub()
     }
   }
 
