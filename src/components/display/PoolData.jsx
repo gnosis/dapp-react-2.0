@@ -42,6 +42,11 @@ const PoolData = ({
                         forceDisable={DX_MGN_POOL.POOL1.CURRENT_STATE !== POOL_STATES.POOLING}
                         inputChangeDispatch={setInputAmount}
                         globalInput={INPUT_AMOUNT}
+                        info={
+                            DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL === 'WETH' ? 
+                            '[WETH] You may need to sign up to 3 TXs [Wrap, Approve, Deposit]' : 
+                            `[${DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL}] You may need to sign up to 2 TXs [Approve, Deposit]`
+                        }
                         title={`deposit [${DX_MGN_POOL.POOL1.DEPOSIT_TOKEN}]`}
                         {...DX_MGN_POOL}
                     />
@@ -67,6 +72,11 @@ const PoolData = ({
                         forceDisable={DX_MGN_POOL.POOL2.CURRENT_STATE !== POOL_STATES.POOLING}
                         inputChangeDispatch={setInputAmount}
                         globalInput={INPUT_AMOUNT}
+                        info={
+                            DX_MGN_POOL.POOL1.SECONDARY_SYMBOL === 'WETH' ? 
+                            '[WETH] You may need to sign up to 3 TXs [Wrap, Approve, Deposit]' : 
+                            `[${DX_MGN_POOL.POOL1.SECONDARY_SYMBOL}] You may need to sign up to 2 TXs [Approve, Deposit]`
+                        }
                         title={`deposit [${DX_MGN_POOL.POOL1.SECONDARY_TOKEN.toLowerCase()}]`}
                         {...DX_MGN_POOL}
                     />

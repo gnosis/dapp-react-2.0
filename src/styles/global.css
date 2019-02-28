@@ -72,6 +72,17 @@ hr {
     margin: 12px 2px -4px;
 }
 
+.info {
+    font-size: 8px;
+    cursor: pointer;
+    font-family: monospace;
+    background: #000;
+    color: #fff;
+    border-radius: 40px;
+    padding: 2px 6px;
+    vertical-align: middle;
+}
+
 .word-wrap {
     white-space: pre-wrap;
     overflow: hidden;
@@ -119,6 +130,17 @@ hr {
 
     white-space: pre-wrap;
     max-width: 70%;
+}
+
+.data-pre-info {
+    background: lightyellow;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: pre-wrap;
+    
+    margin: -17px 0 15px;
+    padding: 3px 8px;
+    width: auto;
 }
 
 form {

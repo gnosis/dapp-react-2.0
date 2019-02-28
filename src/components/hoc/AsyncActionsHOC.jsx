@@ -1,11 +1,14 @@
 import React, { /* useEffect, */ useState } from 'react'
 
+import DataDisplayVisualContainer from '../display/DataDisplay'
+
 const AsyncActionsHOC = Component => ({
     asyncAction,
     buttonText = 'Submit',
     forceDisable,
     inputChangeDispatch,
     globalInput,
+    info,
     title,
     ...rest
 }) => {
@@ -13,9 +16,12 @@ const AsyncActionsHOC = Component => ({
     // e.g on blockchain action - released on receipt
     const [buttonBlocked, setButtonBlocked] = useState(false)
     const [inputAmount, setInputAmount] = useState(null)
+    const [viewInfoStatus, setViewInfoStatus] = useState(false)
     const [error, setError] = useState(null)
 
     // useEffect()
+
+    const handleInfoButtonClick = () => setViewInfoStatus(!viewInfoStatus)
 
     const handleChange = ({ target }) => {
         setError(null)
@@ -53,7 +59,14 @@ const AsyncActionsHOC = Component => ({
 
     return (
         <div className="asyncActionContainer">  
-            <h5>{title}</h5>
+            <h5>{title} {info && <span className="info" onClick={handleInfoButtonClick}>info</span>} </h5>
+            {info && viewInfoStatus && 
+                <DataDisplayVisualContainer
+                    colour="info"
+                >
+                    {() => <span>{info}</span>}
+                </DataDisplayVisualContainer>
+            }
             {Component && 
                 <Component
                     disabled={forceDisable || buttonBlocked}
