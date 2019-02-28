@@ -40,6 +40,10 @@ section {
     width: 100%;
 }
 
+section.home {
+    margin: 15px auto auto;
+}
+
 small {
     font-size: 14px;
 }

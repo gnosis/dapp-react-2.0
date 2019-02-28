@@ -5,7 +5,7 @@ import UserStateDisplay from './UserStateDisplay'
 import Footer from './Footer'
 
 const Home = () => (
-  <section>
+  <section className="Home">
     {/* Show User's State */}
     <UserStateDisplay />
     
