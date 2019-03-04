@@ -4,7 +4,7 @@ import DataDisplayVisualContainer from '../display/DataDisplay'
 
 const AsyncActionsHOC = Component => ({
     asyncAction,
-    buttonText = 'Submit',
+    buttonText = 'subMit',
     forceDisable,
     inputChangeDispatch,
     globalInput,
