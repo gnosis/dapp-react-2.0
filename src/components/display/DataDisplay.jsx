@@ -27,7 +27,7 @@ const DataDisplayVisualContainer = (props) => {
     
     return (
       <>
-        {title && <h3 className="clickableHeader" onClick={() => setOpen(!open)}>{title} <small>(show/hide)</small></h3>}
+        {title && <h2 className="clickableHeader" onClick={() => setOpen(!open)}>{title} <small>(show/hide)</small></h2>}
         <pre className={`data-pre-${colour} word-wrap${!open ? ' hideContent' : ''}${transition ? ' transition' : ''}`} style={{ height }}>
           {children && children()}
           {<DataDisplay {...rest} />}

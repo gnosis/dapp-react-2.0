@@ -1,12 +1,19 @@
-@import url('https://fonts.googleapis.com/css?family=Major+Mono+Display|Permanent+Marker');
+@import '~typeface-permanent-marker';
+@import '~typeface-major-mono-display';
 
 body {
     font-family: 'Major Mono Display', monospace;
-    min-width: 500px;
-    font-size: 1.4rem;
-
+    
     display: flex;
     min-height: 100vh;
+    font-size: 24px;
+    margin: 0;
+}
+
+@media only screen and (max-width: 736px) {
+    body {
+        font-size: 22px;
+    }
 }
 
 body::-webkit-scrollbar {
@@ -29,7 +36,7 @@ body::-webkit-scrollbar-thumb {
 #app {
     display: flex;
     margin: auto;
-    padding: 50px 0;
+    padding: 50px 20px;
     flex-flow: column nowrap;
     /* min-height: 100vh; */
     min-width: 80vw;
@@ -45,7 +52,7 @@ section.home {
 }
 
 small {
-    font-size: 14px;
+    font-size: 0.5em;
 }
 
 li {
@@ -56,13 +63,26 @@ li {
 pre {
     padding: 10px 20px;
     border-radius: 30px;
+    white-space: pre-wrap;
+}
+
+p {
+    font-size: 1em;
+}
+
+pre > p > span.data-title {
+    font-size: 0.6em;
+}
+
+pre > p > span.data-date {
+    font-size: 0.72em;
 }
 
 pre.poolDataContainer > p {
     text-align: left;
 }
 
-pre > h1, pre > h2, pre > h3, pre > h4, pre > h5 {
+pre > h1, pre > h2, pre > h3, pre > h4, pre > h5, pre > h6 {
     font-family: 'Major Mono Display';
     font-weight: 900;
     font-style: italic;
@@ -76,8 +96,63 @@ hr {
     margin: 12px 2px -4px;
 }
 
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+
+  cursor: not-allowed;
+}
+
+button {
+    background-color: #fff; /* Green */
+    border: 1px solid #000;
+    border-radius: 10px;
+    color: #000;
+    
+    display: inline-block;
+    font-family: inherit;
+    font-size: 0.8em;
+    font-weight: 900;
+
+    margin: 4px 2px;
+    padding: 5px 17px;
+    text-align: center;
+    text-decoration: none;
+
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+
+}
+
+button[disabled]:hover {
+  background-color: #cccccc;
+  color: #666666;
+}
+
+button:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+input {
+    padding: 0.6em 0;
+    margin-bottom: 1.4em;
+    font-family: monospace;
+    font-size: 16px;
+    box-shadow: 0px 4px 11px 0px #0000004d;
+    outline: none;
+    border: none;
+}
+
+input[disabled], input:disabled {
+    box-shadow: none;
+}
+
 .info {
-    font-size: 8px;
+    font-size: 0.5em;
     cursor: pointer;
     font-family: monospace;
     background: #000;
@@ -147,7 +222,7 @@ hr {
 
 .data-pre-info {
     background: lightyellow;
-    font-size: 10px;
+    font-size: 0.5em;
     font-weight: 600;
     text-align: center;
     white-space: pre-wrap;
@@ -189,7 +264,9 @@ input[type="text"] {
     padding: 5px;
     
     font-family: 'Permanent Marker', cursive;
-    font-size: 28px;
+    font-size: 1.8em;
+    letter-spacing: 5px;
+    margin: 0.5em 0;
 }
 
 /* .providerChoice:hover {
@@ -226,6 +303,7 @@ input[type="text"] {
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
     
     position: fixed;
     background: linear-gradient(-45deg, #4c68c4, #72bbf7/* #e5a1fc */, #a2b2fe, #eec6fc);
@@ -234,10 +312,9 @@ input[type="text"] {
     -webkit-animation: GradientAnimation 9s ease infinite;
     -moz-animation: GradientAnimation 9s ease infinite;
     animation: GradientAnimation 9s ease infinite;
-    /* background: linear-gradient(-45deg, #72bbf7, #4c68c4);
-    animation: RetroGradient 2s ease infinite; */
 
     top: 0; left: 0; right: 0; bottom: 0;
+    padding: 20px;
 }
 
 .poolContainer, .poolInnerContainer {
@@ -272,6 +349,7 @@ input[type="text"] {
     flex-flow: column nowrap;
     align-items: center;
     
+    margin-top: 0.65em;
     padding: 0 5px 15px;
     font-family: 'Major Mono Display', monospace
 }
@@ -284,59 +362,13 @@ input[type="text"] {
     height: 0 !important;
 }
 
-button:disabled,
-button[disabled]{
-  border: 1px solid #999999;
-  background-color: #cccccc;
-  color: #666666;
-
-  cursor: not-allowed;
+.footerH {
+    font-size: 0.8em;
+    margin: 1em 0;
 }
 
-button {
-    background-color: #fff; /* Green */
-    border: 1px solid #000;
-    border-radius: 10px;
-    color: #000;
-    
-    display: inline-block;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 900;
-
-    margin: 4px 2px;
-    padding: 6px 22px;
-    text-align: center;
-    text-decoration: none;
-
-    -webkit-transition-duration: 0.4s; /* Safari */
-    transition-duration: 0.4s;
-    cursor: pointer;
-
-}
-
-button[disabled]:hover {
-  background-color: #cccccc;
-  color: #666666;
-}
-
-button:hover {
-    background-color: #000;
-    color: #fff;
-}
-
-input {
-    padding: 10px;
-    margin-bottom: 10px;
-    font-family: monospace;
-    font-size: 16px;
-    box-shadow: 0px 4px 11px 0px #0000004d;
-    outline: none;
-    border: none;
-}
-
-input[disabled], input:disabled {
-    box-shadow: none;
+.footerP {
+    font-size: 0.65em;
 }
 
 .loadGradient {

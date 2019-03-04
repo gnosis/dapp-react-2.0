@@ -44,7 +44,7 @@ export const BN_4_PERCENT = toBN(104)
 
 export const POOL_STATES = {
   POOLING: 'Pooling',
-  POOLING_ENDED: 'PoolingEnded',
-  DEPOSIT_WITHDRAW_FROM_DX: 'DepositWithdrawnFromDx',
-  MGN_UNLOCKED: 'MgnUnlocked',
+  POOLING_ENDED: 'Pooling Ended',
+  DEPOSIT_WITHDRAW_FROM_DX: 'Deposit Withdrawn From Dx',
+  MGN_UNLOCKED: 'Mgn Unlocked',
 }

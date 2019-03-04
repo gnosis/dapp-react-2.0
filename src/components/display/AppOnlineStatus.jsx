@@ -13,7 +13,7 @@ const AppOnlineStatusBar = () => {
   const isOnline = useAppOnlineStatus()
   return (
     <div style={{ ...statusBar, background: isOnline ? '#aaffaa' : '#ff7a7a' }}>
-      <pre style={{ fontFamily: 'inherit', margin: 5, fontSize: 15, lineHeight: 0.4 }}>APP STATUS: {isOnline ? 'ONLINE' : 'OFFLINE'}</pre>
+      <pre style={{ fontFamily: 'inherit', margin: 5, fontSize: '0.5em', lineHeight: 0.4 }}>APP STATUS: {isOnline ? 'ONLINE' : 'OFFLINE'}</pre>
     </div>
   )
 }

@@ -127,6 +127,11 @@ const shallowDifferent = (obj1, obj2) => {
   return keys1.some(key => !Object.is(flatObj1[key], flatObj2[key]))
 }
 
+const splitAddress = (addr) => {
+	const { length } = addr
+	return addr.slice(0, 6) + '...' + addr.slice(length - 4)
+}
+
 const poolStateIdToName = (id) => {
   switch (id) {
     case '0':
@@ -163,6 +168,7 @@ export {
   flattener,
   shallowDifferent,
   poolStateIdToName,
+  splitAddress,
 }
 
 /**
