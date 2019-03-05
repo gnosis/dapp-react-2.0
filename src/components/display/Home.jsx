@@ -7,13 +7,17 @@ import Footer from './Footer'
 const Home = () => (
   <section className="Home">
     {/* Show User's State */}
-    <UserStateDisplay />
+    <section className="UserState">
+      <UserStateDisplay />
+    </section>
     
     {/* DxMgnPool Data */}
-    <PoolData />
+    <section className="PoolData">
+      <PoolData />
+      {/* Footer */}
+      <Footer />
+    </section>
 
-    {/* Footer */}
-    <Footer />
   </section>
 )
 

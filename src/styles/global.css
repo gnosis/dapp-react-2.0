@@ -6,14 +6,9 @@ body {
     
     display: flex;
     min-height: 100vh;
+    min-width: 350px;
     font-size: 24px;
     margin: 0;
-}
-
-@media only screen and (max-width: 736px) {
-    body {
-        font-size: 22px;
-    }
 }
 
 body::-webkit-scrollbar {
@@ -36,10 +31,10 @@ body::-webkit-scrollbar-thumb {
 #app {
     display: flex;
     margin: auto;
-    padding: 50px 20px;
+    padding: 50px 10px;
     flex-flow: column nowrap;
     /* min-height: 100vh; */
-    min-width: 80vw;
+    min-width: 93vw;
 }
 
 section {
@@ -68,6 +63,12 @@ pre {
 
 p {
     font-size: 1em;
+}
+
+section.Home p {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 pre > p > span.data-title {
@@ -149,6 +150,26 @@ input {
 
 input[disabled], input:disabled {
     box-shadow: none;
+}
+
+section.Home {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+section.PoolData, section.UserState {
+    flex: 1;
+}
+
+.PoolData {
+    margin: 0 10px;
+    min-width: 690px;
+}
+
+.UserState {
+    margin: 0 10px auto;
+    max-width: 22%;
+    min-width: 370px;
 }
 
 .info {
@@ -269,10 +290,6 @@ input[type="text"] {
     margin: 0.5em 0;
 }
 
-/* .providerChoice:hover {
-    background: white;
-} */
-
 #apiContainer {
     display: flex;
     flex-flow: column;
@@ -380,6 +397,8 @@ input[type="text"] {
     animation: GradientAnimation 30s ease infinite;
 }
 
+/* ANIMATION */
+
 @-webkit-keyframes GradientAnimation {
     0%{background-position:0% 50%}
     50%{background-position:100% 50%}
@@ -394,4 +413,35 @@ input[type="text"] {
     0%{background-position:0% 50%}
     50%{background-position:100% 50%}
     100%{background-position:0% 50%}
+}
+
+/* MEDIA QUERIES */
+
+@media only screen and (max-width: 1120px) {
+    section.UserState {
+        max-width: 500px;
+        margin: auto;
+    }
+    section.PoolData {
+        min-width: 95%;
+    }
+}
+
+@media only screen and (max-width: 735px) {
+    body {
+        font-size: 22px;
+    }
+    section.PoolData {
+        min-width: auto;
+    }
+}
+
+@media only screen and (max-width: 430px) {
+    #app {
+        padding: 50px 5px;
+    }
+
+    section.UserState {
+        min-width: auto;
+    }
 }
