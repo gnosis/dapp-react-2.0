@@ -46,7 +46,7 @@ const displayTime = (sec, locale = 'de-DE', timeZone = 'Europe/Berlin') => (sec 
 const netIdToName = (id) => {
   switch (id) {
     case 1:
-      return 'Ethereum Mainnet'
+      return 'Mainnet'
 
     case 2:
       return 'Morden'
