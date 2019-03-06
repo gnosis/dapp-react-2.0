@@ -1,6 +1,6 @@
 {
   "name": "dx-mgn-pool-react",
-  "version": "0.0.1-RC7",
+  "version": "0.0.1-RC8",
   "description": "Dx-Mgn-Pool React frontend",
   "main": "src/index.js",
   "scripts": {
