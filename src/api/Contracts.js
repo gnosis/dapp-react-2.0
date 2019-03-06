@@ -117,6 +117,20 @@ if (process.env.FE_CONDITIONAL_ENV === 'development') {
   }
 }
 
+// TODO: change - dx-mgn-pool @0.1.0 has no networks-dev
+// in development use different contract addresses
+if (process.env.SHORT_TEST) {
+  // from networks-%ENV%.json
+  const networksDxMgnPoolDev = require('../../test/networks-david-short-test.json')
+
+  for (const contrArt of contractArtifacts) {
+    const { contractName } = contrArt
+    // assign networks from the file, overriding from /build/contracts with same network id
+    // but keeping local network ids
+    Object.assign(contrArt.networks, networksDxMgnPoolDev[contractName])
+  }
+}
+
 /**
  * TruffleWrappedContractArtifacts = TruffleContract(contract artifacts/json)
  * @returns {[string]} ContractsABI[] -> UNDEPLOYED

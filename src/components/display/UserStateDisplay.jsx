@@ -8,9 +8,9 @@ import {
   lockAllMgn,
 } from '../../api'
 
-import { cleanDataFromWei, splitAddress } from '../../api/utils'
+import { splitAddress } from '../../api/utils'
 
-import { DATA_LOAD_STRING } from '../../globals'
+import { DATA_LOAD_STRING, FIXED_DECIMAL_AMOUNT } from '../../globals'
 
 const LockMGN = AsyncActionsHOC()
 
@@ -31,11 +31,12 @@ const UserStateDisplay = ({ NETWORK, USER, MGN_BALANCES }) =>
         <hr />
 
         <h5>mgn bAlances</h5>
-        {Object.keys(MGN_BALANCES).map(key => <p key={key + Math.random()}><span className="data-title">{key.toUpperCase().split('_').join(' ')}:</span> {cleanDataFromWei(MGN_BALANCES[key])}</p>)}
+        {Object.keys(MGN_BALANCES).map(key => <p key={key + Math.random()}><span className="data-title">{key.toUpperCase().split('_').join(' ')}:</span> {(MGN_BALANCES[key] && MGN_BALANCES[key] !== DATA_LOAD_STRING) && Number(MGN_BALANCES[key]).toFixed(FIXED_DECIMAL_AMOUNT)}</p>)}
         <hr />
         <LockMGN 
           asyncAction={lockAllMgn}
           buttonText="lock"
+          buttonOnly
           forceDisable={MGN_BALANCES.BALANCE === DATA_LOAD_STRING || MGN_BALANCES.BALANCE <= 0}
           info="Lock all your MGN at the end of the Pooling period - button will automatically enable itself"
           title="lock mgn tokens"

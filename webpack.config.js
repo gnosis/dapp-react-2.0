@@ -33,6 +33,7 @@ module.exports = (_, { mode }) => {
         SHOW_APP_DATA: JSON.stringify(process.env.SHOW_APP_DATA),
         VERSION: JSON.stringify(`${version}`),
         FE_CONDITIONAL_ENV: JSON.stringify(process.env.FE_CONDITIONAL_ENV || process.env.NODE_ENV),
+        SHORT_TEST: JSON.stringify(process.env.SHORT_TEST),
       },
     }),
   ]

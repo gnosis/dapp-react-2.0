@@ -1,0 +1,18 @@
+{
+    "Coordinator": {
+      "4": {
+        "events": {},
+        "links": {},
+        "address": "0x509589c415a102C3F834C4Ac0a07F6FF5737f289",
+        "transactionHash": "0xad2e252de8d2823102c5079e97bd28a8410cbae2de109e79c3d5cabf33504c9f"
+      }
+    },
+    "Migrations": {
+      "4": {
+        "events": {},
+        "links": {},
+        "address": "0xD8c9c343B56EaC07CF68543C931a612288f857Af",
+        "transactionHash": "0xcb47d801cc82f39f29bd5b15d59e3e9598b26bdf4a487900d6806bacb3bda25f"
+      }
+    }
+  }

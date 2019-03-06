@@ -1,0 +1,22 @@
+const { coord, dxMP } = temp1
+
+const dxMP2Add = await coord.dxMgnPool2.call()
+const dxMP1Add = await coord.dxMgnPool1.call()
+
+const acct = web3.currentProvider.selectedAddress
+
+const dxMgn1 = await dxMP.at(dxMP1Add)
+const dxMgn2 = await dxMP.at(dxMP2Add)
+
+// Trigger withdraw of deposits from dx (state 3)
+await Promise.all([
+    dxMgn1.triggerMGNunlockAndClaimTokens({ from: acct }),
+    dxMgn2.triggerMGNunlockAndClaimTokens({ from: acct }),
+])
+
+// Trigger withdraw of mgn from dx (state 4 (last))
+await Promise.all([
+    dxMgn1.withdrawUnlockedMagnoliaFromDx({ from: acct }),
+    dxMgn2.withdrawUnlockedMagnoliaFromDx({ from: acct }),
+])
+

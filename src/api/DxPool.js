@@ -142,9 +142,48 @@ async function init() {
   const getCurrentPoolingEndTime2 = async () => dxMP2.poolingPeriodEndTime.call()
 
   /**
+   * Get back user's participation status
+   * @param {string} userAccount 
+   */
+  const getParticipationStatus1 = async userAccount => dxMP1.hasParticpationWithdrawn(userAccount)
+  const getParticipationStatus2 = async userAccount => dxMP2.hasParticpationWithdrawn(userAccount)
+
+  /**
+   * withdrawDepositPool1
+   * @description - Withdraws all of users Deposit from Pool 1
+   * @param { string } userAccount 
+   */
+  const withdrawDepositPool1 = async userAccount => dxMP1.withdrawDeposit({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+  withdrawDepositPool1.call = async userAccount => dxMP1.withdrawDeposit.call({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE }) 
+
+  /**
+   * withdrawDepositPool2
+   * @description - Withdraws all of users Deposit from Pool 2
+   * @param { string } userAccount 
+   */
+  const withdrawDepositPool2 = async userAccount => dxMP2.withdrawDeposit({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+  withdrawDepositPool2.call = async userAccount => dxMP2.withdrawDeposit.call({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+
+  /**
+   * withdrawMagnoliaPool1
+   * @description - Withdraws all of users MGN from Pool 1
+   * @param { string } userAccount 
+   */
+  const withdrawMagnoliaPool1 = async userAccount => dxMP1.withdrawMagnolia({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+  withdrawMagnoliaPool1.call = async userAccount => dxMP1.withdrawMagnolia.call({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+
+  /**
+   * withdrawMagnoliaPool2
+   * @description - Withdraws all of users MGN from Pool 2
+   * @param { string } userAccount 
+   */
+  const withdrawMagnoliaPool2 = async userAccount => dxMP2.withdrawMagnolia({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+  withdrawMagnoliaPool2.call = async userAccount => dxMP2.withdrawMagnolia.call({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+
+  /**
    * withdrawMGNandDepositsFromPools
    */
-  const withdrawMGNandDepositsFromPools = async () => coord.withdrawMGNandDepositsFromBothPools({ gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+  const withdrawMGNandDepositsFromPools = async userAccount => coord.withdrawMGNandDepositsFromBothPools({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
 
   /* 
   const getLatestAuctionIndex = ({ sell: { address: t1 }, buy: { address: t2 } }) =>
@@ -192,7 +231,13 @@ async function init() {
     getCurrentPoolingEndTime2,
     calculateClaimableMgnAndDeposits1,
     calculateClaimableMgnAndDeposits2,
+    getParticipationStatus1,
+    getParticipationStatus2,
     withdrawMGNandDepositsFromPools,
+    withdrawDepositPool1,
+    withdrawDepositPool2,
+    withdrawMagnoliaPool1,
+    withdrawMagnoliaPool2,
     // event,
     // allEvents,
   }

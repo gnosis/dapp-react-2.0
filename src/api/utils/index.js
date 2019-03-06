@@ -96,9 +96,21 @@ const netIdToWebsocket = (id) => {
 }
 
 // const cleanData = data => (data && isBN(data) ? fromWei(data) : data)
-const cleanDataFromWei = data => (data && data !== DATA_LOAD_STRING) && Number(fromWei(data.toString())).toFixed(FIXED_DECIMAL_AMOUNT)
+const cleanDataFromWei = data => (data && data !== DATA_LOAD_STRING) && Number(data.toString() / (10 ** 18)).toFixed(FIXED_DECIMAL_AMOUNT)
+// const cleanDataFromWei = data => (data && data !== DATA_LOAD_STRING) && Number(fromWei(data.toString())).toFixed(FIXED_DECIMAL_AMOUNT)
 const cleanDataNative = (data, dec) => (data && data !== DATA_LOAD_STRING) && Number(toBN(data).div(toBN(10).pow(toBN(dec)))).toFixed(FIXED_DECIMAL_AMOUNT)
 const mapTS = (arr, type) => (Array.isArray(arr) ? arr : [arr]).map(item => (type === 'fromWei' && isBN(item) ? fromWei(item) : item).toString())
+
+/**
+ * checkLoadingOrNonZero
+ * @description Function that takes an arbitrary amount of args and returns whether the cummulative reduced sum is truthy
+ * @param  {...any} args
+ */
+const checkLoadingOrNonZero = (...args) => {
+  // if any arguments = 'LOADING...' returns false
+  if (args.some(i => (i === DATA_LOAD_STRING || i === '...'))) return false
+  return !!args.reduce((acc, i) => ((+acc) + (+i)))
+}
 
 const flattener = obj => Object.assign(
   {},
@@ -129,7 +141,7 @@ const shallowDifferent = (obj1, obj2) => {
 
 const splitAddress = (addr) => {
 	const { length } = addr
-	return addr.slice(0, 6) + '...' + addr.slice(length - 4)
+	return `${addr.slice(0, 6)}...${addr.slice(length - 4)}`
 }
 
 const poolStateIdToName = (id) => {
@@ -151,7 +163,10 @@ const poolStateIdToName = (id) => {
   }
 }
 
+const delay = async (time = 1000) => new Promise(acc => setTimeout(() => acc('Delay done'), time))
+
 export {
+  delay,
   toBN,
   isBN,
   toWei,
@@ -169,6 +184,7 @@ export {
   shallowDifferent,
   poolStateIdToName,
   splitAddress,
+  checkLoadingOrNonZero,
 }
 
 /**

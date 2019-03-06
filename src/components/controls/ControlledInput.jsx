@@ -1,17 +1,19 @@
 import React from 'react'
 
-export const TextInput = ({ onChange, disabled }) => (
+export const TextInput = ({ onChange, disabled, ...rest }) => (
     <input
         disabled={disabled}
         onChange={onChange}
-        type="text" 
+        type="text"
+        {...rest}
     />
 )
 
-export const NumberInput = ({ onChange, disabled }) => (
+export const NumberInput = ({ onChange, disabled, ...rest }) => (
     <input
         disabled={disabled}
         onChange={onChange}
         type="number" 
+        {...rest}
     />
 )

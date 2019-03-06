@@ -43,8 +43,8 @@ export const RINKEBY_WETH = require('@gnosis.pm/util-contracts/networks.json').E
 export const BN_4_PERCENT = toBN(104)
 
 export const POOL_STATES = {
-  POOLING: 'Pooling',
-  POOLING_ENDED: 'Pooling Ended',
-  DEPOSIT_WITHDRAW_FROM_DX: 'Deposit Withdrawn From Dx',
-  MGN_UNLOCKED: 'Mgn Unlocked',
+  POOLING: 'POOLING',
+  POOLING_ENDED: 'POOLINGENDED',
+  DEPOSIT_WITHDRAW_FROM_DX: 'DEPOSITWITHDRAWFROMDX',
+  MGN_UNLOCKED: 'MGNUNLOCKED',
 }

@@ -1,30 +1,29 @@
-import React, { /* useEffect, */ useState } from 'react'
+import React, { useState } from 'react'
 
 import DataDisplayVisualContainer from '../display/DataDisplay'
+
+import { delay } from '../../api/utils'
 
 const AsyncActionsHOC = Component => ({
     asyncAction,
     buttonText = 'subMit',
+    buttonOnly,
     forceDisable,
-    inputChangeDispatch,
-    globalInput,
     info,
     title,
-    ...rest
+    ...rest,
 }) => {
     // State - button blocked disables use of butotn
     // e.g on blockchain action - released on receipt
     const [buttonBlocked, setButtonBlocked] = useState(false)
-    const [inputAmount, setInputAmount] = useState(null)
+    const [inputAmount, setInputAmount] = useState(undefined)
     const [viewInfoStatus, setViewInfoStatus] = useState(false)
-    const [error, setError] = useState(null)
-
-    // useEffect()
+    const [error, setError] = useState(undefined)
 
     const handleInfoButtonClick = () => setViewInfoStatus(!viewInfoStatus)
 
     const handleChange = ({ target }) => {
-        setError(null)
+        setError(undefined)
         let { value } = target
         
         // replace commas w/periods
@@ -32,26 +31,32 @@ const AsyncActionsHOC = Component => ({
         
         const validValue = !!(+value)
         if (!validValue && value) {
-            return setError('Please enter a valid amount')
+            setError('Please enter a valid amount')
         }
         
-        return inputChangeDispatch ? inputChangeDispatch(value) : setInputAmount(value)
+        return setInputAmount(value)
     }
-    
+
     const handleClick = async () => {
         try {
-            if (!globalInput && !inputAmount) throw new Error('Please enter a valid amount')
+            if (!buttonOnly && !inputAmount) throw new Error('Please enter a valid amount')
             // disable button
             setButtonBlocked(true)
 
             // fire action
-            await asyncAction()
+            const asyncRec = !buttonOnly ? await asyncAction({ amount: inputAmount }) : await asyncAction()
+            console.debug('Async Action successful: ', asyncRec)
+            
+            // For blockchain MM delay
+            await delay(10000)
         } catch (err) {
 			console.error('AsyncActionsHOC ERROR: ', err)
             setError(err.message || err)
+
+            await delay(4000)
         } finally {
-            inputChangeDispatch && inputChangeDispatch(null)
-            setInputAmount(null)  
+            setError(undefined)
+            setInputAmount('0')
             // reEnable button
             setButtonBlocked(false)
         }
@@ -72,16 +77,19 @@ const AsyncActionsHOC = Component => ({
                     disabled={forceDisable || buttonBlocked}
                     onChange={handleChange}
                     value={inputAmount}
-                    {...rest} 
                 />}
-            <button
-                className="ctaButton"
-                disabled={forceDisable || error || buttonBlocked}
-                onClick={handleClick}
-            >
-                {buttonText}
-            </button>
-            {error && <pre className="data-pre-error">{error}</pre>}
+            {error 
+                ? 
+                <pre className="data-pre-error">{error}</pre> 
+                :
+                <button
+                    className="ctaButton"
+                    disabled={forceDisable || error || buttonBlocked}
+                    onClick={handleClick}
+                >
+                    {buttonText}
+                </button>
+            }
         </div>
     )
 }

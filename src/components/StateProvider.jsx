@@ -4,9 +4,10 @@ import {
   getPoolTokensInfo, 
   approveAndDepositIntoDxMgnPool,
   calculateDxMgnPoolState,
+  withdrawMGNandDepositsFromSinglePool,
 } from '../api'
 
-import { toWei, cleanDataNative } from '../api/utils'
+import { toWei, cleanDataNative, checkLoadingOrNonZero } from '../api/utils'
 
 const defaultState = {
   USER: {
@@ -23,24 +24,28 @@ const defaultState = {
     POOL1: {
       YOUR_SHARE: 0,
       TOTAL_SHARE: 0,
+      TOTAL_CLAIMABLE_DEPOSIT: '...',
+      TOTAL_CLAIMABLE_MGN: '...',
+      TOKEN_BALANCE: '...',
       DEPOSIT_TOKEN: '...',
       DEPOSIT_SYMBOL: '...',
       DEPOSIT_DECIMALS: '...',
       SECONDARY_TOKEN: '...',
       SECONDARY_SYMBOL: '...',
       SECONDARY_DECIMALS: '...',
-      TOKEN_BALANCE: '...',
     },
     POOL2: {
       YOUR_SHARE: 0,
       TOTAL_SHARE: 0,
+      TOTAL_CLAIMABLE_DEPOSIT: '...',
+      TOTAL_CLAIMABLE_MGN: '...',
+      TOKEN_BALANCE: '...',
       DEPOSIT_TOKEN: '...',
       DEPOSIT_SYMBOL: '...',
       DEPOSIT_DECIMALS: '...',
       SECONDARY_TOKEN: '...',
       SECONDARY_SYMBOL: '...',
       SECONDARY_DECIMALS: '...',
-      TOKEN_BALANCE: '...',
     },
   },
   TOKEN_MGN: {
@@ -74,6 +79,7 @@ const memoizedContextValue = ({
   setDepositAmount,
   setInputAmount,
   setPoolTokenInfo,
+  withdrawDepositAndMGN,
 }) => {
   if (setToContext.has(state)) return setToContext.get(state)
 
@@ -92,6 +98,7 @@ const memoizedContextValue = ({
     setDepositAmount,
     setInputAmount,
     setPoolTokenInfo,
+    withdrawDepositAndMGN,
   }
 
   setToContext.set(state, contextValue)
@@ -380,13 +387,12 @@ function AppProvider(props) {
         payload: INPUT_AMOUNT,
       }),
 
-    setDepositAmount: async (poolNumber) => {
-      const { 
-        USER: { ACCOUNT },
-        INPUT_AMOUNT,
-      } = state
-
-      const receipt = await approveAndDepositIntoDxMgnPool(poolNumber, toWei(INPUT_AMOUNT), ACCOUNT)
+    setDepositAmount: async ({
+      poolNumber,
+      amount = state.INPUT_AMOUNT,
+      userAccount = state.USER.ACCOUNT,
+    }) => {
+      const receipt = await approveAndDepositIntoDxMgnPool(poolNumber, toWei(amount), userAccount)
 			console.debug('APPROVE and DEPOSIT into DX-MGN-POOL TX RECEIPT: ', receipt)
     },
 
@@ -462,6 +468,31 @@ function AppProvider(props) {
           balance2: cleanDataNative(balance2, decimals2), // balance2 && (balance2.toString() / 10 ** decimals2),
         },
       })
+    },
+
+    withdrawDepositAndMGN: async (pool) => {
+      if (!pool) throw new Error('No pool specified')
+
+      const { 
+        USER: { ACCOUNT },
+        DX_MGN_POOL: {
+          [pool]: {
+            TOTAL_CLAIMABLE_DEPOSIT: tcd,
+            TOTAL_CLAIMABLE_MGN: tcm,
+          },
+          /* POOL2: {
+            TOTAL_CLAIMABLE_DEPOSIT: tcd2,
+            TOTAL_CLAIMABLE_MGN: tcm2,
+          }, */
+        },
+      } = state
+
+			console.debug('TCL: AppProvider -> tcd, tcm', tcd, tcm)
+      // PoolData.jsx checks that values are nonZero AND not 'LOADING...'
+      // before showing button - so no need to check here as well
+      if (!checkLoadingOrNonZero(tcd, tcm)) throw new Error('Nothing claimable!')
+
+      return withdrawMGNandDepositsFromSinglePool(ACCOUNT, pool)
     },
 
     // USER STATE SPECIFIC DISPATCHERS
