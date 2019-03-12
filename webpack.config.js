@@ -2,6 +2,7 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebPackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 const pkg = require('./package.json')
 
 const version = process.env.BUILD_VERSION || pkg.version
@@ -98,6 +99,13 @@ module.exports = (_, { mode }) => {
       splitChunks: {
         chunks: 'all',
       },
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            mangle: { keep_fnames: /BN/ }, // Note `mangle.properties` is `false` by default.
+          },
+        }),
+      ],
     },
     output,
   }
