@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
-import Providers from '../../api/providers'
+import { delay } from '../../api/utils'
+
+import Providers, { safeInjected, checkProviderOnWindow } from '../../api/providers'
 
 import { connect } from '../StateProvider'
 import { getAPI } from '../../api'
@@ -21,9 +23,20 @@ function WalletIntegration({
   state: { ACTIVE_PROVIDER }, 
   children,
 }) {
+  const [providersDetected, setProvidersDetected] = useState(false)
   const [error, _setError] = useState(undefined)
   const [initialising, _setInitialising] = useState(false)
   const [activeProviderSet, _setActiveProviderState] = useState(undefined)
+
+  useEffect(() => {
+    Promise.race([
+      delay(500),
+      safeInjected,
+    ]).then(async () => {
+      const provider = await checkProviderOnWindow()
+      setProvidersDetected(!!provider)
+    })
+  })
 
   // Fire once on load
   useEffect(() => {
@@ -90,7 +103,7 @@ function WalletIntegration({
   const walletSelector = () => (
     <section className="walletChooser">
       <h2>Please select a wallet</h2>
-      <div className={!initialising ? 'lightBlue' : ''}>
+      <div className={initialising || providersDetected ? '' : 'lightBlue'}>
         {Object.keys(Providers).map((provider, i) => {
           const providerObj = Providers[provider]
           return (
