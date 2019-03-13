@@ -113,7 +113,7 @@ function WalletIntegration({
               key={i}
               onClick={() => onChange(provider)}
             >
-              <h4 className="providerChoice">{`${providerObj.providerName}`}</h4>
+              <h4 className="providerChoice">{`${providerObj.providerName || ''}`}</h4>
             </div>
           )
         })}
