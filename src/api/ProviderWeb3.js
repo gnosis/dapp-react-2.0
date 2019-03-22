@@ -113,6 +113,8 @@ async function init() {
 
   const getBlockInfo = async (blockNumber = "pending") => web3.eth.getBlock(blockNumber)
 
+  if (process.env.NODE_ENV === 'development') window.web3 = web3  
+
   return {
     web3,
     web3WS,

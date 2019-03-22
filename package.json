@@ -17,10 +17,11 @@
     "start:local": "npm run dev",
     "start:localProd": "cross-env FE_CONDITIONAL_ENV='production' npm run dev",
     "start:shortTest": "cross-env SHORT_TEST='true' npm run dev",
-    "rpc": "npx ganache-cli -d --mnemonic 'candy maple cake sugar pudding cream honey rich smooth crumble sweet treat' --defaultBalanceEther '5000'",
+    "rpc": "npx ganache-cli -d -e 10000000000",
     "deploy": "npm run setup-rpc",
     "setup-rpc": "npx truffle migrate",
-    "fast-forward": "npx truffle exec trufflescripts/increase_time.js"
+    "fast-forward": "npx truffle exec trufflescripts/increase_time.js",
+    "auction": "npx truffle exec trufflescripts/auction.js"
   },
   "author": "W3stside <doohhello@gmail.com>(https://github.com/w3stside)",
   "license": "MIT",

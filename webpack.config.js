@@ -102,7 +102,7 @@ module.exports = (_, { mode }) => {
       minimizer: [
         new TerserPlugin({
           terserOptions: {
-            mangle: { keep_fnames: /BN/ }, // Note `mangle.properties` is `false` by default.
+            mangle: { keep_fnames: /^BN$/ }, // Note `mangle.properties` is `false` by default.
           },
         }),
       ],

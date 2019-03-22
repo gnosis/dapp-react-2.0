@@ -1,30 +1,16 @@
 /* eslint no-console:0 */
 module.exports = (web3) => {
-  const getTime = (blockNumber = 'latest') => web3.eth.getBlock(blockNumber).timestamp
-
-  const mineCurrentBlock = () => web3.currentProvider.send({
-    jsonrpc: '2.0',
-    method: 'evm_mine',
-    params: [],
-    id: 0,
-  })
-
-  const increaseTimeBy = (seconds, dontMine) => {
+  const increaseTimeBy = async (seconds, dontMine) => {
     if (seconds < 0) {
       throw new Error('Can\'t decrease time in testrpc')
     }
 
     if (seconds === 0) return
 
-    web3.currentProvider.send({
-      jsonrpc: '2.0',
-      method: 'evm_increaseTime',
-      params: [seconds],
-      id: 0,
-    })
+    await increaseTime(seconds)
 
     if (!dontMine) {
-      mineCurrentBlock()
+      await mineBlock()
     }
   }
 
@@ -34,18 +20,42 @@ module.exports = (web3) => {
     increaseTimeBy(increaseBy, dontMine)
   }
 
-  const makeSnapshot = () => web3.currentProvider.send({ jsonrpc: '2.0', method: 'evm_snapshot' }).result
-
-  const revertSnapshot = snapshotID => new Promise((resolve, reject) => {
-    web3.currentProvider.sendAsync({ jsonrpc: '2.0', method: 'evm_revert', params: [snapshotID] }, (err) => {
-      if (!err) {
-        console.log('Revert Success')
-        resolve(snapshotID)
-      } else {
-        reject(err)
-      }
+  function mineBlock() {
+    return web3Send({
+      method: 'evm_mine',
     })
-  })
+  }
+
+  function increaseTime(num) {
+    if (num <= 0) {
+      console.log('No need to increase time')
+      return
+    }
+    return web3Send({
+      method: 'evm_increaseTime', params: [num],
+    })
+  }
+
+  async function makeSnapshot() {
+    return (await web3Send({
+      method: 'evm_snapshot',
+    })).result
+  }
+
+  function revertSnapshot(id) {
+    return web3Send({
+      method: 'evm_revert',
+      params: [id],
+    })
+  }
+
+  function web3Send(options) {
+    return new Promise((resolve, reject) => web3.currentProvider.send(options, (err, res) => (err ? reject(err) : resolve(res))))
+  }
+
+  async function getTime(block = 'latest') {
+    return (await web3.eth.getBlock(block)).timestamp
+  }
 
   return {
     getTime,
@@ -53,7 +63,7 @@ module.exports = (web3) => {
     setTime,
     makeSnapshot,
     revertSnapshot,
-    mineCurrentBlock,
+    mineBlock,
   }
 }
 

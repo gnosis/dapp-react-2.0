@@ -22,15 +22,15 @@ module.exports = async () => {
   >>>>>>
   >>>>
   >>
-  Current time: ${new Date(getTime() * 1000)}
+  Current time: ${new Date(await getTime() * 1000)}
   ===========================================================================================
   `)
 
-  increaseTimeBy(time, dontMine)
+  await increaseTimeBy(time, dontMine)
 
   console.log(`
   ===========================================================================================
-  New time: ${new Date(getTime() * 1000)}
+  New time: ${new Date(await getTime() * 1000)}
   ===========================================================================================
   `)
 }

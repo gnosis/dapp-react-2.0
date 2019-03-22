@@ -84,16 +84,11 @@ export const safeInjected = new Promise((resolve) => {
 
 export const checkProviderOnWindow = async () => {
   if (typeof window !== 'undefined') {
-    console.log('window.ethereum: ', window.ethereum)
-    console.log('window.web3: ', window.web3)
-    console.log('window.web3.currentProvider: ', window.web3 && window.web3.currentProvider)
     if (window.ethereum) {
-      console.log('USING window.ethereum')
       await window.ethereum.enable()
       return window.ethereum
     }
     if (window.web3) {
-      console.log('USING window.web3.currentProvider')
       return window.web3.currentProvider
     }
   }

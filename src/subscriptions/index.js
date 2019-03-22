@@ -251,25 +251,88 @@ export const MGNPoolDataSubscription = createSubscription({
 })
 
 export default async function startSubscriptions() {
-    const { Web3 } = await getAPI()
+  const { Web3 } = await getAPI()
 
-    // get initial state populated
-    AccountSub.update()
-    BlockSub.update()
+  // get initial state populated
+  AccountSub.update()
+  BlockSub.update()
+  NetworkSub.update()
 
     // create filter listening for latest new blocks
-    const subscription = Web3.web3WS.eth.subscribe('newBlockHeaders')
+  const subscription = Web3.web3WS.eth.subscribe("newBlockHeaders")
 
-    subscription.on('data', (blockHeader) => {
-        console.debug('New block header - updating AccountSub, BlockSub + subscribers', blockHeader.timestamp)
-        AccountSub.update()
+  subscription.on("data", (blockHeader) => {
+    console.debug(
+      "New block header - updating AccountSub, BlockSub + subscribers",
+      blockHeader.timestamp,
+    )
+    // AccountSub.update()
         BlockSub.update()
     })
 
-    subscription.on('error', (err) => {
-        console.error('An error in newBlockHeaders WS subscription occurred - unsubscribing.', err.message || err)
+  subscription.on("error", (err) => {
+    console.error(
+      "An error in newBlockHeaders WS subscription occurred - unsubscribing.",
+      err.message || err,
+    )
         subscription.unsubscribe()
     })
 
-    return () => subscription && subscription.unsubscribe()
+  const unsubAcc = watchMMaskFor(Web3.web3.currentProvider, 'accountsChanged', () => AccountSub.update())
+  const unsubNetwork = watchMMaskFor(Web3.web3.currentProvider, 'networkChanged', () => NetworkSub.update())
+
+  return () => {
+    subscription && subscription.unsubscribe()
+    unsubAcc()
+    unsubNetwork()
+  }
+}
+
+function watchMMaskFor(provider, event, cb) {
+ if (typeof provider.on === 'function') {
+  provider.on(event, cb)
+  return () => provider.off(event, console.info)
+ }
+// noop
+ return () => {}
+}
+
+if (process.env.NODE_ENV === 'development') {
+  const withDevTools = typeof window !== "undefined" && window.__REDUX_DEVTOOLS_EXTENSION__
+
+  if (withDevTools) {
+    const subs = {
+      AccountSub,
+      BlockSub,
+      ETHbalanceSub,
+      MGNBalancesSub,
+      MGNPoolDataSub,
+      NetworkSub,
+    }
+
+    window.subs = subs
+  
+
+    const globalTools = window.__REDUX_DEVTOOLS_EXTENSION__.connect({ name: 'Global' })
+    const globalState = {}
+    
+    for (const name of Object.keys(subs)) {
+      const sub = subs[name]
+      const devTools = window.__REDUX_DEVTOOLS_EXTENSION__.connect({ name })
+
+      const state = sub.getState()
+      globalState[name] = state
+      
+      devTools.init(state)
+      
+      sub.subscribe((newState) => {
+        devTools.send('UPDATE', newState)
+
+        globalState[name] = newState
+        globalTools.send(name, globalState)
+      })
+    }
+
+    globalTools.init(globalState)
+  }
 }
