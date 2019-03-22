@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const HtmlWebPackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 const pkg = require('./package.json')
 
 const version = process.env.BUILD_VERSION || pkg.version
@@ -35,6 +36,27 @@ module.exports = (_, { mode }) => {
         VERSION: JSON.stringify(`${version}`),
         FE_CONDITIONAL_ENV: JSON.stringify(process.env.FE_CONDITIONAL_ENV || process.env.NODE_ENV),
         SHORT_TEST: JSON.stringify(process.env.SHORT_TEST),
+      },
+    }),
+    new FaviconsWebpackPlugin({
+      logo: './src/assets/MGN_token_white_on_blue.svg',
+      prefix: './', // puts favicons into root folder,
+      // which allows for not html content (like pdf) to fetch /favicon.icon from default location
+
+      // Generate a cache file with control hashes and
+      // don't rebuild the favicons until those hashes change
+      persistentCache: true,
+      icons: {
+        android: false,
+        appleIcon: false,
+        appleStartup: false,
+        coast: false,
+        favicons: true,
+        firefox: false,
+        opengraph: false,
+        twitter: false,
+        yandex: false,
+        windows: false,
       },
     }),
   ]
