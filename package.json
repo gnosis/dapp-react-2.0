@@ -1,6 +1,6 @@
 {
   "name": "dx-mgn-pool-react",
-  "version": "0.0.1-RC14",
+  "version": "0.0.1-RC15-Spinnerz",
   "description": "Dx-Mgn-Pool React frontend",
   "main": "src/index.js",
   "scripts": {
