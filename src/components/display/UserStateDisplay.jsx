@@ -19,7 +19,7 @@ const UserStateDisplay = ({ NETWORK, USER, MGN_BALANCES }) =>
     title="Connected Wallet"
     colour="salmon"
     height="27.8em"
-    startOpen={false}
+    startOpen
     transition
   >
     {() =>

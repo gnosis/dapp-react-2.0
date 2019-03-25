@@ -47,7 +47,7 @@ const PoolData = ({
                     {showDataForState(DX_MGN_POOL.POOL1.TOTAL_CLAIMABLE_DEPOSIT, POOL1STATE, POOL_STATES.POOLING) 
                         && <p><span className="data-title">TOTAL CLAIMABLE DEPOSIT:</span> {DX_MGN_POOL.POOL1.TOTAL_CLAIMABLE_DEPOSIT}</p>}
                     <hr />
-                    <p><span className="data-title">[<strong>{DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL}</strong>] WALLET BALANCE:</span> {DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL === 'WETH' ? ((+DX_MGN_POOL.POOL1.TOKEN_BALANCE) + (+BALANCE)).toFixed(FIXED_DECIMAL_AMOUNT) : DX_MGN_POOL.POOL1.TOKEN_BALANCE}</p>
+                    <p><span className="data-title">[<strong>{DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL}</strong>] WALLET BALANCE:</span> {DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL === 'WETH' || DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL === 'ETH' ? ((+DX_MGN_POOL.POOL1.TOKEN_BALANCE) + (+BALANCE)).toFixed(FIXED_DECIMAL_AMOUNT) : DX_MGN_POOL.POOL1.TOKEN_BALANCE}</p>
                     <hr />
                     {POOL1STATE === POOL_STATES.POOLING 
                         && <DepositToken
@@ -79,7 +79,7 @@ const PoolData = ({
                                     title="Withdraw"
                                     buttonText="Withdraw"
                                     buttonOnly
-                                    info="Withdraw any of your MGN + Deposits"
+                                    info="Withdraw any available MGN + Deposits from Pool #1"
                                 />
                             }
                         </DataDisplayVisualContainer>
@@ -134,7 +134,7 @@ const PoolData = ({
                                     title="Withdraw"
                                     buttonText="Withdraw"
                                     buttonOnly
-                                    info="Withdraw any of your MGN + Deposits"
+                                    info="Withdraw any available MGN + Deposits from Pool #2"
                                 />
                             }
                         </DataDisplayVisualContainer>
