@@ -100,6 +100,15 @@ module.exports = (_, { mode }) => {
           },
         },
         {
+          test: /\.(svg)(\?[a-z0-9]+)?$/,
+          use: {
+            loader: 'file-loader',
+            options: {
+              name: 'icons/[name].[ext]',
+            },
+          },
+        },
+        {
           test: path.resolve(__dirname, './inline_render.js'),
           use: [
             'cache-loader',

@@ -13,24 +13,19 @@ function Countdown({
     BLOCK_TIMESTAMP,
     POOLING_PERIOD_END,
 }) { 
-    const [timeDifference, setTimeDifference] = useState((POOLING_PERIOD_END - BLOCK_TIMESTAMP) || '...')
+    const [timeDifference, setTimeDifference] = useState(undefined)
 
     useEffect(() => {
         if (BLOCK_TIMESTAMP && POOLING_PERIOD_END) {
             const newDiff = POOLING_PERIOD_END - BLOCK_TIMESTAMP
-			console.log('TCL: newDiff', newDiff)
-            
             // Set hours until PoolingEnds + 24 hours + 8 hours (for even auctions)
             setTimeDifference((newDiff / 3600 + 32).toFixed(2))
         }
     }, [BLOCK_TIMESTAMP, POOLING_PERIOD_END])
 
-    // dont show negative time
-    if (timeDifference <= 0) return null
-
     return (
         <div>
-            <h6>CLAIM & WITHDRAW IN APPROX. {formatTime(timeDifference)}</h6>
+            {(timeDifference && timeDifference > 0) && <h6>CLAIM & WITHDRAW IN APPROX. {formatTime(timeDifference)}</h6>}
         </div>
     )
 }

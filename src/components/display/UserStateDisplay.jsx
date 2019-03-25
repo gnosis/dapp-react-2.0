@@ -12,35 +12,42 @@ import { splitAddress } from '../../api/utils'
 
 import { DATA_LOAD_STRING, FIXED_DECIMAL_AMOUNT } from '../../globals'
 
+const userStateDisplayHeader = {
+  backgroundColor: '#fbcaca',
+}
+
 const LockMGN = AsyncActionsHOC()
 
 const UserStateDisplay = ({ NETWORK, USER, MGN_BALANCES }) =>
   <DataDisplayVisualContainer
     title="Connected Wallet"
     colour="salmon"
-    height="27.8em"
+    height={!(+MGN_BALANCES.BALANCE) ? '21.8em' : '27.8em'}
     startOpen
     transition
   >
     {() =>
       <>
-        <h5>account & netWork</h5>
+        <h5 style={userStateDisplayHeader}>account & netWork</h5>
         <p><span className="data-title">ACCOUNT:</span> <span title={USER.ACCOUNT}>{USER.ACCOUNT === DATA_LOAD_STRING ? DATA_LOAD_STRING : splitAddress(USER.ACCOUNT)}</span></p>
         <p><span className="data-title">NETWORK:</span> <strong>{NETWORK.toUpperCase()}</strong></p>
         <p><span className="data-title">[ETH] BALANCE:</span> {USER.BALANCE && USER.BALANCE}</p>
         <hr />
 
-        <h5>mgn bAlances</h5>
+        <h5 style={userStateDisplayHeader}>mgn bAlances</h5>
         {Object.keys(MGN_BALANCES).map(key => <p key={key + Math.random()}><span className="data-title">{key.toUpperCase().split('_').join(' ')}:</span> {(MGN_BALANCES[key] && MGN_BALANCES[key] !== DATA_LOAD_STRING) && Number(MGN_BALANCES[key]).toFixed(FIXED_DECIMAL_AMOUNT)}</p>)}
-        <hr />
-        <LockMGN 
-          asyncAction={lockAllMgn}
-          buttonText="lock"
-          buttonOnly
-          forceDisable={MGN_BALANCES.BALANCE === DATA_LOAD_STRING || MGN_BALANCES.BALANCE <= 0}
-          info="Lock all your MGN at the end of the Pooling period - button will automatically enable itself"
-          title="lock mgn tokens"
-        />
+        {!!(+MGN_BALANCES.BALANCE) && 
+        <>
+          <hr />
+          <LockMGN 
+            asyncAction={lockAllMgn}
+            buttonText="lock"
+            buttonOnly
+            forceDisable={MGN_BALANCES.BALANCE === DATA_LOAD_STRING || MGN_BALANCES.BALANCE <= 0}
+            info="Lock your MGN"
+            title={`lock ${MGN_BALANCES.BALANCE} mgn`}
+          />
+        </>}
       </>
     }
   </DataDisplayVisualContainer>
