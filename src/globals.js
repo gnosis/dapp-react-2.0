@@ -56,3 +56,8 @@ export const POOL_STATES_READABLE = {
   MGNUNLOCKED: 'MGN UNLOCKED',
   'loading...': 'loading...',
 }
+
+export const LOCALFORAGE_KEYS = {
+  VERIFICATION_SETTINGS: 'dxMgnPool-VerificationSettings',
+  COOKIE_SETTINGS: 'dxMgnPool-CookieSettings',
+}

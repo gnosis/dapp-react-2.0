@@ -27,16 +27,8 @@ function WalletIntegration({
   const [error, _setError] = useState(undefined)
   const [initialising, _setInitialising] = useState(false)
   const [activeProviderSet, _setActiveProviderState] = useState(undefined)
+  // const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
 
-  useEffect(() => {
-    Promise.race([
-      delay(500),
-      safeInjected,
-    ]).then(async () => {
-      const provider = await checkProviderOnWindow()
-      setProvidersDetected(!!provider)
-    })
-  })
 
   // Fire once on load
   useEffect(() => {
@@ -57,6 +49,15 @@ function WalletIntegration({
     try {
       // Set Modal
       showModal('Loading user data . . .')
+
+      // Gnosis Safe Fix
+      Promise.race([
+        delay(500),
+        safeInjected,
+      ]).then(async () => {
+        const provider = await checkProviderOnWindow()
+        setProvidersDetected(!!provider)
+      })
 
       // State setters
       _setError(undefined)
@@ -122,6 +123,22 @@ function WalletIntegration({
     </section>
   )
   
+  /* // TODO: remove
+  if (!disclaimerAccepted) {
+    return (
+      <DutchXVerfication
+        fontFamily="monospace"
+        relativeFontSize={13}
+
+        acceptDisclaimer={setDisclaimerAccepted}
+        saveLocalForageVerificationSettings={asyncSaveSettings}
+
+        localForageVerificationKey={LOCALFORAGE_KEYS.VERIFICATION_SETTINGS}
+        localForageCookiesKey={LOCALFORAGE_KEYS.COOKIE_SETTINGS}
+      />
+    )
+  } */
+
   if (error) return <h1>An error occurred: {error}</h1>
   
   if ((ACTIVE_PROVIDER && activeProviderSet) && !initialising) return children

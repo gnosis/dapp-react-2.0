@@ -124,6 +124,9 @@ module.exports = (_, { mode }) => {
     },
     resolve: {
       extensions: ['.js', '.jsx', '.json'],
+      alias: {
+        react: path.resolve('./node_modules/react'),
+      },
     },
     plugins,
     optimization: {

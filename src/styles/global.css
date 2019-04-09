@@ -1,6 +1,11 @@
 @import '~typeface-permanent-marker';
 @import '~typeface-major-mono-display';
 
+#modal {
+    position: relative;
+    z-index: 999;
+}
+
 body {
     font-family: 'Major Mono Display', monospace;
     

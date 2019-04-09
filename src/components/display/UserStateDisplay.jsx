@@ -45,7 +45,7 @@ const UserStateDisplay = ({ NETWORK, USER, MGN_BALANCES }) =>
             buttonOnly
             forceDisable={MGN_BALANCES.BALANCE === DATA_LOAD_STRING || MGN_BALANCES.BALANCE <= 0}
             info="Lock your MGN"
-            title={`lock ${MGN_BALANCES.BALANCE} mgn`}
+            title={`lock ${Number(MGN_BALANCES.BALANCE).toFixed(FIXED_DECIMAL_AMOUNT)} mgn`}
           />
         </>}
       </>
