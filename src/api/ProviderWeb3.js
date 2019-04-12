@@ -61,6 +61,9 @@ const setupWeb3Watchdog = async (web3) => {
 
 async function init() {
   const web3 = await setupWeb3()
+  // TODO: remove this garbage
+  web3.currentProvider.setMaxListeners(999)
+  
   const web3WS = await setupWeb3Watchdog(web3)
 
   /* 

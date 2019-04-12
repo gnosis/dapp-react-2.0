@@ -337,6 +337,20 @@ export const withdrawMGNandDepositsFromSinglePool = async (userAccount, pool) =>
   if (!pool) throw new Error('No pool specified!')
   userAccount = await fillDefaultAccount(userAccount)
   
+  const { DxPool: { withdrawDepositAndMagnoliaPool1, withdrawDepositAndMagnoliaPool2 } } = await getAPI()
+
+  if (pool === 'POOL1') {
+    const withdrawDepMag1 = await withdrawDepositAndMagnoliaPool1.call(userAccount) && await withdrawDepositAndMagnoliaPool1(userAccount)
+		console.debug('TCL: withdrawMGNandDepositsFromSinglePool -> withdrawDepositPool1', withdrawDepMag1)
+  } else {
+    const withdrawDepMag2 = await withdrawDepositAndMagnoliaPool2.call(userAccount) && await withdrawDepositAndMagnoliaPool2(userAccount)
+		console.debug('TCL: withdrawMGNandDepositsFromSinglePool -> withdrawDepositPool1', withdrawDepMag2)
+  }
+}
+/* export const withdrawMGNandDepositsFromSinglePool = async (userAccount, pool) => {
+  if (!pool) throw new Error('No pool specified!')
+  userAccount = await fillDefaultAccount(userAccount)
+  
   const { DxPool: { withdrawDepositPool1, withdrawDepositPool2, withdrawMagnoliaPool1, withdrawMagnoliaPool2 } } = await getAPI()
 
   if (pool === 'POOL1') {
@@ -350,46 +364,7 @@ export const withdrawMGNandDepositsFromSinglePool = async (userAccount, pool) =>
     const withdrawMgn2Rec = await withdrawMagnoliaPool2.call(userAccount) && await withdrawMagnoliaPool2(userAccount)
 		console.debug('TCL: withdrawMGNandDepositsFromSinglePool -> withdrawMagnoliaPool2', withdrawMgn2Rec)
   }
-}
-
-/**
- * withdrawMGNandDepositsFromAllPoolsManually
- * @description Calls individual withdrawMagnolia & Deposit as opposed to using delegate call (which is broken)
- * @param { string } userAccount
- */
-// export const withdrawMGNandDepositsFromAllPoolsManually = async (userAccount, pool) => {
-//   userAccount = await fillDefaultAccount(userAccount)
-//   const { 
-//     DxPool: { 
-//       getParticipationStatus1, getParticipationStatus2,
-//       withdrawDepositPool1, withdrawDepositPool2, 
-//       withdrawMagnoliaPool1, withdrawMagnoliaPool2,
-//     }, 
-//   } = await getAPI()
-
-//   const [hasParticipated1, hasParticipated2] = await Promise.all([getParticipationStatus1(userAccount), getParticipationStatus2(userAccount)])
-// 	console.debug('TCL: withdrawMGNandDepositsFromAllPoolsManually -> hasParticipated1, hasParticipated2', hasParticipated1, hasParticipated2)
-
-//   let pool1Receipt, pool2Receipt
-
-//   // check Pool 1 status and run actions
-//   // must NOT have participated yet AND have claimable Deposit
-//   if (!hasParticipated1) {
-//     pool1Receipt = await Promise.all([
-//       withdrawDepositPool1(userAccount),
-//       withdrawMagnoliaPool1(userAccount),
-//     ])
-//   }
-//   // check Pool 2 status and run actions
-//   if (!hasParticipated2) {
-//     pool2Receipt = await Promise.all([
-//       withdrawDepositPool2(userAccount),
-//       withdrawMagnoliaPool2(userAccount),
-//     ])
-//   }
-
-//   return [pool1Receipt, pool2Receipt]
-// }
+} */
 
 // ============
 // MISC

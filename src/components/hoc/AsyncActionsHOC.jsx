@@ -4,6 +4,8 @@ import DataDisplayVisualContainer from '../display/DataDisplay'
 
 import { delay } from '../../api/utils'
 
+import mgnSVG from '../../assets/MGN_token_white_on_blue.svg'
+
 const AsyncActionsHOC = Component => ({
     asyncAction,
     buttonText = 'subMit',
@@ -11,7 +13,6 @@ const AsyncActionsHOC = Component => ({
     forceDisable,
     info,
     title,
-    ...rest,
 }) => {
     // State - button blocked disables use of butotn
     // e.g on blockchain action - released on receipt
@@ -80,15 +81,23 @@ const AsyncActionsHOC = Component => ({
                 />}
             {error 
                 ? 
-                <pre className="data-pre-error">{error}</pre> 
+                    // Show error if error
+                    <pre className="data-pre-error">{error}</pre> 
                 :
-                <button
-                    className="ctaButton"
-                    disabled={forceDisable || error || buttonBlocked}
-                    onClick={handleClick}
-                >
-                    {buttonText}
-                </button>
+                    // Show img SVG spinning loader if loading/blocked
+                    // Else show button
+                    buttonBlocked 
+                        ? 
+                    // eslint-disable-next-line jsx-a11y/alt-text
+                    <img src={mgnSVG} className="loadingSVG" /> 
+                        :
+                    <button
+                        className="ctaButton"
+                        disabled={forceDisable || error || buttonBlocked}
+                        onClick={handleClick}
+                    >
+                        {buttonText}
+                    </button>
             }
         </div>
     )

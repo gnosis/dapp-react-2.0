@@ -8,7 +8,7 @@ import { TextInput } from '../controls/ControlledInput'
 
 import { checkLoadingOrNonZero } from '../../api/utils'
 
-import { POOL_STATES, DATA_LOAD_STRING, FIXED_DECIMAL_AMOUNT } from '../../globals'
+import { POOL_STATES, POOL_STATES_READABLE, DATA_LOAD_STRING, FIXED_DECIMAL_AMOUNT } from '../../globals'
 
 const DepositToken = AsyncActionsHOC(TextInput)
 const WithdrawMGNandDepositsFromBothPools = AsyncActionsHOC()
@@ -33,8 +33,8 @@ const PoolData = ({
             <div className="poolInnerContainer">
                 {/* POOL 1 */}
                 <pre className="poolDataContainer data-pre-blue">
-                    <h3>{DX_MGN_POOL.POOL1.DEPOSIT_TOKEN.toLowerCase()} [{DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL.toLowerCase()}]</h3>
-                    <p><span className="data-title">STATUS:</span> <strong>{POOL1STATE.toUpperCase()}</strong></p>
+                    <h3 style={{ backgroundColor: '#bae8f9' }}>{DX_MGN_POOL.POOL1.DEPOSIT_TOKEN.toLowerCase()} [{DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL.toLowerCase()}]</h3>
+                    <p><span className="data-title">STATUS:</span> <strong>{POOL_STATES_READABLE[POOL1STATE].toUpperCase()}</strong></p>
                     {DX_MGN_POOL.POOL1.POOLING_PERIOD_END !== DATA_LOAD_STRING && 
                         <p><span className="data-title">POOLING END TIME:</span> <span className="data-date">{new Date(DX_MGN_POOL.POOL1.POOLING_PERIOD_END * 1000).toLocaleString()}</span></p>}
                     <hr />
@@ -48,19 +48,24 @@ const PoolData = ({
                         && <p><span className="data-title">TOTAL CLAIMABLE DEPOSIT:</span> {DX_MGN_POOL.POOL1.TOTAL_CLAIMABLE_DEPOSIT}</p>}
                     <hr />
                     <p><span className="data-title">[<strong>{DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL}</strong>] WALLET BALANCE:</span> {DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL === 'WETH' || DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL === 'ETH' ? ((+DX_MGN_POOL.POOL1.TOKEN_BALANCE) + (+BALANCE)).toFixed(FIXED_DECIMAL_AMOUNT) : DX_MGN_POOL.POOL1.TOKEN_BALANCE}</p>
-                    <hr />
+                    
                     {POOL1STATE === POOL_STATES.POOLING 
-                        && <DepositToken
-                            asyncAction={params => setDepositAmount({ poolNumber: 1, ...params })}
-                            forceDisable={POOL1STATE !== POOL_STATES.POOLING}
-                            info={DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL === 'WETH' 
-                                ? 
-                                '[WETH] You may need to sign up to 3 TXs [Wrap, Approve, Deposit]' 
-                                : 
-                                `[${DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL}] You may need to sign up to 2 TXs [Approve, Deposit]`}
-                            title={`deposit [${DX_MGN_POOL.POOL1.DEPOSIT_TOKEN.toLowerCase()}]`}
-                            {...DX_MGN_POOL}
-                        />}
+                        && 
+                        <>
+                            <hr />
+                            <DepositToken
+                                asyncAction={params => setDepositAmount({ poolNumber: 1, ...params })}
+                                forceDisable={POOL1STATE !== POOL_STATES.POOLING}
+                                info={DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL === 'WETH' 
+                                    ? 
+                                    '[WETH] You may need to sign up to 3 TXs [Wrap, Approve, Deposit]' 
+                                    : 
+                                    `[${DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL}] You may need to sign up to 2 TXs [Approve, Deposit]`}
+                                title={`deposit [${DX_MGN_POOL.POOL1.DEPOSIT_TOKEN.toLowerCase()}]`}
+                                {...DX_MGN_POOL}
+                            />
+                        </>
+                    }
                     <Countdown POOLING_PERIOD_END={DX_MGN_POOL.POOL1.POOLING_PERIOD_END} />
                     {
                         // Non zero, claimable values?
@@ -79,7 +84,7 @@ const PoolData = ({
                                     title="Withdraw"
                                     buttonText="Withdraw"
                                     buttonOnly
-                                    info="Withdraw any of your MGN + Deposits"
+                                    info="Withdraw any available MGN + Deposits from Pool #1"
                                 />
                             }
                         </DataDisplayVisualContainer>
@@ -87,8 +92,8 @@ const PoolData = ({
                 </pre>
                 {/* POOL 2 */}
                 <pre className="poolDataContainer data-pre-purple">
-                    <h3>{DX_MGN_POOL.POOL1.SECONDARY_TOKEN.toLowerCase()} [{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL.toLowerCase()}]</h3>
-                    <p><span className="data-title">STATUS:</span> <strong>{POOL2STATE.toUpperCase()}</strong></p>
+                    <h3 style={{ backgroundColor: '#d1c6fb' }}>{DX_MGN_POOL.POOL1.SECONDARY_TOKEN.toLowerCase()} [{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL.toLowerCase()}]</h3>
+                    <p><span className="data-title">STATUS:</span> <strong>{POOL_STATES_READABLE[POOL2STATE].toUpperCase()}</strong></p>
                     {DX_MGN_POOL.POOL2.POOLING_PERIOD_END !== DATA_LOAD_STRING && 
                         <p><span className="data-title">POOLING END TIME:</span> <span className="data-date">{new Date(DX_MGN_POOL.POOL2.POOLING_PERIOD_END * 1000).toLocaleString()}</span></p>}
                     <hr />
@@ -103,19 +108,22 @@ const PoolData = ({
                     <hr />
                     <p><span className="data-title">[<strong>{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL}</strong>] WALLET BALANCE:</span> {DX_MGN_POOL.POOL1.SECONDARY_SYMBOL === 'WETH' ? ((+DX_MGN_POOL.POOL2.TOKEN_BALANCE) + (+BALANCE)).toFixed(FIXED_DECIMAL_AMOUNT) : DX_MGN_POOL.POOL2.TOKEN_BALANCE}</p>
 
-                    <hr />
                     {POOL2STATE === POOL_STATES.POOLING 
-                        && <DepositToken
-                            asyncAction={params => setDepositAmount({ poolNumber: 2, ...params })}
-                            forceDisable={POOL2STATE !== POOL_STATES.POOLING}
-                            info={
-                                DX_MGN_POOL.POOL1.SECONDARY_SYMBOL === 'WETH' ? 
-                                '[WETH] You may need to sign up to 3 TXs [Wrap, Approve, Deposit]' : 
-                                `[${DX_MGN_POOL.POOL1.SECONDARY_SYMBOL}] You may need to sign up to 2 TXs [Approve, Deposit]`
-                            }
-                            title={`deposit [${DX_MGN_POOL.POOL1.SECONDARY_TOKEN.toLowerCase()}]`}
-                            {...DX_MGN_POOL}
-                        />}
+                        && 
+                        <>
+                            <hr />
+                            <DepositToken
+                                asyncAction={params => setDepositAmount({ poolNumber: 2, ...params })}
+                                forceDisable={POOL2STATE !== POOL_STATES.POOLING}
+                                info={
+                                    DX_MGN_POOL.POOL1.SECONDARY_SYMBOL === 'WETH' ? 
+                                    '[WETH] You may need to sign up to 3 TXs [Wrap, Approve, Deposit]' : 
+                                    `[${DX_MGN_POOL.POOL1.SECONDARY_SYMBOL}] You may need to sign up to 2 TXs [Approve, Deposit]`
+                                }
+                                title={`deposit [${DX_MGN_POOL.POOL1.SECONDARY_TOKEN.toLowerCase()}]`}
+                                {...DX_MGN_POOL}
+                            />
+                        </>}
                     <Countdown POOLING_PERIOD_END={DX_MGN_POOL.POOL2.POOLING_PERIOD_END} />
                     {
                         // Non zero, claimable values?
@@ -134,7 +142,7 @@ const PoolData = ({
                                     title="Withdraw"
                                     buttonText="Withdraw"
                                     buttonOnly
-                                    info="Withdraw any of your MGN + Deposits"
+                                    info="Withdraw any available MGN + Deposits from Pool #2"
                                 />
                             }
                         </DataDisplayVisualContainer>

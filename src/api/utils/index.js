@@ -19,6 +19,48 @@ const windowLoaded = new Promise((resolve) => {
   })
 })
 
+export const web3CompatibleNetwork = async () => {
+  await windowLoaded
+  // blocks access via load
+  if (typeof window === 'undefined' || !window.web3) return (console.error('No Provider detected. Returning UNKNOWN network.'), 'UNKNOWN')
+
+  let { web3 } = window
+  let netID
+
+  // irregular APIs - Opera, new MM, some other providers
+  if (web3.currentProvider && !web3.version) {
+    const Web3 = require('web3')
+    console.warn('Non-Metamask or Gnosis Safe Provider injected web3 API detected')
+
+    window.web3 = web3 = new Web3(web3.currentProvider)
+  }
+
+  // 1.X.X API
+  if (typeof web3.version === 'string') {
+    netID = await new Promise((accept, reject) => {
+      web3.eth.net.getId((err, res) => {
+        if (err) {
+          reject(new Error(`UNKNOWN ${err}`))
+        } else {
+          accept(res)
+        }
+      })
+    })
+  } else {
+    // 0.XX.xx API
+    // without windowLoaded web3 can be injected but network id not yet set
+    netID = await new Promise((a, r) => {
+      web3.version.getNetwork((e, res) => {
+        if (e) return r(new Error(`UNKNOWN ${e}`))
+
+        return a(res)
+      })
+    })
+  }
+
+  return netID
+}
+
 const zeroDecimalsRegEx = /\.?0+$/
 const decimalChecker = (n) => {
   const indOfDecimal = n.indexOf('.')
