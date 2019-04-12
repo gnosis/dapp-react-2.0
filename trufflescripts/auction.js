@@ -102,6 +102,8 @@ const main = async () => {
 
   try {
     for (const step of steps) {
+      // each loop depends on the next - await here
+      // eslint-disable-next-line no-await-in-loop
       await runStep(step, participatingAccounts, contracts, master)
     }
   } catch (error) {
@@ -226,9 +228,9 @@ async function createAuction({ dx, ethToken, gnoToken }) {
   console.log('\tauctionIndex: ', auctionIndex.toString(), '\n')
 }
 
-async function depositToPools({ ethPool, gnoPool, ethToken, gnoToken }, accounts) {
+async function depositToPools({ ethPool, gnoPool }, accounts) {
   const amount = depositAmount
-  console.log(`\nDepositing ${amount} WETH and GNO to EthPool and GnoPoll respectively from each account`)
+  console.log(`\nDepositing ${amount} WETH and GNO to EthPool and GnoPool respectively from each account`)
 
   // console.log((await ethToken.balanceOf(accounts[0])).toString())
   // console.log((await ethToken.allowance(accounts[0], ethPool.address)).toString())
@@ -489,37 +491,6 @@ async function withdrawFunds({ ethPool, gnoPool, coordinator }, accounts) {
   await printPoolState(ethPool)
 }
 
-// const address2symbol = {}
-// async function getTokenSymbol(address) {
-//   address = address.toLowerCase()
-//   if (address2symbol[address]) return address2symbol[address]
-
-//   const request = {
-//     data: "0x95d89b41",
-//     to: address,
-//   }
-
-//   const symbolHex = await web3.eth.call(request)
-//   return (address2symbol[address] = web3.eth.abi.decodeParameter(
-//     "string",
-//     symbolHex,
-//   ))
-// }
-
-// const address2decimals = {}
-// async function getTokenDecimals(address) {
-//   address = address.toLowerCase()
-//   if (address2decimals[address]) return address2decimals[address]
-
-//   const request = {
-//     data: "0x313ce567",
-//     to: address,
-//   }
-
-//   const decimalsHex = await web3.eth.call(request)
-//   return (address2decimals[address] = new BN(decimalsHex))
-// }
-
 async function getContracts() {
   const dxProxy = await DXProxy.deployed()
   const dx = await DX.at(dxProxy.address)
@@ -543,7 +514,6 @@ async function getContracts() {
     gnoPool,
   }
 }
-
 
 async function printPoolState(pool) {
   const poolStateN = await pool.updateAndGetCurrentState.call()

@@ -17,7 +17,7 @@ async function init() {
     coord.dxMgnPool1.call(),
     coord.dxMgnPool2.call(),
   ])
-  
+
   const [dxMP1, dxMP2] = await Promise.all([
     dxMP.at(dxMP1Address),
     dxMP.at(dxMP2Address),
@@ -47,7 +47,7 @@ async function init() {
    * @returns { Promise<string[]> } - [ dtAddress, stAddress ]
    */
   const getPoolTokensAddresses = async () => Promise.all([
-    dxMP1.depositToken.call(), 
+    dxMP1.depositToken.call(),
     dxMP1.secondaryToken.call(),
   ])
 
@@ -94,7 +94,7 @@ async function init() {
    * @param { string } userAddress
    * @returns { BN } getMGNBalance as <BN>
    */
-  const getMGNBalance = async (address, userAddress) => (await getTokenMGN(address)).balanceOf.call(userAddress)  
+  const getMGNBalance = async (address, userAddress) => (await getTokenMGN(address)).balanceOf.call(userAddress)
 
   /**
    * lockMGN
@@ -102,7 +102,7 @@ async function init() {
    * @param { string } address - Address
    * @param { string } userAddress - Address 
    */
-  const lockMGN = async (amount, address, userAddress) => (await getTokenMGN(address)).lockTokens(amount, { from: userAddress, gas: GAS_LIMIT, gasPrice: GAS_PRICE })  
+  const lockMGN = async (amount, address, userAddress) => (await getTokenMGN(address)).lockTokens(amount, { from: userAddress, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
 
   /**
    * depositIntoPool1
@@ -154,7 +154,7 @@ async function init() {
    * @param { string } userAccount 
    */
   const withdrawDepositPool1 = async userAccount => dxMP1.withdrawDeposit({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
-  withdrawDepositPool1.call = async userAccount => dxMP1.withdrawDeposit.call({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE }) 
+  withdrawDepositPool1.call = async userAccount => dxMP1.withdrawDeposit.call({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
 
   /**
    * withdrawDepositPool2
@@ -179,6 +179,22 @@ async function init() {
    */
   const withdrawMagnoliaPool2 = async userAccount => dxMP2.withdrawMagnolia({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
   withdrawMagnoliaPool2.call = async userAccount => dxMP2.withdrawMagnolia.call({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+  
+  /**
+   * withdrawDepositAndMagnoliaPool1
+   * @description - Withdraws all of users MGN from Pool 1
+   * @param { string } userAccount 
+   */
+  const withdrawDepositAndMagnoliaPool1 = async userAccount => dxMP1.withdrawDepositandMagnolia({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+  withdrawDepositAndMagnoliaPool1.call = async userAccount => dxMP2.withdrawDepositandMagnolia.call({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+  
+  /**
+   * withdrawDepositAndMagnoliaPool2
+   * @description - Withdraws all of users MGN from Pool 2
+   * @param { string } userAccount 
+   */
+  const withdrawDepositAndMagnoliaPool2 = async userAccount => dxMP2.withdrawDepositandMagnolia({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
+  withdrawDepositAndMagnoliaPool2.call = async userAccount => dxMP2.withdrawDepositandMagnolia.call({ from: userAccount, gas: GAS_LIMIT, gasPrice: GAS_PRICE })
 
   /**
    * withdrawMGNandDepositsFromPools
@@ -238,6 +254,8 @@ async function init() {
     withdrawDepositPool2,
     withdrawMagnoliaPool1,
     withdrawMagnoliaPool2,
+    withdrawDepositAndMagnoliaPool1,
+    withdrawDepositAndMagnoliaPool2,
     // event,
     // allEvents,
   }
