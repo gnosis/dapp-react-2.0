@@ -5,7 +5,7 @@ set -ev
 # Only:
 # - Tagged commits
 # - Security env variables are available.
-if [ -n "$TRAVIS_TAG" ] && [ -n "$PROD_DEPLOYMENT_HOOK_TOKEN" ] && [ -n "$PROD_DEPLOYMENT_HOOK_URL_DOMAIN" ]
+if [ -n "$TRAVIS_TAG" ] && [ -n "$PROD_DEPLOYMENT_HOOK_TOKEN" ] && [ -n "$PROD_DEPLOYMENT_HOOK_URL_DOMAIN" ] && [ -n "$PROD_DEPLOYMENT_HOOK_ID" ]
 then
   curl --silent --output /dev/null -X POST \
      -F token="$PROD_DEPLOYMENT_HOOK_TOKEN" \
