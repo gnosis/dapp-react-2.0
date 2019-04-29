@@ -23,6 +23,9 @@ function Countdown({
         }
     }, [BLOCK_TIMESTAMP, POOLING_PERIOD_END])
 
+    // dont show negative time
+    if (timeDifference <= 0) return null
+
     return (
         <div>
             {(timeDifference && timeDifference > 0) && <h6>CLAIM & WITHDRAW IN APPROX. {formatTime(timeDifference)}</h6>}

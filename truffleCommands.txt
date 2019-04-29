@@ -1,0 +1,21 @@
+coord = await Coordinator.deployed()
+
+pool1 = await DxMgnPool.at(await coord.dxMgnPool1.call()), pool2 = await DxMgnPool.at(await coord.dxMgnPool2.call())
+
+dx = await DutchExchange.at(await pool1.dx.call())
+
+ether = await EtherToken.at(await pool1.depositToken.call())
+
+totalDeposit1 = await pool1.totalDeposit.call(), totalDeposit2 = await pool2.totalDeposit.call(), totalPoolShare1 = await pool1.totalPoolShares.call(), totalPoolShare2 = await pool2.totalPoolShares.call()
+
+// Get individual PoolShare by address and aucIdx
+getPoolShares1 = async (address = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0', idx = 0) => pool1.participationsByAddress(address, idx), getPoolShares2 = async (address = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0', idx = 0) => pool2.participationsByAddress(address, idx)
+
+// CalculateClaimableDeposit
+calculateClaimableDeposit1 = async (address = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0', aucIdx = 0) => totalDeposit1.mul((await getPoolShares1(address, aucIdx)).poolShares).div(totalPoolShare1), calculateClaimableDeposit2 = async (address = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0', aucIdx = 0) => totalDeposit2.mul((await getPoolShares2(address, aucIdx)).poolShares).div(totalPoolShare2)
+
+// Looping function for claimable + MGN
+(await pool1.getAllClaimableMgnAndDeposits('0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'))['1'].map(i => console.log(i.toString()))
+
+// Problem
+// depositToken.balanceOf(pool1 (or pool2)) is wrong or small, why?
