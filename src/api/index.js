@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 // API
 import { getTokensAPI } from './Tokens'
 import { getWeb3API } from './ProviderWeb3'
@@ -340,31 +341,11 @@ export const withdrawMGNandDepositsFromSinglePool = async (userAccount, pool) =>
   const { DxPool: { withdrawDepositAndMagnoliaPool1, withdrawDepositAndMagnoliaPool2 } } = await getAPI()
 
   if (pool === 'POOL1') {
-    const withdrawDepMag1 = await withdrawDepositAndMagnoliaPool1.call(userAccount) && await withdrawDepositAndMagnoliaPool1(userAccount)
-		console.debug('TCL: withdrawMGNandDepositsFromSinglePool -> withdrawDepositPool1', withdrawDepMag1)
-  } else {
-    const withdrawDepMag2 = await withdrawDepositAndMagnoliaPool2.call(userAccount) && await withdrawDepositAndMagnoliaPool2(userAccount)
-		console.debug('TCL: withdrawMGNandDepositsFromSinglePool -> withdrawDepositPool1', withdrawDepMag2)
+    return await withdrawDepositAndMagnoliaPool1.call(userAccount) && withdrawDepositAndMagnoliaPool1(userAccount)
   }
+  // ELSE it's pool2
+  return await withdrawDepositAndMagnoliaPool2.call(userAccount) && withdrawDepositAndMagnoliaPool2(userAccount)
 }
-/* export const withdrawMGNandDepositsFromSinglePool = async (userAccount, pool) => {
-  if (!pool) throw new Error('No pool specified!')
-  userAccount = await fillDefaultAccount(userAccount)
-  
-  const { DxPool: { withdrawDepositPool1, withdrawDepositPool2, withdrawMagnoliaPool1, withdrawMagnoliaPool2 } } = await getAPI()
-
-  if (pool === 'POOL1') {
-    const withdrawDep1Rec = await withdrawDepositPool1.call(userAccount) && await withdrawDepositPool1(userAccount)
-		console.debug('TCL: withdrawMGNandDepositsFromSinglePool -> withdrawDepositPool1', withdrawDep1Rec)
-    const withdrawMgn1Rec = await withdrawMagnoliaPool1.call(userAccount) && await withdrawMagnoliaPool1(userAccount)
-		console.debug('TCL: withdrawMGNandDepositsFromSinglePool -> withdrawDepositPool1', withdrawMgn1Rec)
-  } else {
-    const withdrawDep2Rec = await withdrawDepositPool2.call(userAccount) && await withdrawDepositPool2(userAccount)
-    console.debug('TCL: withdrawMGNandDepositsFromSinglePool -> withdrawMagnoliaPool2', withdrawDep2Rec)
-    const withdrawMgn2Rec = await withdrawMagnoliaPool2.call(userAccount) && await withdrawMagnoliaPool2(userAccount)
-		console.debug('TCL: withdrawMGNandDepositsFromSinglePool -> withdrawMagnoliaPool2', withdrawMgn2Rec)
-  }
-} */
 
 // ============
 // MISC
@@ -527,7 +508,7 @@ async function isETH(tokenAddress, netId) {
 
   let ETH_ADDRESS
   
-  if (netId === '1') {
+  if (netId == 1) {
     // Mainnet
     const { MAINNET_WETH } = require('../globals')
     ETH_ADDRESS = MAINNET_WETH
@@ -536,7 +517,6 @@ async function isETH(tokenAddress, netId) {
     const { RINKEBY_WETH } = require('../globals')
     ETH_ADDRESS = RINKEBY_WETH
   }
-  
   return tokenAddress.toUpperCase() === ETH_ADDRESS.toUpperCase() ? ETH_ADDRESS : false
 }
 

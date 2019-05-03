@@ -28,7 +28,7 @@ const PoolData = ({
     hasClaimables2,
 }) =>
     <>
-        <h2>DutchX MGN pool - {DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL.toLowerCase()}/{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL.toLowerCase()}</h2>
+        <h2>dutchx mgn pool - {DX_MGN_POOL.POOL1.DEPOSIT_SYMBOL.toLowerCase()}/{DX_MGN_POOL.POOL1.SECONDARY_SYMBOL.toLowerCase()}</h2>
         <div className="poolContainer">
             <div className="poolInnerContainer">
                 {/* POOL 1 */}

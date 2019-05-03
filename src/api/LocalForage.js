@@ -4,13 +4,11 @@ import { web3CompatibleNetwork } from './utils'
 import { LOCALFORAGE_KEYS } from '../globals'
 
 export const loadLocalForage = async () => {
-    const [network, verificationSettings, cookieSettings] = await Promise.all([
+    const [network, verificationSettings/* , cookieSettings */] = await Promise.all([
         web3CompatibleNetwork(),
         localForage.getItem(LOCALFORAGE_KEYS.VERIFICATION_SETTINGS),
         localForage.getItem(LOCALFORAGE_KEYS.COOKIE_SETTINGS),
     ])
-
-    console.log("TCL: loadLocalForage -> verificationSettings, cookieSettings", verificationSettings, cookieSettings)
 
     if (verificationSettings) {
         // check disclaimer settings for networks accepted
