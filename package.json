@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@gnosis.pm/dutchx-verification-react": "^0.0.1-RC3",
-    "@gnosis.pm/dx-mgn-pool": "^0.2.0",
+    "@gnosis.pm/dx-mgn-pool": "0.2.3",
     "create-subscription": "^16.8.2",
     "css-loader": "^0.28.11",
     "localforage": "^1.7.1",
