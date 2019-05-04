@@ -35,16 +35,20 @@ body::-webkit-scrollbar-thumb {
 
 #app {
     display: flex;
-    margin: auto;
-    padding: 50px 10px;
+    margin: 0 auto;
+    /* padding: 0 10px 50px; */
     flex-flow: column nowrap;
-    /* min-height: 100vh; */
-    min-width: 93vw;
+    /* min-width: 93vw; */
+    min-width: 100%;
 }
 
 section {
     margin: auto;
     width: 100%;
+}
+
+section.Home, section.walletChooser {
+    max-width: 93%;
 }
 
 section.home {
@@ -473,9 +477,9 @@ input[type="text"] {
 }
 
 @media only screen and (max-width: 430px) {
-    #app {
+    /* #app {
         padding: 50px 5px;
-    }
+    } */
 
     section.UserState {
         min-width: auto;

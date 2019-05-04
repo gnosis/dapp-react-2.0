@@ -1,5 +1,9 @@
 import { toBN } from './api/utils'
 
+export const CONTENT_URLS = {
+  HOW_IT_WORKS: 'https://medium.com',
+}
+
 export const ETHEREUM_NETWORKS = {
   MAIN: 'MAIN',
   MORDEN: 'MORDEN',
