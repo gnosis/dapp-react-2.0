@@ -1,5 +1,20 @@
 import { toBN } from './api/utils'
 
+export const APP_URLS = {
+  LOCAL: [
+    'localhost', 
+    '0.0.0.0', 
+    '127.0.0.1',
+  ],
+  DEV: ['dx-mgn-pool.dev.gnosisdev.com'],
+  STAGING: ['dx-mgn-pool.staging.gnosisdev.com'],
+  PRODUCTION: {
+    MAIN: ['mgn-pool.slow.trade'],
+    RINKEBY: ['rinkeby.mgn-pool.slow.trade'],
+  },
+  PR_REVIEW_TEST: hostname => /^\w+--dxmgnpoolreact.review.gnosisdev.com$/.test(hostname),
+}
+
 export const CONTENT_URLS = {
   HOW_IT_WORKS: 'https://medium.com',
 }
