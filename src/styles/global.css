@@ -164,6 +164,22 @@ input[disabled], input:disabled {
     box-shadow: none;
 }
 
+.blockedModal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column nowrap;
+    height: 100vh;
+    width: 100%;
+
+    background: linear-gradient(-45deg, #858eaa, #cfa9d6/* #e5a1fc */, #b1bae6, #e8cdf1);
+    background-size: 600% 600%;
+
+    -webkit-animation: GradientAnimation 20s ease infinite;
+    -moz-animation: GradientAnimation 20s ease infinite;
+    animation: GradientAnimation 20s ease infinite;
+}
+
 section.Home {
     display: flex;
     flex-flow: row wrap;
