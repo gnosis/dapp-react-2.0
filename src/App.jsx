@@ -1,8 +1,10 @@
 import React from 'react'
 import { hot } from 'react-hot-loader'
+
 import { DutchXVerificationHOC } from '@gnosis.pm/dutchx-verification-react'
 
 import AppOnlineStatusBar from './components/display/AppOnlineStatus'
+import Blocked from './components/display/Modals/Blocked'
 import Home from './components/display/Home'
 import StateProvider from './components/StateProvider'
 import WalletIntegration from './components/controls/WalletIntegration'
@@ -15,7 +17,7 @@ import {
   GlobalSub,
 } from './subscriptions'
 
-const SubscribedApp = () => (
+const SubscribedApp = () =>
   <GlobalSubscription source={GlobalSub}>
     {subState =>
       <StateProvider subState={subState}>       
@@ -26,17 +28,18 @@ const SubscribedApp = () => (
       </StateProvider>
     }
   </GlobalSubscription>
-)
 
 const VerificationWrappedApp = DutchXVerificationHOC(SubscribedApp)(LOCALFORAGE_KEYS.VERIFICATION_SETTINGS, LOCALFORAGE_KEYS.COOKIE_SETTINGS)
 
 const App = ({
   disabledReason,
-}) =>
-  disabledReason
+}) => (
+  disabledReason 
     ?
-  <div><h1>BLOCKED</h1></div>
+  // App is blocked 
+  <Blocked /> 
     :
   <VerificationWrappedApp />
+)
 
 export default hot(module)(withErrorBoundary(App))
