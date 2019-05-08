@@ -21,12 +21,6 @@
       ]
     },
     "rules": {
-      "jsx-a11y/heading-has-content": 0,
-      "jsx-a11y/aria-role": 0,
-      "jsx-a11y/no-static-element-interactions": 0,
-      "jsx-a11y/label-has-for": 0,
-      "jsx-a11y/click-events-have-key-events": 0,
-      "jsx-a11y/no-noninteractive-element-interactions": 0,
       "linebreak-style": 0,
       "import/no-unresolved": [
         2,
