@@ -2,7 +2,7 @@ import React, { useReducer, useEffect } from 'react'
 import { 
   getAPI,
 } from '../api'
-import { State, ETHEREUM_NETWORKS, Balance, AppStore, DeployedContract, WalletProvider } from 'types';
+import { State, ETHEREUM_NETWORKS, Balance, AppStore, DeployedContract, WalletProvider, SubscriptionStateInterface } from 'types';
 import { ReactComponentLike } from 'prop-types';
 
 const defaultState: State = {
@@ -161,12 +161,7 @@ function reducer(state: State, action: any) {
 
 interface AppProviderProps {
   children?: any;
-  subState: {
-    account: Account,
-    timestamp: string,
-    balance: Balance,
-    network: ETHEREUM_NETWORKS,
-  }[]
+  subState: SubscriptionStateInterface;
 }
 
 function AppProvider(props: AppProviderProps) {

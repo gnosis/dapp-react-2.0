@@ -64,6 +64,6 @@ export const RINKEBY_WETH = require('@gnosis.pm/util-contracts/networks.json').E
 export const BN_4_PERCENT = toBN(104)
 
 export const LOCALFORAGE_KEYS = {
-  VERIFICATION_SETTINGS: 'dxMgnPool-VerificationSettings',
-  COOKIE_SETTINGS: 'dxMgnPool-CookieSettings',
+  VERIFICATION_SETTINGS: 'dapp-VerificationSettings',
+  COOKIE_SETTINGS: 'dapp-CookieSettings',
 }

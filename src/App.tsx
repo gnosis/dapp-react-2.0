@@ -18,7 +18,7 @@ import {
   GlobalSub,
 } from './subscriptions'
 
-import { Balance, ETHEREUM_NETWORKS } from 'types'
+import { SubscriptionStateInterface } from 'types'
 
 interface AppProps {
   disabledReason?: string;
@@ -26,13 +26,7 @@ interface AppProps {
 
 const SubscribedApp = () =>
   <GlobalSubscription source={GlobalSub}>
-    {(subState: [{
-      account: Account,
-      timestamp: string,
-      balance: Balance,
-      network: ETHEREUM_NETWORKS,
-    }
-  ]) =>
+    {(subState: SubscriptionStateInterface) =>
       <StateProvider subState={subState}>       
         <AppOnlineStatusBar />
         <WalletIntegration>
