@@ -1,12 +1,8 @@
-# Dx-Mgn-Pool React Web
+# DApp React Subs
 
-React frontend project interfacing with the [Dx-Mgn-Pool](https://github.com/gnosis/dx-mgn-pool) smartcontracts.
+React frontend project using React 16.8+ and subscriptions to state
 
 ----------------------------------
-
-## Dx-Mgn-Pool Protocol
-
-Please refer to the [Dx-Mgn-Pool](https://github.com/gnosis/dx-mgn-pool) repo for more in-depth information on how the protocol works.
 
 ## License
 

@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react'
 
+// State connector
+import { connect } from '../StateProvider'
+
+// API
+import { getAPI } from '../../api'
+import Providers, { safeInjected, checkProviderOnWindow } from '../../api/providers'
+import { getAppContracts } from '../../api/Contracts'
 import { delay } from '../../api/utils'
 
-import Providers, { safeInjected, checkProviderOnWindow } from '../../api/providers'
-
-import { connect } from '../StateProvider'
-import { getAPI } from '../../api'
-import { getAppContracts } from '../../api/Contracts'
-
+// HOC Components
 import ConfigDisplayerHOC from '../hoc/ConfigDisplayHOC'
 import ModalHOC from '../hoc/ModalHOC'
 
+// Subscription starter
 import startSubscriptions from '../../subscriptions'
 
 function WalletIntegration({ 
@@ -18,17 +21,17 @@ function WalletIntegration({
     registerProviders, 
     setActiveProvider,
     showModal,
-    setPoolTokenInfo,
   }, 
   state: { ACTIVE_PROVIDER }, 
   children,
 }) {
+  /* 
+   * STATE
+   */
+  const [activeProviderSet, setActiveProviderState] = useState(undefined)
+  const [error, setError] = useState(undefined)
+  const [initialising, setInitialising] = useState(false)
   const [providersDetected, setProvidersDetected] = useState(false)
-  const [error, _setError] = useState(undefined)
-  const [initialising, _setInitialising] = useState(false)
-  const [activeProviderSet, _setActiveProviderState] = useState(undefined)
-  // const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
-
 
   // Fire once on load
   useEffect(() => {
@@ -60,8 +63,8 @@ function WalletIntegration({
       })
 
       // State setters
-      _setError(undefined)
-      _setInitialising(true)
+      setError(undefined)
+      setInitialising(true)
 
       const chosenProvider = Providers[providerInfo]
       // initialize providers and return specific Web3 instances
@@ -71,7 +74,7 @@ function WalletIntegration({
       setActiveProvider(providerInfo)
       
       // Save web3 provider + notify state locally
-      _setActiveProviderState(true)
+      setActiveProviderState(true)
 
       // interface with contracts & connect entire DX API
       await getAppContracts()
@@ -88,13 +91,13 @@ function WalletIntegration({
       // Hide Modal, all good!
       showModal(undefined)
 
-      return _setInitialising(false)
+      return setInitialising(false)
     } catch (err) {
       console.error(err)
 
       showModal(undefined)      
-      _setInitialising(false)
-      _setError(error)
+      setInitialising(false)
+      setError(error)
 
       // Unsubscribe
       return unsub()
@@ -122,22 +125,6 @@ function WalletIntegration({
       {error && <h3>{error.message}</h3>}
     </section>
   )
-  
-  /* // TODO: remove
-  if (!disclaimerAccepted) {
-    return (
-      <DutchXVerfication
-        fontFamily="monospace"
-        relativeFontSize={13}
-
-        acceptDisclaimer={setDisclaimerAccepted}
-        saveLocalForageVerificationSettings={asyncSaveSettings}
-
-        localForageVerificationKey={LOCALFORAGE_KEYS.VERIFICATION_SETTINGS}
-        localForageCookiesKey={LOCALFORAGE_KEYS.COOKIE_SETTINGS}
-      />
-    )
-  } */
 
   if (error) return <h1>An error occurred: {error}</h1>
   
@@ -150,39 +137,29 @@ const mapProps = ({
   // state properties
   state: {
     PROVIDER: { ACTIVE_PROVIDER },
-    TOKEN_MGN: {
-      ADDRESS,
-    },
     LOADING,
     SHOW_MODAL,
-    INPUT_AMOUNT,
   },
   // dispatchers
   appLoading,
   registerProviders,
-  setActiveProvider,
-  getDXTokenBalance,
   saveContract,
+  setActiveProvider,
   showModal,
-  setPoolTokenInfo,
 }) => ({
   // state properties
   state: {
-    "[MGN] Address": ADDRESS,
     ACTIVE_PROVIDER,
     LOADING,
     SHOW_MODAL,
-    INPUT_AMOUNT,
   },
   // dispatchers
   dispatchers: {
     appLoading,
     registerProviders,
     setActiveProvider,
-    getDXTokenBalance,
     saveContract,
     showModal,
-    setPoolTokenInfo,
   },
 })
 

@@ -6,6 +6,7 @@ import AppOnlineStatusBar from './components/display/AppOnlineStatus'
 import Home from './components/display/Home'
 import StateProvider from './components/StateProvider'
 import WalletIntegration from './components/controls/WalletIntegration'
+import withErrorBoundary from './components/hoc/withErrorBoundary'
 
 import { LOCALFORAGE_KEYS } from './globals'
 
@@ -14,7 +15,7 @@ import {
   GlobalSub,
 } from './subscriptions'
 
-const App = () => (
+const SubscribedApp = () => (
   <GlobalSubscription source={GlobalSub}>
     {subState =>
       <StateProvider subState={subState}>       
@@ -27,4 +28,15 @@ const App = () => (
   </GlobalSubscription>
 )
 
-export default hot(module)(DutchXVerificationHOC(App)(LOCALFORAGE_KEYS.VERIFICATION_SETTINGS, LOCALFORAGE_KEYS.COOKIE_SETTINGS))
+const VerificationWrappedApp = DutchXVerificationHOC(SubscribedApp)(LOCALFORAGE_KEYS.VERIFICATION_SETTINGS, LOCALFORAGE_KEYS.COOKIE_SETTINGS)
+
+const App = ({
+  disabledReason,
+}) =>
+  disabledReason
+    ?
+  <div><h1>BLOCKED</h1></div>
+    :
+  <VerificationWrappedApp />
+
+export default hot(module)(withErrorBoundary(App))

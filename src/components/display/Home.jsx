@@ -1,8 +1,7 @@
 import React from 'react'
 
-import PoolData from './PoolData'
-import UserStateDisplay from './UserStateDisplay'
 import Footer from './Footer'
+import UserStateDisplay from './UserStateDisplay'
 
 const Home = () => (
   <section className="Home">
@@ -10,14 +9,15 @@ const Home = () => (
     <section className="UserState">
       <UserStateDisplay />
     </section>
-    
-    {/* DxMgnPool Data */}
+    {/* App Section */}
     <section className="PoolData">
-      <PoolData />
+      {/* Data */}
+      <div>
+        <code>Fake Data here...</code>
+      </div>
       {/* Footer */}
       <Footer />
     </section>
-
   </section>
 )
 

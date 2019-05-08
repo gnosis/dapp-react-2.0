@@ -31,11 +31,11 @@ module.exports = (_, { mode }) => {
     }),
     new webpack.DefinePlugin({
       'process.env': {
+        FE_CONDITIONAL_ENV: JSON.stringify(process.env.FE_CONDITIONAL_ENV || process.env.NODE_ENV),
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+        SHORT_TEST: JSON.stringify(process.env.SHORT_TEST),
         SHOW_APP_DATA: JSON.stringify(process.env.SHOW_APP_DATA),
         VERSION: JSON.stringify(`${version}`),
-        FE_CONDITIONAL_ENV: JSON.stringify(process.env.FE_CONDITIONAL_ENV || process.env.NODE_ENV),
-        SHORT_TEST: JSON.stringify(process.env.SHORT_TEST),
       },
     }),
     new FaviconsWebpackPlugin({
@@ -63,7 +63,7 @@ module.exports = (_, { mode }) => {
 
   if (prodBuild) {
     plugins.push(new MiniCssExtractPlugin({
-      filename: 'dx-mgn-pool-frontend-[name].[hash].css',
+      filename: 'dapp-react-frontend-[name].[hash].css',
       chunkFilename: '[id].[hash].css',
     }))
   }
