@@ -1,5 +1,5 @@
-@import '~typeface-permanent-marker';
-@import '~typeface-major-mono-display';
+/* @import '~typeface-permanent-marker';
+@import '~typeface-major-mono-display'; */
 
 #modal {
     position: relative;
@@ -7,7 +7,7 @@
 }
 
 body {
-    font-family: 'Major Mono Display', monospace;
+    font-family: monospace;
     
     display: flex;
     min-height: 100vh;
@@ -93,7 +93,6 @@ pre.poolDataContainer > p {
 }
 
 pre > h1, pre > h2, pre > h3, pre > h4, pre > h5, pre > h6 {
-    font-family: 'Major Mono Display';
     font-weight: 900;
     font-style: italic;
 
@@ -312,7 +311,7 @@ input[type="text"] {
     display: inline-block;
     padding: 5px;
     
-    font-family: 'Permanent Marker', cursive;
+    font-family: 'Permanent Marker', monospace;
     font-size: 1.8em;
     letter-spacing: 5px;
     margin: 0.5em 0;

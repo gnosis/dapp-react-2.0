@@ -68,6 +68,7 @@ module.exports = (_, { mode }) => {
     }))
   }
   return {
+    entry: "index.tsx",
     devtool: mode === 'development' && 'module-source-map',
     module: {
       rules: [
@@ -88,6 +89,18 @@ module.exports = (_, { mode }) => {
           exclude: /node_modules/,
           use: {
             loader: 'babel-loader',
+          },
+        },
+        {
+          test: /\.tsx?$/,
+          exclude: /(node_modules)/,
+          use: {
+            loader: 'awesome-typescript-loader',
+            options: {
+              useBabel: true,
+              useCache: true,
+              babelCore: '@babel/core',
+            },
           },
         },
         {
@@ -123,11 +136,19 @@ module.exports = (_, { mode }) => {
       ],
     },
     resolve: {
-      extensions: ['.js', '.jsx', '.json'],
-      alias: {
-        react: path.resolve('./node_modules/react'),
-      },
+      symlinks: false,
+      modules: [
+        `${__dirname}/src`,
+        'node_modules',
+      ],
+      extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
+    // resolve: {
+    //   extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+    //   alias: {
+    //     react: path.resolve('./node_modules/react'),
+    //   },
+    // },
     plugins,
     optimization: {
       splitChunks: {
