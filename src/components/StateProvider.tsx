@@ -2,7 +2,7 @@ import React, { useReducer, useEffect } from 'react'
 import { 
   getAPI,
 } from '../api'
-import { State, ETHEREUM_NETWORKS, Balance, AppStore, DeployedContract, WalletProvider, SubscriptionStateInterface } from 'types';
+import { State, AppStore, DeployedContract, WalletProvider, SubscriptionStateInterface } from 'types';
 import { ReactComponentLike } from 'prop-types';
 
 const defaultState: State = {

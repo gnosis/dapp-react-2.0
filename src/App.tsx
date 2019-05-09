@@ -36,7 +36,7 @@ const SubscribedApp = () =>
     }
   </GlobalSubscription>
 
-const VerificationWrappedApp = DutchXVerificationHOC(SubscribedApp)(LOCALFORAGE_KEYS.VERIFICATION_SETTINGS, LOCALFORAGE_KEYS.COOKIE_SETTINGS)
+const VerificationWrappedApp = process.env.FE_CONDITIONAL_ENV === 'production' ? SubscribedApp : DutchXVerificationHOC(SubscribedApp)(LOCALFORAGE_KEYS.VERIFICATION_SETTINGS, LOCALFORAGE_KEYS.COOKIE_SETTINGS)
 
 const App = ({
   disabledReason,
